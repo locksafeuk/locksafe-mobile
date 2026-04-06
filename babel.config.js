@@ -7,7 +7,13 @@ module.exports = function (api) {
     ],
     plugins: [
       // react-native-reanimated/plugin must be listed last
-      'react-native-reanimated/plugin',
+      // Disable worklets optimization to avoid dependency issues
+      [
+        'react-native-reanimated/plugin',
+        {
+          disableInlineStylesWarning: true,
+        },
+      ],
     ],
   };
 };
