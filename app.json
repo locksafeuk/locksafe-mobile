@@ -63,6 +63,14 @@
       "expo-secure-store",
       "expo-dev-client",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ],
+      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "LockSafe needs your location for real-time tracking."
