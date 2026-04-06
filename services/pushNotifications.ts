@@ -1,6 +1,8 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { subscribeToOneSignal, unsubscribeFromOneSignal } from './api';
+import { useEffect } from 'react';
+import { useRouter } from 'expo-router';
 
 // ==========================================
 // OneSignal Push Notification Service
@@ -37,11 +39,14 @@ export interface NotificationPayload {
 
 // Type definitions for OneSignal (without full SDK dependency)
 interface OneSignalNotification {
-  notificationId: string;
-  body: string;
-  title: string;
+  notificationId?: string;
+  body?: string;
+  title?: string;
   additionalData?: Record<string, unknown>;
 }
+
+// OneSignal module type
+type OneSignalModule = typeof import('react-native-onesignal');
 
 /**
  * Push Notification Service for handling OneSignal integration
@@ -49,6 +54,7 @@ interface OneSignalNotification {
 class PushNotificationService {
   private initialized = false;
   private playerId: string | null = null;
+  private oneSignalModule: OneSignalModule | null = null;
   private notificationOpenedHandlers: Array<
     (notification: NotificationPayload) => void
   > = [];
@@ -70,50 +76,55 @@ class PushNotificationService {
       // For now, we set up the structure and log
       console.log('Initializing OneSignal with App ID:', ONESIGNAL_APP_ID);
 
-      // Dynamic import of OneSignal to avoid build issues if not installed
+      // Try to load OneSignal SDK
       try {
-        const OneSignal = await import('react-native-onesignal');
+        // Use require instead of dynamic import for compatibility
+        const OneSignal = require('react-native-onesignal') as OneSignalModule;
+        this.oneSignalModule = OneSignal;
 
-        // Initialize OneSignal
-        OneSignal.default.initialize(ONESIGNAL_APP_ID);
+        // Initialize OneSignal using the static method
+        OneSignal.OneSignal.initialize(ONESIGNAL_APP_ID);
 
         // Request notification permission
-        const granted =
-          await OneSignal.default.Notifications.requestPermission(true);
+        const granted = await OneSignal.OneSignal.Notifications.requestPermission(true);
         console.log('Push notification permission:', granted);
 
-        // Get player ID
-        this.playerId = await OneSignal.default.User.getOnesignalId();
+        // Get player ID using the correct API
+        const onesignalId = await OneSignal.OneSignal.User.getOnesignalId();
+        this.playerId = onesignalId || null;
         console.log('OneSignal Player ID:', this.playerId);
 
-        // Set up notification handlers
-        OneSignal.default.Notifications.addEventListener(
+        // Set up notification handlers using type-safe wrapper
+        OneSignal.OneSignal.Notifications.addEventListener(
           'click',
-          (event: { notification: OneSignalNotification }) => {
-            this.handleNotificationOpened(event.notification);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (event: any) => {
+            const notification = event.notification as OneSignalNotification;
+            this.handleNotificationOpened(notification);
           }
         );
 
-        OneSignal.default.Notifications.addEventListener(
+        OneSignal.OneSignal.Notifications.addEventListener(
           'foregroundWillDisplay',
-          (event: {
-            notification: OneSignalNotification;
-            preventDefault: () => void;
-          }) => {
-            this.handleNotificationReceived(event.notification);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (event: any) => {
+            const notification = event.notification as OneSignalNotification;
+            this.handleNotificationReceived(notification);
           }
         );
 
         this.initialized = true;
       } catch (importError) {
         console.log(
-          'OneSignal SDK not available, push notifications disabled'
+          'OneSignal SDK not available, push notifications disabled',
+          importError
         );
         // Continue without push notifications
         this.initialized = true;
       }
     } catch (error) {
       console.error('Failed to initialize OneSignal:', error);
+      this.initialized = true;
     }
   }
 
@@ -130,20 +141,20 @@ class PushNotificationService {
     }
 
     try {
-      // Dynamic import
-      try {
-        const OneSignal = await import('react-native-onesignal');
+      // Use cached OneSignal module
+      if (this.oneSignalModule) {
+        try {
+          // Set external user ID
+          await this.oneSignalModule.OneSignal.login(userId);
 
-        // Set external user ID
-        await OneSignal.default.login(userId);
-
-        // Add user tags
-        await OneSignal.default.User.addTags({
-          user_type: userType,
-          platform: Platform.OS,
-        });
-      } catch (e) {
-        // OneSignal not available
+          // Add user tags
+          this.oneSignalModule.OneSignal.User.addTags({
+            user_type: userType,
+            platform: Platform.OS,
+          });
+        } catch (e) {
+          console.log('OneSignal user registration error:', e);
+        }
       }
 
       // Register with our backend
@@ -170,12 +181,13 @@ class PushNotificationService {
     if (!this.playerId) return;
 
     try {
-      // Dynamic import
-      try {
-        const OneSignal = await import('react-native-onesignal');
-        await OneSignal.default.logout();
-      } catch (e) {
-        // OneSignal not available
+      // Use cached OneSignal module
+      if (this.oneSignalModule) {
+        try {
+          await this.oneSignalModule.OneSignal.logout();
+        } catch (e) {
+          console.log('OneSignal logout error:', e);
+        }
       }
 
       // Unregister from our backend
@@ -194,8 +206,9 @@ class PushNotificationService {
    */
   async updateTags(tags: Record<string, string>): Promise<void> {
     try {
-      const OneSignal = await import('react-native-onesignal');
-      await OneSignal.default.User.addTags(tags);
+      if (this.oneSignalModule) {
+        this.oneSignalModule.OneSignal.User.addTags(tags);
+      }
     } catch (error) {
       console.error('Failed to update OneSignal tags:', error);
     }
@@ -321,9 +334,6 @@ export const pushNotificationService = new PushNotificationService();
 // React Hook for Push Notifications
 // ==========================================
 
-import { useEffect, useCallback } from 'react';
-import { useRouter } from 'expo-router';
-
 /**
  * React hook to handle push notification navigation
  */
@@ -334,7 +344,7 @@ export function usePushNotificationNavigation(): void {
     const unsubscribe = pushNotificationService.onNotificationOpened(
       (notification) => {
         const path = pushNotificationService.getDeepLinkPath(notification);
-        router.push(path as any);
+        router.push(path as Parameters<typeof router.push>[0]);
       }
     );
 

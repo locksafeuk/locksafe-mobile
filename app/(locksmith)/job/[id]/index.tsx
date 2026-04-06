@@ -87,8 +87,8 @@ export default function LocksmithJobDetailScreen() {
       const gps = await LocationService.getCurrentPosition();
       const response = await updateJobStatus(id!, newStatus, gps || undefined);
 
-      if (response.success) {
-        updateJobInList(response.job);
+      if (response.success && response.data) {
+        updateJobInList(response.data);
         await fetchJob(id!);
       }
     } catch (error: any) {

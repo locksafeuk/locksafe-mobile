@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
-import { post, get, setAuthToken, clearAuthToken, setUserData, getUserData, API_BASE_URL } from '../services/api';
+import { post, get as apiGet, setAuthToken, clearAuthToken, setUserData, getUserData, API_BASE_URL } from '../services/api';
 import type { Customer, Locksmith } from '../types';
 
 // Token and user storage keys
@@ -20,6 +20,38 @@ export interface AuthUser {
   isVerified?: boolean;
   stripeConnectOnboarded?: boolean;
   onboardingCompleted?: boolean;
+  // Locksmith-specific fields
+  rating?: number;
+  totalJobs?: number;
+  totalEarnings?: number;
+  isActive?: boolean;
+  licenseNumber?: string;
+  insuranceNumber?: string;
+  coverageAreas?: string[];
+  services?: string[];
+  yearsExperience?: number;
+  baseLat?: number;
+  baseLng?: number;
+  baseAddress?: string;
+  coverageRadius?: number;
+  defaultAssessmentFee?: number;
+  stripeConnectId?: string;
+  stripeConnectVerified?: boolean;
+  smsNotifications?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  isAvailable?: boolean;
+  lastAvailabilityChange?: string;
+  scheduleEnabled?: boolean;
+  scheduleTimezone?: string;
+  scheduleStartTime?: string;
+  scheduleEndTime?: string;
+  scheduleDays?: string[];
+  oneSignalPlayerId?: string;
+  termsAcceptedAt?: string;
+  profileImage?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface LoginResponse {
@@ -184,6 +216,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isVerified: response.user.isVerified,
           stripeConnectOnboarded: response.user.stripeConnectOnboarded,
           onboardingCompleted: response.user.onboardingCompleted,
+          rating: response.user.rating,
+          totalJobs: response.user.totalJobs,
+          totalEarnings: response.user.totalEarnings,
+          isActive: response.user.isActive,
+          licenseNumber: response.user.licenseNumber,
+          insuranceNumber: response.user.insuranceNumber,
+          coverageAreas: response.user.coverageAreas,
+          services: response.user.services,
+          yearsExperience: response.user.yearsExperience,
+          baseLat: response.user.baseLat,
+          baseLng: response.user.baseLng,
+          baseAddress: response.user.baseAddress,
+          coverageRadius: response.user.coverageRadius,
+          defaultAssessmentFee: response.user.defaultAssessmentFee,
+          stripeConnectId: response.user.stripeConnectId,
+          stripeConnectVerified: response.user.stripeConnectVerified,
+          smsNotifications: response.user.smsNotifications,
+          emailNotifications: response.user.emailNotifications,
+          pushNotifications: response.user.pushNotifications,
+          isAvailable: response.user.isAvailable,
+          lastAvailabilityChange: response.user.lastAvailabilityChange,
+          scheduleEnabled: response.user.scheduleEnabled,
+          scheduleTimezone: response.user.scheduleTimezone,
+          scheduleStartTime: response.user.scheduleStartTime,
+          scheduleEndTime: response.user.scheduleEndTime,
+          scheduleDays: response.user.scheduleDays,
+          oneSignalPlayerId: response.user.oneSignalPlayerId,
+          termsAcceptedAt: response.user.termsAcceptedAt,
+          profileImage: response.user.profileImage,
+          createdAt: response.user.createdAt,
+          updatedAt: response.user.updatedAt,
         };
 
         await setUserData(user);
@@ -278,6 +341,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isVerified: response.user.isVerified,
           stripeConnectOnboarded: response.user.stripeConnectOnboarded,
           onboardingCompleted: response.user.onboardingCompleted,
+          rating: response.user.rating,
+          totalJobs: response.user.totalJobs,
+          totalEarnings: response.user.totalEarnings,
+          isActive: response.user.isActive,
+          licenseNumber: response.user.licenseNumber,
+          insuranceNumber: response.user.insuranceNumber,
+          coverageAreas: response.user.coverageAreas,
+          services: response.user.services,
+          yearsExperience: response.user.yearsExperience,
+          baseLat: response.user.baseLat,
+          baseLng: response.user.baseLng,
+          baseAddress: response.user.baseAddress,
+          coverageRadius: response.user.coverageRadius,
+          defaultAssessmentFee: response.user.defaultAssessmentFee,
+          stripeConnectId: response.user.stripeConnectId,
+          stripeConnectVerified: response.user.stripeConnectVerified,
+          smsNotifications: response.user.smsNotifications,
+          emailNotifications: response.user.emailNotifications,
+          pushNotifications: response.user.pushNotifications,
+          isAvailable: response.user.isAvailable,
+          lastAvailabilityChange: response.user.lastAvailabilityChange,
+          scheduleEnabled: response.user.scheduleEnabled,
+          scheduleTimezone: response.user.scheduleTimezone,
+          scheduleStartTime: response.user.scheduleStartTime,
+          scheduleEndTime: response.user.scheduleEndTime,
+          scheduleDays: response.user.scheduleDays,
+          oneSignalPlayerId: response.user.oneSignalPlayerId,
+          termsAcceptedAt: response.user.termsAcceptedAt,
+          profileImage: response.user.profileImage,
+          createdAt: response.user.createdAt,
+          updatedAt: response.user.updatedAt,
         };
 
         await setUserData(user);
@@ -335,13 +429,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   // Check if current session is valid
   checkSession: async () => {
     try {
-      const response = await get<{
+      const response = await apiGet<{
         success: boolean;
         authenticated: boolean;
         user?: AuthUser;
       }>('/api/auth/session');
 
-      if (response.success && response.authenticated && response.user) {
+      if (response && response.success && response.authenticated && response.user) {
         // Update local user data with server data
         await setUserData(response.user);
         set({ user: response.user });
