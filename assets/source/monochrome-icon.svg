@@ -1,0 +1,26 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Android Monochrome Icon - White silhouette only -->
+  <!-- No keyhole cutout, solid white shapes -->
+
+  <!-- Lock Icon -->
+  <g transform="translate(512, 380)">
+    <!-- Shackle -->
+    <path d="M-72 0 A72 72 0 0 1 72 0"
+          fill="none"
+          stroke="white"
+          stroke-width="36"
+          stroke-linecap="round"/>
+
+    <!-- Lock Body -->
+    <rect x="-108" y="-8" width="216" height="180" rx="29" ry="29" fill="white"/>
+  </g>
+
+  <!-- SAFE Text -->
+  <text x="512" y="700"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-size="82"
+        font-weight="bold"
+        fill="white"
+        text-anchor="middle"
+        dominant-baseline="middle">SAFE</text>
+</svg>

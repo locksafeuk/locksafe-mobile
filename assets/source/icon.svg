@@ -1,0 +1,51 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="100%" style="stop-color:#c2410c"/>
+    </linearGradient>
+    <radialGradient id="glowGradient" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0)"/>
+    </radialGradient>
+    <clipPath id="roundedClip">
+      <rect width="1024" height="1024" rx="225" ry="225"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <g clip-path="url(#roundedClip)">
+    <rect width="1024" height="1024" fill="url(#bgGradient)"/>
+    <rect width="1024" height="1024" fill="url(#glowGradient)"/>
+  </g>
+
+  <!-- Lock Icon -->
+  <g transform="translate(512, 380)">
+    <!-- Shackle -->
+    <path d="M-92 0 A92 92 0 0 1 92 0"
+          fill="none"
+          stroke="white"
+          stroke-width="46"
+          stroke-linecap="round"/>
+
+    <!-- Lock Body -->
+    <rect x="-138" y="-10" width="276" height="230" rx="37" ry="37" fill="white"/>
+
+    <!-- Keyhole -->
+    <circle cx="0" cy="75" r="37" fill="#f97316"/>
+    <path d="M-23 110 L23 110 L14 175 L-14 175 Z" fill="#f97316"/>
+  </g>
+
+  <!-- SAFE Text -->
+  <text x="512" y="800"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-size="123"
+        font-weight="bold"
+        fill="white"
+        text-anchor="middle"
+        dominant-baseline="middle">SAFE</text>
+
+  <!-- Subtle Border -->
+  <rect x="5" y="5" width="1014" height="1014" rx="220" ry="220"
+        fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
+</svg>

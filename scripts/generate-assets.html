@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LockSafe Asset Generator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: white;
+      padding: 40px;
+      min-height: 100vh;
+    }
+    h1 { color: #f97316; margin-bottom: 8px; }
+    h2 { color: #94a3b8; font-weight: 400; font-size: 16px; margin-bottom: 40px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .card h3 { margin: 16px 0 4px; font-size: 14px; }
+    .card p { color: #64748b; font-size: 12px; margin: 0 0 16px; }
+    canvas {
+      border-radius: 12px;
+      max-width: 100%;
+      height: auto;
+      background: #fff;
+    }
+    button {
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    button:hover { background: #ea580c; }
+    .download-all {
+      background: #22c55e;
+      margin-bottom: 32px;
+      padding: 16px 32px;
+      font-size: 16px;
+    }
+    .download-all:hover { background: #16a34a; }
+    .instructions {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .instructions h3 { color: #f97316; margin-top: 0; }
+    .instructions ol { color: #94a3b8; line-height: 1.8; }
+    .instructions code {
+      background: #0f172a;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>LockSafe Asset Generator</h1>
+    <h2>Generate all required app icons and splash screens</h2>
+
+    <div class="instructions">
+      <h3>Instructions</h3>
+      <ol>
+        <li>Click <strong>"Download All Assets"</strong> to get a ZIP file with all assets</li>
+        <li>Or click individual download buttons for specific assets</li>
+        <li>Copy downloaded files to <code>locksafe-mobile/assets/</code></li>
+        <li>The icons use the LockSafe orange (#f97316) brand color</li>
+      </ol>
+    </div>
+
+    <button class="download-all" onclick="downloadAll()">Download All Assets (ZIP)</button>
+
+    <div class="grid" id="assets"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    // LockSafe brand colors
+    const ORANGE = '#f97316';
+    const ORANGE_DARK = '#c2410c';
+    const ORANGE_LIGHT = '#fed7aa';
+    const WHITE = '#ffffff';
+    const SLATE_900 = '#0f172a';
+
+    // Asset configurations
+    const assets = [
+      { id: 'icon', name: 'App Icon', size: 1024, file: 'icon.png', type: 'icon' },
+      { id: 'adaptive-icon', name: 'Android Adaptive Icon', size: 1024, file: 'adaptive-icon.png', type: 'adaptive-foreground' },
+      { id: 'android-foreground', name: 'Android Foreground', size: 1024, file: 'android-icon-foreground.png', type: 'adaptive-foreground' },
+      { id: 'android-background', name: 'Android Background', size: 1024, file: 'android-icon-background.png', type: 'adaptive-background' },
+      { id: 'android-monochrome', name: 'Android Monochrome', size: 1024, file: 'android-icon-monochrome.png', type: 'monochrome' },
+      { id: 'favicon', name: 'Favicon', size: 48, file: 'favicon.png', type: 'icon' },
+      { id: 'splash-icon', name: 'Splash Icon', size: 288, file: 'splash-icon.png', type: 'splash-icon' },
+      { id: 'splash-full', name: 'Splash Screen (Full)', size: 1284, file: 'splash.png', type: 'splash-full', height: 2778 },
+    ];
+
+    // Draw lock icon
+    function drawLockIcon(ctx, cx, cy, size, color = WHITE) {
+      const scale = size / 100;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+
+      // Lock body (rounded rectangle)
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(-30, -10, 60, 50, 8);
+      ctx.fill();
+
+      // Lock shackle (arc)
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(0, -10, 20, Math.PI, 0);
+      ctx.stroke();
+
+      // Keyhole
+      ctx.fillStyle = ORANGE;
+      ctx.beginPath();
+      ctx.arc(0, 12, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-5, 18);
+      ctx.lineTo(5, 18);
+      ctx.lineTo(3, 32);
+      ctx.lineTo(-3, 32);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Draw app icon
+    function drawAppIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, ORANGE);
+      gradient.addColorStop(1, ORANGE_DARK);
+
+      // Rounded rectangle background
+      const radius = size * 0.22;
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, radius);
+      ctx.fill();
+
+      // Inner glow
+      const glowGradient = ctx.createRadialGradient(
+        size * 0.3, size * 0.3, 0,
+        size * 0.5, size * 0.5, size * 0.6
+      );
+      glowGradient.addColorStop(0, 'rgba(255,255,255,0.15)');
+      glowGradient.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glowGradient;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, radius);
+      ctx.fill();
+
+      // Lock icon
+      drawLockIcon(ctx, size / 2, size * 0.42, size * 0.45);
+
+      // "SAFE" text
+      ctx.fillStyle = WHITE;
+      ctx.font = `bold ${size * 0.12}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SAFE', size / 2, size * 0.78);
+
+      // Subtle border
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = size * 0.01;
+      ctx.beginPath();
+      ctx.roundRect(size * 0.005, size * 0.005, size * 0.99, size * 0.99, radius);
+      ctx.stroke();
+    }
+
+    // Draw adaptive icon foreground (no background)
+    function drawAdaptiveForeground(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Transparent background
+      ctx.clearRect(0, 0, size, size);
+
+      // Lock icon (centered with safe zone padding - 66% of full size)
+      const iconSize = size * 0.35;
+      drawLockIcon(ctx, size / 2, size * 0.42, iconSize);
+
+      // "SAFE" text
+      ctx.fillStyle = WHITE;
+      ctx.font = `bold ${size * 0.08}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SAFE', size / 2, size * 0.68);
+    }
+
+    // Draw adaptive icon background
+    function drawAdaptiveBackground(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Solid orange background
+      ctx.fillStyle = ORANGE;
+      ctx.fillRect(0, 0, size, size);
+
+      // Subtle gradient overlay
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0.1)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+    }
+
+    // Draw monochrome icon
+    function drawMonochrome(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Transparent background
+      ctx.clearRect(0, 0, size, size);
+
+      // Draw lock icon in white
+      const scale = size * 0.003;
+      ctx.save();
+      ctx.translate(size / 2, size * 0.42);
+      ctx.scale(scale, scale);
+
+      // Lock body
+      ctx.fillStyle = WHITE;
+      ctx.beginPath();
+      ctx.roundRect(-30, -10, 60, 50, 8);
+      ctx.fill();
+
+      // Lock shackle
+      ctx.strokeStyle = WHITE;
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(0, -10, 20, Math.PI, 0);
+      ctx.stroke();
+
+      // Keyhole (transparent)
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'black';
+      ctx.beginPath();
+      ctx.arc(0, 12, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-5, 18);
+      ctx.lineTo(5, 18);
+      ctx.lineTo(3, 32);
+      ctx.lineTo(-3, 32);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+
+      // "SAFE" text
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = WHITE;
+      ctx.font = `bold ${size * 0.08}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SAFE', size / 2, size * 0.68);
+    }
+
+    // Draw splash icon
+    function drawSplashIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Transparent background
+      ctx.clearRect(0, 0, size, size);
+
+      // Lock icon centered
+      drawLockIcon(ctx, size / 2, size * 0.4, size * 0.5);
+
+      // "SAFE" text
+      ctx.fillStyle = WHITE;
+      ctx.font = `bold ${size * 0.15}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SAFE', size / 2, size * 0.78);
+    }
+
+    // Draw full splash screen
+    function drawSplashFull(canvas, width, height) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+
+      // Orange background
+      ctx.fillStyle = ORANGE;
+      ctx.fillRect(0, 0, width, height);
+
+      // Gradient overlay
+      const gradient = ctx.createRadialGradient(
+        width / 2, height / 3, 0,
+        width / 2, height / 2, height * 0.8
+      );
+      gradient.addColorStop(0, 'rgba(255,255,255,0.1)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0.15)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // Lock icon
+      const iconSize = Math.min(width, height) * 0.25;
+      drawLockIcon(ctx, width / 2, height * 0.38, iconSize);
+
+      // "LOCK" text
+      ctx.fillStyle = WHITE;
+      ctx.font = `300 ${height * 0.06}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('LOCK', width / 2, height * 0.54);
+
+      // "SAFE" text (bold)
+      ctx.font = `bold ${height * 0.08}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText('SAFE', width / 2, height * 0.62);
+
+      // Tagline
+      ctx.font = `300 ${height * 0.018}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.fillText('24/7 Emergency Locksmith Services', width / 2, height * 0.68);
+    }
+
+    // Generate all assets
+    function generateAssets() {
+      const container = document.getElementById('assets');
+      container.innerHTML = '';
+
+      assets.forEach(asset => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const canvas = document.createElement('canvas');
+        canvas.id = asset.id;
+
+        const displaySize = Math.min(200, asset.size);
+
+        switch (asset.type) {
+          case 'icon':
+            drawAppIcon(canvas, asset.size);
+            break;
+          case 'adaptive-foreground':
+            drawAdaptiveForeground(canvas, asset.size);
+            break;
+          case 'adaptive-background':
+            drawAdaptiveBackground(canvas, asset.size);
+            break;
+          case 'monochrome':
+            drawMonochrome(canvas, asset.size);
+            break;
+          case 'splash-icon':
+            drawSplashIcon(canvas, asset.size);
+            break;
+          case 'splash-full':
+            drawSplashFull(canvas, asset.size, asset.height);
+            break;
+        }
+
+        canvas.style.width = displaySize + 'px';
+        canvas.style.height = (asset.height ? displaySize * (asset.height / asset.size) : displaySize) + 'px';
+
+        card.innerHTML = `
+          <h3>${asset.name}</h3>
+          <p>${asset.size}${asset.height ? ' x ' + asset.height : ' x ' + asset.size} px</p>
+        `;
+        card.insertBefore(canvas, card.querySelector('h3'));
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Download';
+        btn.onclick = () => downloadAsset(asset);
+        card.appendChild(btn);
+
+        container.appendChild(card);
+      });
+    }
+
+    // Download single asset
+    function downloadAsset(asset) {
+      const canvas = document.getElementById(asset.id);
+      const link = document.createElement('a');
+      link.download = asset.file;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Download all assets as ZIP
+    async function downloadAll() {
+      const zip = new JSZip();
+
+      for (const asset of assets) {
+        const canvas = document.getElementById(asset.id);
+        const dataUrl = canvas.toDataURL('image/png');
+        const base64 = dataUrl.split(',')[1];
+        zip.file(asset.file, base64, { base64: true });
+      }
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.download = 'locksafe-assets.zip';
+      link.href = URL.createObjectURL(content);
+      link.click();
+    }
+
+    // Generate on load
+    window.onload = generateAssets;
+  </script>
+</body>
+</html>

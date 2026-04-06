@@ -1,0 +1,30 @@
+<svg width="288" height="288" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
+  <!-- Splash Icon - White lock on transparent background -->
+  <!-- Will be displayed on orange (#f97316) splash background -->
+
+  <!-- Lock Icon -->
+  <g transform="translate(144, 100)">
+    <!-- Shackle -->
+    <path d="M-50 0 A50 50 0 0 1 50 0"
+          fill="none"
+          stroke="white"
+          stroke-width="25"
+          stroke-linecap="round"/>
+
+    <!-- Lock Body -->
+    <rect x="-75" y="-5" width="150" height="125" rx="20" ry="20" fill="white"/>
+
+    <!-- Keyhole -->
+    <circle cx="0" cy="40" r="20" fill="#f97316"/>
+    <path d="M-12 58 L12 58 L7 95 L-7 95 Z" fill="#f97316"/>
+  </g>
+
+  <!-- SAFE Text -->
+  <text x="144" y="245"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-size="43"
+        font-weight="bold"
+        fill="white"
+        text-anchor="middle"
+        dominant-baseline="middle">SAFE</text>
+</svg>
