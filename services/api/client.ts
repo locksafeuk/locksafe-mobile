@@ -83,7 +83,17 @@ function resolveApiUrl(): string {
   // For web development, ALWAYS use the CORS proxy server to avoid cross-origin issues.
   // The proxy runs on port 3001 and forwards /api/* to www.locksafe.uk.
   // Start it with: node proxy-server.js
+  //
+  // When accessed via the Abacus AI preview URL, localhost:3001 won't work
+  // because the JS runs in the user's browser. Use the proxy's public URL instead.
   if (isWeb && typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('preview.abacusai.app')) {
+      // Replace the app's preview subdomain with the proxy's port-specific subdomain
+      // e.g. 13a18d74ac-8081.na104.preview.abacusai.app → 13a18d74ac-3001.na104.preview.abacusai.app
+      const proxyHost = hostname.replace(/-\d+\./, '-3001.');
+      return `https://${proxyHost}`;
+    }
     return 'http://localhost:3001';
   }
 

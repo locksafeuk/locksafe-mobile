@@ -13,9 +13,27 @@ const https = require('https');
 const PORT = process.env.PROXY_PORT || 3001;
 const TARGET_HOST = 'www.locksafe.uk';
 
+// Allowed CORS origins - localhost dev and Abacus AI preview URLs
+const ALLOWED_ORIGINS = [
+  /^http:\/\/localhost(:\d+)?$/,
+  /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
+  /^https:\/\/[a-z0-9-]+\.na\d+\.preview\.abacusai\.app$/,
+];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // allow non-browser requests
+  return ALLOWED_ORIGINS.some(pattern => pattern.test(origin));
+}
+
 const server = http.createServer((req, res) => {
-  // CORS headers for all responses
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  const origin = req.headers.origin;
+
+  // CORS headers - only allow known origins
+  if (isAllowedOrigin(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'null');
+  }
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,x-mobile-app,x-platform,x-app-version');
@@ -134,8 +152,9 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`\n🔀 CORS Proxy running on http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n🔀 CORS Proxy running on http://0.0.0.0:${PORT}`);
   console.log(`   Forwarding /api/* → https://${TARGET_HOST}/api/*`);
-  console.log(`   Health check: http://localhost:${PORT}/proxy-health\n`);
+  console.log(`   Health check: http://localhost:${PORT}/proxy-health`);
+  console.log(`   Preview URL:  https://13a18d74ac-${PORT}.na104.preview.abacusai.app\n`);
 });
