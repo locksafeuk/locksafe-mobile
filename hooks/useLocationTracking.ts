@@ -1,8 +1,8 @@
 /**
  * useLocationTracking Hook
  *
- * Provides real-time locksmith location tracking for customers.
- * Automatically polls the server for location updates.
+ * Provides real-time locksmith location tracking via server polling.
+ * Can be used for job-level location monitoring.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -144,7 +144,7 @@ export function useLocationTracking(
 /**
  * useLocksmithLocationStreaming Hook
  *
- * For locksmiths to stream their location to customers.
+ * For locksmiths to stream their location during active jobs.
  */
 
 import {

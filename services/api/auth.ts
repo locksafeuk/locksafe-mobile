@@ -1,5 +1,5 @@
 import { post, get } from './client';
-import type { Customer, Locksmith, ApiResponse } from '../../types';
+import type { Locksmith, ApiResponse } from '../../types';
 
 // ==========================================
 // Auth API Types
@@ -12,7 +12,7 @@ export interface LoginResponse {
     name: string;
     email: string;
     phone?: string;
-    type: 'customer' | 'locksmith' | 'admin';
+    type: string; // Backend returns 'customer' | 'locksmith' | 'admin', app enforces locksmith-only
     companyName?: string;
     isVerified?: boolean;
     stripeConnectOnboarded?: boolean;
@@ -20,12 +20,6 @@ export interface LoginResponse {
   };
   error?: string;
   redirectTo?: string;
-}
-
-export interface RegisterCustomerResponse {
-  success: boolean;
-  customer?: Customer;
-  error?: string;
 }
 
 export interface RegisterLocksmithResponse {
@@ -39,7 +33,7 @@ export interface SessionResponse {
   authenticated: boolean;
   user?: {
     id: string;
-    type: 'customer' | 'locksmith' | 'admin';
+    type: string;
     name: string;
     email: string;
   };
@@ -63,29 +57,12 @@ export interface ResetPasswordResponse {
 
 /**
  * Login with email and password
- * Works for both customers and locksmiths via unified endpoint
+ * Uses unified endpoint, locksmith-only in this app
  */
 export async function login(email: string, password: string): Promise<LoginResponse> {
   return post<LoginResponse>('/api/auth/login', {
     email: email.toLowerCase().trim(),
     password,
-  });
-}
-
-/**
- * Register a new customer account
- */
-export async function registerCustomer(data: {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-}): Promise<RegisterCustomerResponse> {
-  return post<RegisterCustomerResponse>('/api/auth/register', {
-    name: data.name,
-    email: data.email.toLowerCase().trim(),
-    phone: data.phone,
-    password: data.password,
   });
 }
 
@@ -160,37 +137,10 @@ export async function verifyEmail(token: string): Promise<ApiResponse> {
 }
 
 /**
- * Accept terms and conditions for customers
- */
-export async function acceptCustomerTerms(): Promise<ApiResponse> {
-  return post<ApiResponse>('/api/customer/accept-terms', {});
-}
-
-/**
  * Accept terms and conditions for locksmiths
  */
 export async function acceptLocksmithTerms(): Promise<ApiResponse> {
   return post<ApiResponse>('/api/locksmith/accept-terms', {});
-}
-
-/**
- * Update customer profile
- */
-export async function updateCustomerProfile(data: {
-  name?: string;
-  phone?: string;
-}): Promise<ApiResponse<Customer>> {
-  return post<ApiResponse<Customer>>('/api/customer/profile', data);
-}
-
-/**
- * Update customer password
- */
-export async function updateCustomerPassword(data: {
-  currentPassword: string;
-  newPassword: string;
-}): Promise<ApiResponse> {
-  return post<ApiResponse>('/api/customer/password', data);
 }
 
 /**

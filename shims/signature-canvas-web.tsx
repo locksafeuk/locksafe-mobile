@@ -25,7 +25,6 @@ const SignatureScreen = forwardRef(({ onOK, onClear, webStyle, style, penColor, 
 SignatureScreen.displayName = 'SignatureScreen';
 
 export default SignatureScreen;
-export type { SignatureViewRef as SignatureViewRef };
 
 const styles = StyleSheet.create({
   container: {

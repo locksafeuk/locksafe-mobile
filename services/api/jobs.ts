@@ -1,19 +1,14 @@
-import { post, get, put, patch, del } from './client';
+import { post, get, patch, del } from './client';
 import type {
   Job,
   JobStatus,
-  ProblemType,
-  PropertyType,
   GPSCoordinates,
   Quote,
   Photo,
   PhotoType,
   LocksmithApplication,
-  Signature,
   Review,
   ApiResponse,
-  JobCreateRequest,
-  JobCreateResponse,
 } from '../../types';
 
 // ==========================================
@@ -60,39 +55,10 @@ export interface QuoteResponse {
 // ==========================================
 
 /**
- * Create a new job request (Customer)
- */
-export async function createJob(data: JobCreateRequest): Promise<JobCreateResponse> {
-  return post<JobCreateResponse>('/api/jobs', {
-    name: data.name,
-    phone: data.phone,
-    email: data.email,
-    postcode: data.postcode.toUpperCase().trim(),
-    address: data.address,
-    problemType: data.problemType,
-    propertyType: data.propertyType,
-    description: data.description,
-    requestGps: data.requestGps,
-  });
-}
-
-/**
  * Get job by ID
  */
 export async function getJob(jobId: string): Promise<JobDetailResponse> {
   return get<JobDetailResponse>(`/api/jobs/${jobId}`);
-}
-
-/**
- * Get jobs for a customer
- */
-export async function getCustomerJobs(
-  customerId: string,
-  status?: JobStatus
-): Promise<JobListResponse> {
-  const params = new URLSearchParams({ customerId });
-  if (status) params.append('status', status);
-  return get<JobListResponse>(`/api/jobs?${params.toString()}`);
 }
 
 /**
@@ -151,18 +117,6 @@ export async function getJobApplications(
   jobId: string
 ): Promise<ApplicationsResponse> {
   return get<ApplicationsResponse>(`/api/jobs/${jobId}/applications`);
-}
-
-/**
- * Accept a locksmith application (Customer)
- */
-export async function acceptApplication(
-  jobId: string,
-  applicationId: string
-): Promise<ApiResponse> {
-  return post<ApiResponse>(`/api/jobs/${jobId}/accept-application`, {
-    applicationId,
-  });
 }
 
 /**
@@ -238,70 +192,6 @@ export async function getJobQuote(
   jobId: string
 ): Promise<{ success: boolean; quote: Quote | null }> {
   return get(`/api/jobs/${jobId}/quote`);
-}
-
-/**
- * Accept or decline a quote (Customer)
- */
-export async function respondToQuote(
-  jobId: string,
-  accepted: boolean
-): Promise<ApiResponse> {
-  return put<ApiResponse>(`/api/jobs/${jobId}/quote`, { accepted });
-}
-
-/**
- * Submit digital signature (Customer)
- */
-export async function submitSignature(
-  jobId: string,
-  data: {
-    signatureData: string; // Base64 image
-    signerName: string;
-    confirmsWork: boolean;
-    confirmsPrice: boolean;
-    confirmsSatisfied: boolean;
-    gps?: GPSCoordinates;
-  }
-): Promise<ApiResponse<Signature>> {
-  return post<ApiResponse<Signature>>(`/api/jobs/${jobId}/signature`, data);
-}
-
-/**
- * Confirm job completion (Customer)
- */
-export async function confirmJobCompletion(
-  jobId: string,
-  gps?: GPSCoordinates
-): Promise<ApiResponse> {
-  return post<ApiResponse>(`/api/jobs/${jobId}/confirm-completion`, { gps });
-}
-
-/**
- * Submit a review for a job (Customer)
- */
-export async function submitReview(
-  jobId: string,
-  data: {
-    rating: number; // 1-5
-    comment?: string;
-    isPublic?: boolean;
-  }
-): Promise<ApiResponse<Review>> {
-  return post<ApiResponse<Review>>(`/api/jobs/${jobId}/review`, {
-    rating: data.rating,
-    comment: data.comment,
-    isPublic: data.isPublic ?? true,
-  });
-}
-
-/**
- * Cancel a job with refund (Customer)
- */
-export async function cancelJobWithRefund(
-  jobId: string
-): Promise<ApiResponse> {
-  return post<ApiResponse>(`/api/jobs/${jobId}/cancel-refund`, {});
 }
 
 /**

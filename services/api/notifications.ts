@@ -22,22 +22,6 @@ export interface OneSignalSubscribeResponse {
 // ==========================================
 
 /**
- * Get notifications for a customer
- */
-export async function getCustomerNotifications(
-  customerId: string,
-  options?: {
-    unreadOnly?: boolean;
-    limit?: number;
-  }
-): Promise<NotificationsResponse> {
-  const params = new URLSearchParams({ customerId });
-  if (options?.unreadOnly) params.append('unreadOnly', 'true');
-  if (options?.limit) params.append('limit', options.limit.toString());
-  return get<NotificationsResponse>(`/api/notifications?${params.toString()}`);
-}
-
-/**
  * Get notifications for a locksmith
  */
 export async function getLocksmithNotifications(
@@ -63,15 +47,6 @@ export async function markNotificationAsRead(
 }
 
 /**
- * Mark all notifications as read for a customer
- */
-export async function markAllCustomerNotificationsAsRead(
-  customerId: string
-): Promise<ApiResponse> {
-  return post<ApiResponse>('/api/notifications/read-all', { customerId });
-}
-
-/**
  * Mark all notifications as read for a locksmith
  */
 export async function markAllLocksmithNotificationsAsRead(
@@ -86,7 +61,7 @@ export async function markAllLocksmithNotificationsAsRead(
 export async function subscribeToOneSignal(data: {
   playerId: string;
   userId: string;
-  userType: 'customer' | 'locksmith';
+  userType: 'locksmith';
 }): Promise<OneSignalSubscribeResponse> {
   return post<OneSignalSubscribeResponse>('/api/onesignal/subscribe', {
     playerId: data.playerId,
@@ -101,7 +76,7 @@ export async function subscribeToOneSignal(data: {
 export async function unsubscribeFromOneSignal(data: {
   playerId: string;
   userId: string;
-  userType: 'customer' | 'locksmith';
+  userType: 'locksmith';
 }): Promise<ApiResponse> {
   return post<ApiResponse>('/api/onesignal/unsubscribe', data);
 }
@@ -118,7 +93,7 @@ export async function subscribeToPushNotifications(data: {
     };
   };
   userId?: string;
-  userType?: 'customer' | 'locksmith';
+  userType?: 'locksmith';
 }): Promise<ApiResponse> {
   return post<ApiResponse>('/api/notifications/subscribe', data);
 }

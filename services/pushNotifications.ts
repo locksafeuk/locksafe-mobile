@@ -13,20 +13,15 @@ import { subscribeToOneSignal, unsubscribeFromOneSignal } from './api';
 const ONESIGNAL_APP_ID =
   Constants.expoConfig?.extra?.oneSignalAppId || 'YOUR_ONESIGNAL_APP_ID';
 
-// Notification types the app handles
+// Notification types the app handles (locksmith-only)
 export type NotificationType =
-  // Customer notifications
-  | 'LOCKSMITH_ASSIGNED'
-  | 'LOCKSMITH_EN_ROUTE'
-  | 'LOCKSMITH_ARRIVED'
-  | 'QUOTE_READY'
-  | 'WORK_COMPLETE'
-  | 'JOB_CANCELLED'
-  // Locksmith notifications
   | 'NEW_JOB_AVAILABLE'
   | 'JOB_ACCEPTED'
+  | 'LOCKSMITH_ASSIGNED'
   | 'QUOTE_ACCEPTED'
   | 'QUOTE_DECLINED'
+  | 'WORK_COMPLETE'
+  | 'JOB_CANCELLED'
   | 'PAYOUT_SENT'
   | 'SIGNATURE_REMINDER';
 
@@ -69,7 +64,7 @@ class PushNotificationService {
    */
   async registerUser(
     userId: string,
-    userType: 'customer' | 'locksmith'
+    userType: 'locksmith' = 'locksmith'
   ): Promise<boolean> {
     console.log(`Push notification user registration stub: ${userId}, ${userType}`);
     return true;
@@ -80,7 +75,7 @@ class PushNotificationService {
    */
   async unregisterUser(
     userId: string,
-    userType: 'customer' | 'locksmith'
+    userType: 'locksmith' = 'locksmith'
   ): Promise<void> {
     console.log(`Push notification user unregistration stub: ${userId}, ${userType}`);
   }
@@ -133,28 +128,20 @@ class PushNotificationService {
     const { type, jobId } = notification;
 
     switch (type) {
-      // Locksmith paths
-      case 'LOCKSMITH_ASSIGNED':
-      case 'LOCKSMITH_EN_ROUTE':
-      case 'LOCKSMITH_ARRIVED':
-      case 'QUOTE_READY':
-      case 'WORK_COMPLETE':
-      case 'JOB_CANCELLED':
-        return jobId ? `/(locksmith)/job/${jobId}` : '/(locksmith)/(tabs)';
       case 'NEW_JOB_AVAILABLE':
         return '/(locksmith)/(tabs)/available';
-      case 'JOB_ACCEPTED':
-        return jobId ? `/(locksmith)/job/${jobId}` : '/(locksmith)/(tabs)';
-      case 'QUOTE_ACCEPTED':
-      case 'QUOTE_DECLINED':
-        return jobId ? `/(locksmith)/job/${jobId}` : '/(locksmith)/(tabs)';
       case 'PAYOUT_SENT':
         return '/(locksmith)/(tabs)/earnings';
+      case 'JOB_ACCEPTED':
+      case 'LOCKSMITH_ASSIGNED':
+      case 'QUOTE_ACCEPTED':
+      case 'QUOTE_DECLINED':
+      case 'WORK_COMPLETE':
+      case 'JOB_CANCELLED':
       case 'SIGNATURE_REMINDER':
         return jobId ? `/(locksmith)/job/${jobId}` : '/(locksmith)/(tabs)';
-
       default:
-        return '/';
+        return '/(locksmith)/(tabs)';
     }
   }
 }

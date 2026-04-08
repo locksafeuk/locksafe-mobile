@@ -45,7 +45,7 @@ type EventCallback = (data: TrackingEvent) => void;
 
 /**
  * TrackingService provides real-time job tracking via Server-Sent Events (SSE).
- * Used by customers to track locksmith location during a job.
+ * Provides real-time job tracking via SSE for location and status updates.
  */
 class TrackingService {
   private eventSource: EventSource | null = null;

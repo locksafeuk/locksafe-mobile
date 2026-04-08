@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import type { Job, LocksmithApplication } from '../types';
 import {
   getJob,
-  getCustomerJobs,
   getLocksmithJobs,
   getAvailableJobs,
   getJobApplications,
@@ -10,7 +9,6 @@ import {
 
 interface JobState {
   currentJob: Job | null;
-  customerJobs: Job[];
   locksmithJobs: Job[];
   availableJobs: Job[];
   applications: LocksmithApplication[];
@@ -19,7 +17,6 @@ interface JobState {
 
   // Actions
   fetchJob: (jobId: string) => Promise<void>;
-  fetchCustomerJobs: (customerId: string) => Promise<void>;
   fetchLocksmithJobs: (locksmithId: string) => Promise<void>;
   fetchAvailableJobs: (locksmithId: string) => Promise<void>;
   fetchApplications: (jobId: string) => Promise<void>;
@@ -30,7 +27,6 @@ interface JobState {
 
 export const useJobStore = create<JobState>((set, get) => ({
   currentJob: null,
-  customerJobs: [],
   locksmithJobs: [],
   availableJobs: [],
   applications: [],
@@ -49,23 +45,6 @@ export const useJobStore = create<JobState>((set, get) => ({
     } catch (error: any) {
       set({
         error: error.response?.data?.error || 'Failed to fetch job',
-        isLoading: false,
-      });
-    }
-  },
-
-  fetchCustomerJobs: async (customerId) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await getCustomerJobs(customerId);
-      if (response.success) {
-        set({ customerJobs: response.jobs, isLoading: false });
-      } else {
-        set({ error: 'Failed to fetch jobs', isLoading: false });
-      }
-    } catch (error: any) {
-      set({
-        error: error.response?.data?.error || 'Failed to fetch jobs',
         isLoading: false,
       });
     }
@@ -127,12 +106,7 @@ export const useJobStore = create<JobState>((set, get) => ({
   },
 
   updateJobInList: (updatedJob) => {
-    const { customerJobs, locksmithJobs, availableJobs, currentJob } = get();
-
-    // Update in customerJobs
-    const updatedCustomerJobs = customerJobs.map((j) =>
-      j.id === updatedJob.id ? updatedJob : j
-    );
+    const { locksmithJobs, availableJobs, currentJob } = get();
 
     // Update in locksmithJobs
     const updatedLocksmithJobs = locksmithJobs.map((j) =>
@@ -150,7 +124,6 @@ export const useJobStore = create<JobState>((set, get) => ({
       currentJob?.id === updatedJob.id ? updatedJob : currentJob;
 
     set({
-      customerJobs: updatedCustomerJobs,
       locksmithJobs: updatedLocksmithJobs,
       availableJobs: updatedAvailableJobs,
       currentJob: updatedCurrentJob,

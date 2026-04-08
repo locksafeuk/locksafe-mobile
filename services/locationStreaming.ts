@@ -132,7 +132,6 @@ async function sendLocationUpdate(
 
 /**
  * Get current locksmith location for a job
- * Call this from customer app to track locksmith
  */
 export async function getLocksmithLocation(
   jobId: string
