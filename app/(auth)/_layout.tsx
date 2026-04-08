@@ -9,8 +9,6 @@ export default function AuthLayout() {
         animation: 'slide_from_right',
       }}
     >
-      <Stack.Screen name="customer-login" />
-      <Stack.Screen name="customer-register" />
       <Stack.Screen name="locksmith-login" />
       <Stack.Screen name="locksmith-register" />
     </Stack>

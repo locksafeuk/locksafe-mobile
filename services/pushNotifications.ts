@@ -133,23 +133,14 @@ class PushNotificationService {
     const { type, jobId } = notification;
 
     switch (type) {
-      // Customer paths
+      // Locksmith paths
       case 'LOCKSMITH_ASSIGNED':
       case 'LOCKSMITH_EN_ROUTE':
       case 'LOCKSMITH_ARRIVED':
-        return jobId ? `/(customer)/job/${jobId}` : '/(customer)/(tabs)';
       case 'QUOTE_READY':
-        return jobId
-          ? `/(customer)/job/${jobId}?tab=quote`
-          : '/(customer)/(tabs)';
       case 'WORK_COMPLETE':
-        return jobId
-          ? `/(customer)/job/${jobId}?tab=sign`
-          : '/(customer)/(tabs)';
       case 'JOB_CANCELLED':
-        return '/(customer)/(tabs)/jobs';
-
-      // Locksmith paths
+        return jobId ? `/(locksmith)/job/${jobId}` : '/(locksmith)/(tabs)';
       case 'NEW_JOB_AVAILABLE':
         return '/(locksmith)/(tabs)/available';
       case 'JOB_ACCEPTED':

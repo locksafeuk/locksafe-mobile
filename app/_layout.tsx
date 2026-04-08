@@ -51,7 +51,6 @@ export default function RootLayout() {
             >
               <Stack.Screen name="index" />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(customer)" options={{ headerShown: false }} />
               <Stack.Screen name="(locksmith)" options={{ headerShown: false }} />
             </Stack>
           </QueryClientProvider>

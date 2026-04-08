@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { post, get as apiGet, setAuthToken, clearAuthToken, setUserData, getUserData, API_BASE_URL } from '../services/api';
-import type { Customer, Locksmith } from '../types';
+import type { Locksmith } from '../types';
 
-// User types matching web app
-export type UserType = 'customer' | 'locksmith' | 'admin';
+// User type - locksmith only
+export type UserType = 'locksmith';
 
 export interface AuthUser {
   id: string;
@@ -52,7 +52,6 @@ export interface AuthUser {
 interface LoginResponse {
   success: boolean;
   user?: AuthUser;
-  customer?: AuthUser;
   locksmith?: AuthUser;
   error?: string;
   redirectTo?: string;
@@ -61,7 +60,6 @@ interface LoginResponse {
 interface RegisterResponse {
   success: boolean;
   user?: AuthUser;
-  customer?: Customer;
   locksmith?: Locksmith;
   token?: string;
   error?: string;
@@ -75,21 +73,12 @@ interface AuthState {
 
   // Actions
   initialize: () => Promise<void>;
-  loginCustomer: (email: string, password: string) => Promise<boolean>;
   loginLocksmith: (email: string, password: string) => Promise<boolean>;
-  registerCustomer: (data: CustomerRegisterData) => Promise<boolean>;
   registerLocksmith: (data: LocksmithRegisterData) => Promise<boolean>;
   logout: () => Promise<void>;
   clearError: () => void;
   updateUser: (updates: Partial<AuthUser>) => void;
   checkSession: () => Promise<boolean>;
-}
-
-export interface CustomerRegisterData {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
 }
 
 export interface LocksmithRegisterData {
@@ -132,57 +121,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // Customer login - uses unified /api/auth/login endpoint
-  loginCustomer: async (email: string, password: string) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const response = await post<LoginResponse>('/api/auth/login', {
-        email: email.toLowerCase().trim(),
-        password,
-      });
-
-      if (response.success && response.user) {
-        // Ensure user type is customer
-        if (response.user.type !== 'customer') {
-          set({
-            isLoading: false,
-            error: 'Please use the locksmith login for professional accounts.',
-          });
-          return false;
-        }
-
-        const user: AuthUser = {
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-          phone: response.user.phone,
-          type: 'customer',
-          onboardingCompleted: response.user.onboardingCompleted,
-        };
-
-        await setUserData(user);
-        set({ user, isLoading: false, error: null });
-        return true;
-      }
-
-      set({
-        isLoading: false,
-        error: response.error || 'Invalid email or password',
-      });
-      return false;
-    } catch (error: any) {
-      console.error('Customer login error:', error);
-      // Extract error message from API response if available, otherwise use generic message
-      const apiError = error.response?.data?.error || error.response?.data?.message;
-      set({
-        isLoading: false,
-        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during login'),
-      });
-      return false;
-    }
-  },
-
   // Locksmith login - uses unified /api/auth/login endpoint
   loginLocksmith: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
@@ -198,7 +136,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         if (response.user.type !== 'locksmith') {
           set({
             isLoading: false,
-            error: 'Please use the customer login for customer accounts.',
+            error: 'This app is for locksmith professionals only. Please use the customer website.',
           });
           return false;
         }
@@ -262,50 +200,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         isLoading: false,
         error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during login'),
-      });
-      return false;
-    }
-  },
-
-  // Customer registration
-  registerCustomer: async (data: CustomerRegisterData) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const response = await post<RegisterResponse>('/api/auth/register', {
-        name: data.name,
-        email: data.email.toLowerCase().trim(),
-        phone: data.phone,
-        password: data.password,
-      });
-
-      // Registration now returns user and token directly for mobile apps
-      if (response.success && response.user) {
-        const user: AuthUser = {
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-          phone: response.user.phone,
-          type: 'customer',
-          onboardingCompleted: response.user.onboardingCompleted,
-        };
-
-        await setUserData(user);
-        set({ user, isLoading: false, error: null });
-        return true;
-      }
-
-      set({
-        isLoading: false,
-        error: response.error || 'Registration failed',
-      });
-      return false;
-    } catch (error: any) {
-      console.error('Customer registration error:', error);
-      const apiError = error.response?.data?.error || error.response?.data?.message;
-      set({
-        isLoading: false,
-        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during registration'),
       });
       return false;
     }
@@ -449,12 +343,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 }));
-
-// Export a hook to get the user type for routing
-export function useUserType(): UserType | null {
-  const user = useAuthStore((state) => state.user);
-  return user?.type ?? null;
-}
 
 // Export a hook to check if user is authenticated
 export function useIsAuthenticated(): boolean {

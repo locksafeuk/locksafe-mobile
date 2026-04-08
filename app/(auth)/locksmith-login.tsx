@@ -64,10 +64,10 @@ export default function LocksmithLoginScreen() {
             </View>
 
             <Text className="text-3xl font-bold text-slate-900 mb-2">
-              Locksmith login
+              Welcome back
             </Text>
             <Text className="text-slate-500 text-lg mb-8">
-              Sign in to your partner account
+              Sign in to your LockSafe account
             </Text>
 
             {/* Error Message */}
