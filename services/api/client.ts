@@ -145,14 +145,37 @@ api.interceptors.request.use(
 // Response interceptor - handle token from response and 401 errors
 api.interceptors.response.use(
   async (response: AxiosResponse) => {
-    // If response includes a token (from login/register), save it
+    // If response includes a token in the body (from login/register), save it
+    // The proxy server injects the token from Set-Cookie into the response body for web
     if (response.data?.token) {
       try {
         await secureSetItem(TOKEN_KEY, response.data.token);
+        console.log('[API Client] Auth token saved from response body');
       } catch (error) {
         console.error('Error saving token:', error);
       }
     }
+
+    // For native platforms, also check Set-Cookie header for auth_token
+    if (!isWeb && !response.data?.token) {
+      const setCookie = response.headers?.['set-cookie'];
+      if (setCookie) {
+        const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+        for (const cookie of cookies) {
+          const match = cookie.match(/auth_token=([^;]+)/);
+          if (match && match[1]) {
+            try {
+              await secureSetItem(TOKEN_KEY, match[1]);
+              console.log('[API Client] Auth token saved from Set-Cookie header');
+            } catch (error) {
+              console.error('Error saving token from cookie:', error);
+            }
+            break;
+          }
+        }
+      }
+    }
+
     return response;
   },
   async (error) => {

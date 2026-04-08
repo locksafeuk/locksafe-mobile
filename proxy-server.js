@@ -75,12 +75,52 @@ const server = http.createServer((req, res) => {
       if (proxyRes.headers['content-type']) {
         res.setHeader('Content-Type', proxyRes.headers['content-type']);
       }
+
+      // Extract auth_token from Set-Cookie and inject into JSON response body
+      // The backend sends tokens as cookies, but the mobile app expects them in the body
+      let authTokenFromCookie = null;
       if (proxyRes.headers['set-cookie']) {
+        const cookies = Array.isArray(proxyRes.headers['set-cookie'])
+          ? proxyRes.headers['set-cookie']
+          : [proxyRes.headers['set-cookie']];
+        for (const cookie of cookies) {
+          const match = cookie.match(/auth_token=([^;]+)/);
+          if (match) {
+            authTokenFromCookie = match[1];
+            break;
+          }
+        }
+        // Also forward cookies for compatibility
         res.setHeader('Set-Cookie', proxyRes.headers['set-cookie']);
       }
 
-      res.writeHead(proxyRes.statusCode);
-      proxyRes.pipe(res);
+      // If we found a token in cookies, inject it into the JSON response body
+      if (authTokenFromCookie && proxyRes.headers['content-type']?.includes('application/json')) {
+        const bodyChunks = [];
+        proxyRes.on('data', chunk => bodyChunks.push(chunk));
+        proxyRes.on('end', () => {
+          let bodyStr = Buffer.concat(bodyChunks).toString('utf8');
+          try {
+            const bodyJson = JSON.parse(bodyStr);
+            if (!bodyJson.token) {
+              bodyJson.token = authTokenFromCookie;
+              console.log(`[Proxy] Injected auth_token into response body for ${req.url}`);
+            }
+            const newBody = JSON.stringify(bodyJson);
+            res.writeHead(proxyRes.statusCode, {
+              'Content-Length': Buffer.byteLength(newBody),
+            });
+            res.end(newBody);
+          } catch (e) {
+            // Not valid JSON, forward as-is
+            res.writeHead(proxyRes.statusCode);
+            res.end(bodyStr);
+          }
+        });
+      } else {
+        res.writeHead(proxyRes.statusCode);
+        proxyRes.pipe(res);
+      }
     });
 
     proxyReq.on('error', (err) => {
