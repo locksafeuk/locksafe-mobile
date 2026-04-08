@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,11 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, CheckCircle, FileText, PenLine, RotateCcw } from 'lucide-react-native';
+import { ArrowLeft, CheckCircle, FileText, PenLine } from 'lucide-react-native';
 import { useJobStore } from '../../../../stores/jobStore';
 import { submitSignature, confirmJobCompletion } from '../../../../services/api/jobs';
 import { LocationService } from '../../../../services/location';
-
-// Note: For production, you would use react-native-signature-canvas
-// This is a simplified placeholder that captures touch events
+import SignaturePad from '../../../../components/SignaturePad';
 
 export default function CustomerSignatureScreen() {
   const router = useRouter();
@@ -41,7 +39,7 @@ export default function CustomerSignatureScreen() {
 
   const handleSubmit = async () => {
     if (!signatureData) {
-      Alert.alert('Signature Required', 'Please sign in the box above.');
+      Alert.alert('Signature Required', 'Please sign in the box above and tap "Confirm Signature".');
       return;
     }
 
@@ -89,13 +87,6 @@ export default function CustomerSignatureScreen() {
     }
   };
 
-  // Simulate signature capture - in production use react-native-signature-canvas
-  const handleSignatureCapture = () => {
-    // Generate a placeholder signature data
-    const placeholderSignature = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==`;
-    setSignatureData(placeholderSignature);
-  };
-
   if (!currentJob) {
     return (
       <SafeAreaView className="flex-1 bg-slate-50 items-center justify-center">
@@ -119,7 +110,7 @@ export default function CustomerSignatureScreen() {
         </View>
       </View>
 
-      <ScrollView className="flex-1">
+      <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
         {/* Job Summary */}
         <View className="mx-4 mt-4">
           <View className="bg-white rounded-xl p-4 border border-slate-200">
@@ -204,9 +195,10 @@ export default function CustomerSignatureScreen() {
           <Text className="text-sm font-medium text-slate-500 uppercase mb-3">
             Your Signature
           </Text>
-          <View className="bg-white rounded-xl border-2 border-dashed border-slate-300 overflow-hidden">
-            {signatureData ? (
-              <View className="h-48 items-center justify-center bg-slate-50">
+
+          {signatureData ? (
+            <View className="bg-white rounded-xl border-2 border-green-300 overflow-hidden">
+              <View className="h-48 items-center justify-center bg-green-50">
                 <CheckCircle size={48} color="#22c55e" />
                 <Text className="text-green-600 font-medium mt-2">
                   Signature captured
@@ -215,23 +207,19 @@ export default function CustomerSignatureScreen() {
                   onPress={handleClearSignature}
                   className="flex-row items-center mt-3 px-4 py-2 bg-slate-200 rounded-lg"
                 >
-                  <RotateCcw size={16} color="#64748b" />
-                  <Text className="text-slate-600 ml-2">Clear & Redo</Text>
+                  <PenLine size={16} color="#64748b" />
+                  <Text className="text-slate-600 ml-2">Sign Again</Text>
                 </Pressable>
               </View>
-            ) : (
-              <Pressable
-                onPress={handleSignatureCapture}
-                className="h-48 items-center justify-center"
-              >
-                <PenLine size={32} color="#94a3b8" />
-                <Text className="text-slate-400 mt-2">Tap to sign</Text>
-                <Text className="text-slate-300 text-sm mt-1">
-                  Sign with your finger
-                </Text>
-              </Pressable>
-            )}
-          </View>
+            </View>
+          ) : (
+            <SignaturePad
+              onSignatureCapture={(data) => setSignatureData(data)}
+              onClear={handleClearSignature}
+              height={200}
+            />
+          )}
+
           <Text className="text-slate-400 text-xs text-center mt-2">
             Your signature will be securely stored with GPS verification
           </Text>

@@ -28,14 +28,15 @@ import {
   updateJobStatus,
 } from '../../../../services/api/jobs';
 import { LocationService } from '../../../../services/location';
-import type { Locksmith, JobStatus } from '../../../../types';
+import JobMap from '../../../../components/JobMap';
+import type { JobStatus } from '../../../../types';
 
 export default function LocksmithJobDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { currentJob, fetchJob, isLoading, updateJobInList } = useJobStore();
   const { user } = useAuthStore();
-  const locksmith = user as Locksmith;
+  const locksmith = user;
 
   const [assessmentFee, setAssessmentFee] = useState('29');
   const [eta, setEta] = useState('15');
@@ -232,6 +233,31 @@ export default function LocksmithJobDetailScreen() {
             )}
           </View>
         </View>
+
+        {/* Map */}
+        {currentJob.latitude && currentJob.longitude && (
+          <View className="mx-4 mt-4">
+            <JobMap
+              jobLocation={{
+                latitude: currentJob.latitude,
+                longitude: currentJob.longitude,
+                title: 'Job Location',
+                description: `${currentJob.address}, ${currentJob.postcode}`,
+              }}
+              locksmithLocation={
+                locksmith?.baseLat && locksmith?.baseLng
+                  ? {
+                      latitude: locksmith.baseLat,
+                      longitude: locksmith.baseLng,
+                      title: 'Your Location',
+                    }
+                  : undefined
+              }
+              height={180}
+              showRoute={isAssigned}
+            />
+          </View>
+        )}
 
         {/* Assessment Fee Display */}
         <View className="mx-4 mt-4">

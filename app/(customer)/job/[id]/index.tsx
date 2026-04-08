@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, RefreshControl, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, RefreshControl, Alert, ActivityIndicator, Linking } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -14,7 +14,8 @@ import {
   Navigation,
 } from 'lucide-react-native';
 import { useJobStore } from '../../../../stores/jobStore';
-import { getJobApplications, acceptApplication } from '../../../../services/api/jobs';
+import { getJobApplications, acceptApplication, respondToQuote } from '../../../../services/api/jobs';
+import JobMap from '../../../../components/JobMap';
 import type { LocksmithApplication } from '../../../../types';
 
 function StatusProgress({ status }: { status: string }) {
@@ -228,6 +229,22 @@ export default function CustomerJobDetailScreen() {
           <StatusProgress status={currentJob.status} />
         </View>
 
+        {/* Map */}
+        {currentJob.latitude && currentJob.longitude && (
+          <View className="px-4 mb-4">
+            <JobMap
+              jobLocation={{
+                latitude: currentJob.latitude,
+                longitude: currentJob.longitude,
+                title: 'Job Location',
+                description: `${currentJob.address}, ${currentJob.postcode}`,
+              }}
+              height={180}
+              interactive={false}
+            />
+          </View>
+        )}
+
         {/* Location */}
         <View className="px-4 mb-4">
           <View className="bg-white rounded-xl p-4 border border-slate-200">
@@ -283,7 +300,11 @@ export default function CustomerJobDetailScreen() {
                   </Pressable>
                 )}
                 <Pressable
-                  onPress={() => {/* TODO: Call locksmith */}}
+                  onPress={() => {
+                    if (currentJob.locksmith?.phone) {
+                      Linking.openURL(`tel:${currentJob.locksmith.phone}`);
+                    }
+                  }}
                   className="flex-1 flex-row items-center justify-center py-3 bg-green-500 rounded-xl"
                 >
                   <Phone size={18} color="white" />
@@ -320,10 +341,31 @@ export default function CustomerJobDetailScreen() {
 
               {currentJob.status === 'QUOTED' && !currentJob.quote.accepted && (
                 <View className="flex-row mt-4">
-                  <Pressable className="flex-1 py-3 border border-slate-300 rounded-xl mr-2 items-center">
+                  <Pressable
+                    onPress={async () => {
+                      try {
+                        await respondToQuote(id!, false);
+                        await fetchJob(id!);
+                      } catch (error: any) {
+                        Alert.alert('Error', error.message || 'Failed to decline quote');
+                      }
+                    }}
+                    className="flex-1 py-3 border border-slate-300 rounded-xl mr-2 items-center active:bg-slate-100"
+                  >
                     <Text className="text-slate-700 font-semibold">Decline</Text>
                   </Pressable>
-                  <Pressable className="flex-1 py-3 bg-orange-500 rounded-xl ml-2 items-center">
+                  <Pressable
+                    onPress={async () => {
+                      try {
+                        await respondToQuote(id!, true);
+                        await fetchJob(id!);
+                        Alert.alert('Quote Accepted', 'The locksmith will now begin work.');
+                      } catch (error: any) {
+                        Alert.alert('Error', error.message || 'Failed to accept quote');
+                      }
+                    }}
+                    className="flex-1 py-3 bg-orange-500 rounded-xl ml-2 items-center active:bg-orange-600"
+                  >
                     <Text className="text-white font-semibold">Accept Quote</Text>
                   </Pressable>
                 </View>

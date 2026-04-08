@@ -3,7 +3,10 @@ import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'https://locksafe.uk';
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  Constants.expoConfig?.extra?.apiUrl ||
+  'https://locksafe.uk';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,

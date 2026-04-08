@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, Linking, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Phone, Navigation, Clock, MapPin, User } from 'lucide-react-native';
 import { useJobStore } from '../../../../stores/jobStore';
 import { useJobTracking } from '../../../../services/tracking';
+import JobMap, { type MapLocation } from '../../../../components/JobMap';
 import type { GPSCoordinates } from '../../../../types';
 
 export default function CustomerTrackingScreen() {
@@ -35,8 +36,12 @@ export default function CustomerTrackingScreen() {
 
   const handleOpenMaps = () => {
     if (currentJob?.latitude && currentJob?.longitude) {
-      const url = `https://maps.google.com/?q=${currentJob.latitude},${currentJob.longitude}`;
-      Linking.openURL(url);
+      const url = Platform.select({
+        ios: `maps:0,0?q=${currentJob.latitude},${currentJob.longitude}`,
+        android: `geo:${currentJob.latitude},${currentJob.longitude}?q=${currentJob.latitude},${currentJob.longitude}`,
+        default: `https://maps.google.com/?q=${currentJob.latitude},${currentJob.longitude}`,
+      });
+      if (url) Linking.openURL(url);
     }
   };
 
@@ -56,10 +61,34 @@ export default function CustomerTrackingScreen() {
         return 'Locksmith is on the way';
       case 'ARRIVED':
         return 'Locksmith has arrived';
+      case 'DIAGNOSING':
+        return 'Locksmith is diagnosing the issue';
+      case 'IN_PROGRESS':
+        return 'Work in progress';
       default:
         return 'Tracking locksmith...';
     }
   };
+
+  // Build map locations
+  const jobLocation: MapLocation | null =
+    currentJob.latitude && currentJob.longitude
+      ? {
+          latitude: currentJob.latitude,
+          longitude: currentJob.longitude,
+          title: 'Job Location',
+          description: `${currentJob.address}, ${currentJob.postcode}`,
+        }
+      : null;
+
+  const locksmithMapLocation: MapLocation | null = tracking.locksmithLocation
+    ? {
+        latitude: tracking.locksmithLocation.lat,
+        longitude: tracking.locksmithLocation.lng,
+        title: currentJob.locksmith?.name || 'Locksmith',
+        description: currentJob.locksmith?.companyName,
+      }
+    : null;
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -74,85 +103,87 @@ export default function CustomerTrackingScreen() {
           </Text>
           <Text className="text-slate-500 text-sm">{currentJob.jobNumber}</Text>
         </View>
-      </View>
-
-      {/* Map Placeholder */}
-      <View className="flex-1 bg-slate-200 items-center justify-center">
-        <View className="bg-white rounded-2xl p-6 mx-4 shadow-lg">
-          <View className="items-center mb-4">
-            {tracking.isConnected ? (
-              <View className="w-16 h-16 bg-green-100 rounded-full items-center justify-center mb-3">
-                <Navigation size={32} color="#22c55e" />
-              </View>
-            ) : (
-              <View className="w-16 h-16 bg-orange-100 rounded-full items-center justify-center mb-3">
-                <Clock size={32} color="#f97316" />
-              </View>
-            )}
-
-            <Text className="text-xl font-bold text-slate-900 text-center">
-              {getStatusMessage()}
-            </Text>
-
-            {tracking.locksmithLocation && (
-              <Text className="text-slate-500 mt-1">
-                Live tracking active
-              </Text>
-            )}
-          </View>
-
-          {/* ETA */}
-          {(eta || currentJob.acceptedEta) && currentJob.status === 'EN_ROUTE' && (
-            <View className="bg-blue-50 rounded-xl p-4 mb-4">
-              <Text className="text-blue-600 text-sm text-center">
-                Estimated arrival
-              </Text>
-              <Text className="text-3xl font-bold text-blue-700 text-center">
-                {eta || currentJob.acceptedEta} min
-              </Text>
-            </View>
-          )}
-
-          {/* Location Info */}
-          <View className="flex-row items-center mb-4">
-            <MapPin size={18} color="#64748b" />
-            <Text className="text-slate-600 ml-2 flex-1" numberOfLines={2}>
-              {currentJob.address}, {currentJob.postcode}
-            </Text>
-          </View>
-
-          {/* Locksmith Info */}
-          {currentJob.locksmith && (
-            <View className="border-t border-slate-100 pt-4">
-              <View className="flex-row items-center">
-                <View className="w-12 h-12 bg-slate-100 rounded-full items-center justify-center mr-3">
-                  <User size={24} color="#64748b" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-slate-900 font-semibold">
-                    {currentJob.locksmith.name}
-                  </Text>
-                  {currentJob.locksmith.companyName && (
-                    <Text className="text-slate-500 text-sm">
-                      {currentJob.locksmith.companyName}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
-          )}
-        </View>
-
-        {/* Connection Status */}
-        <View className="mt-4 flex-row items-center">
+        {/* Connection Status Indicator */}
+        <View className="flex-row items-center">
           <View
             className={`w-2 h-2 rounded-full mr-2 ${
               tracking.isConnected ? 'bg-green-500' : 'bg-orange-500'
             }`}
           />
-          <Text className="text-slate-500 text-sm">
-            {tracking.isConnected ? 'Live tracking connected' : 'Connecting...'}
+          <Text className="text-slate-400 text-xs">
+            {tracking.isConnected ? 'Live' : 'Connecting'}
           </Text>
+        </View>
+      </View>
+
+      {/* Live Map */}
+      <View className="flex-1">
+        <JobMap
+          jobLocation={jobLocation}
+          locksmithLocation={locksmithMapLocation}
+          height={undefined}
+          showRoute={currentJob.status === 'EN_ROUTE'}
+          autoFitMarkers={true}
+          style={{ flex: 1, borderRadius: 0 }}
+        />
+
+        {/* Status Overlay */}
+        <View className="absolute bottom-0 left-0 right-0 px-4 pb-4">
+          <View className="bg-white rounded-2xl p-4 shadow-lg">
+            {/* Status Row */}
+            <View className="flex-row items-center mb-3">
+              {tracking.isConnected ? (
+                <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center mr-3">
+                  <Navigation size={20} color="#22c55e" />
+                </View>
+              ) : (
+                <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center mr-3">
+                  <Clock size={20} color="#f97316" />
+                </View>
+              )}
+              <View className="flex-1">
+                <Text className="text-base font-semibold text-slate-900">
+                  {getStatusMessage()}
+                </Text>
+                {tracking.locksmithLocation && (
+                  <Text className="text-slate-500 text-sm">
+                    Live tracking active
+                  </Text>
+                )}
+              </View>
+            </View>
+
+            {/* ETA */}
+            {(eta || currentJob.acceptedEta) && currentJob.status === 'EN_ROUTE' && (
+              <View className="bg-blue-50 rounded-xl p-3 mb-3">
+                <Text className="text-blue-600 text-xs text-center">
+                  Estimated arrival
+                </Text>
+                <Text className="text-2xl font-bold text-blue-700 text-center">
+                  {eta || currentJob.acceptedEta} min
+                </Text>
+              </View>
+            )}
+
+            {/* Locksmith Info */}
+            {currentJob.locksmith && (
+              <View className="flex-row items-center pt-3 border-t border-slate-100">
+                <View className="w-10 h-10 bg-slate-100 rounded-full items-center justify-center mr-3">
+                  <User size={20} color="#64748b" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-900 font-medium">
+                    {currentJob.locksmith.name}
+                  </Text>
+                  {currentJob.locksmith.companyName && (
+                    <Text className="text-slate-500 text-xs">
+                      {currentJob.locksmith.companyName}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
         </View>
       </View>
 

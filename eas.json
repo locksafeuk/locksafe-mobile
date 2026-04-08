@@ -14,7 +14,12 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "http://localhost:3000"
+        "APP_VARIANT": "development",
+        "API_URL": "http://localhost:3000",
+        "EXPO_PUBLIC_API_URL": "http://localhost:3000",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_xxx",
+        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "xxx-xxx-xxx",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaxxx"
       }
     },
     "development-device": {
@@ -27,7 +32,12 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "http://localhost:3000"
+        "APP_VARIANT": "development",
+        "API_URL": "https://locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_xxx",
+        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "xxx-xxx-xxx",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaxxx"
       }
     },
     "preview": {
@@ -39,16 +49,12 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "https://locksafe.uk"
-      }
-    },
-    "preview-apk": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "API_URL": "https://locksafe.uk"
+        "APP_VARIANT": "preview",
+        "API_URL": "https://locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_xxx",
+        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "xxx-xxx-xxx",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaxxx"
       }
     },
     "production": {
@@ -60,7 +66,11 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "API_URL": "https://locksafe.uk"
+        "API_URL": "https://locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_YOUR_LIVE_STRIPE_KEY",
+        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "YOUR_ONESIGNAL_APP_ID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "YOUR_PRODUCTION_GOOGLE_MAPS_KEY"
       }
     }
   },
