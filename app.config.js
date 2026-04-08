@@ -93,6 +93,7 @@ module.exports = () => {
       },
       plugins: [
         'expo-router',
+        'expo-asset',
         'expo-secure-store',
         'expo-dev-client',
         [
