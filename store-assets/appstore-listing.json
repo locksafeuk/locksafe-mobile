@@ -1,0 +1,68 @@
+{
+  "appName": "LockSafe - Locksmith Partner",
+  "subtitle": "Manage Jobs, Quotes & Earnings",
+  "promotionalText": "The #1 app for professional locksmiths in the UK. Get matched with jobs nearby, create quotes on-site, track earnings, and grow your business — all from your phone.",
+  "description": "LockSafe is the ultimate professional partner app designed exclusively for qualified locksmiths in the UK. Whether you handle emergency lockouts, scheduled lock changes, or security upgrades, LockSafe connects you with customers in your area and helps you manage every aspect of your locksmith business from your phone.\n\n🔑 SMART JOB MATCHING\nReceive real-time notifications for new jobs near your location. View job details including problem type, property type, distance, and assessment fees before accepting. Set your availability with a single tap to start or stop receiving job requests.\n\n📋 COMPLETE JOB MANAGEMENT\nTrack every job from initial request through to completion. Update job status in real-time — navigate to site, mark arrival, begin work, and complete jobs with a streamlined workflow. Keep customers informed at every stage with automatic status updates.\n\n💰 TRANSPARENT QUOTE BUILDER\nCreate detailed, professional quotes on-site with our built-in quote builder. Add parts with quantities and unit prices, set labour costs and time estimates, and let the app automatically calculate subtotals, VAT (20%), and grand totals. Customers receive clear, itemised quotes they can review and approve.\n\n📸 PHOTO EVIDENCE & DOCUMENTATION\nCapture and upload photo evidence at every stage — before, during, and after the job. All photos are GPS-tagged for verification. Build a comprehensive job record that protects both you and your customers.\n\n✍️ DIGITAL SIGNATURES\nCollect customer signatures digitally upon job completion. No more paper forms — everything is securely stored and linked to the job record for your records and dispute resolution.\n\n📍 REAL-TIME GPS TRACKING\nCustomers can track your arrival in real-time once you accept a job. The app streams your location securely, providing accurate ETAs and building customer confidence.\n\n💷 EARNINGS & PAYOUTS\nTrack your earnings in real-time with detailed breakdowns of assessment fees and job totals. View your commission structure, monthly earnings, and payout history. Integrated with Stripe Connect for fast, secure payouts directly to your bank account.\n\n⭐ BUILD YOUR REPUTATION\nReceive ratings and reviews from satisfied customers. Your profile showcases your rating, completed jobs count, verification status, and company details — helping you win more work.\n\n🔔 PUSH NOTIFICATIONS\nNever miss a job opportunity. Receive instant push notifications for new jobs in your area, job updates, quote approvals, and payout confirmations. Configure notification preferences for push, SMS, and email.\n\n🛡️ PROFESSIONAL PLATFORM\nLockSafe is built for verified, professional locksmiths. Our platform ensures quality service for customers while providing locksmiths with a steady stream of work, fair pricing, and reliable payments.\n\nKEY FEATURES:\n• Real-time job notifications and smart matching\n• Availability toggle — go online/offline instantly\n• Detailed job cards with distance and fee information\n• Professional quote builder with VAT calculation\n• Photo evidence uploads (Before/During/After)\n• GPS-tagged documentation\n• Digital signature capture\n• Real-time GPS tracking for customers\n• Stripe Connect earnings and payouts\n• Rating and review system\n• Push, SMS, and email notifications\n• Profile and coverage area management\n• Secure authentication and data handling\n\nJoin hundreds of professional locksmiths across the UK who trust LockSafe to grow their business. Download now and start earning.\n\nFor support: contact@locksafe.uk\nVisit: www.locksafe.uk",
+  "keywords": "locksmith,jobs,quotes,earnings,lockout,security,keys,locks,partner,business",
+  "supportURL": "https://www.locksafe.uk",
+  "marketingURL": "https://www.locksafe.uk",
+  "privacyPolicyURL": "https://www.locksafe.uk/privacy",
+  "category": {
+    "primary": "Business",
+    "secondary": "Utilities"
+  },
+  "ageRating": {
+    "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+    "contests": "NONE",
+    "gamblingAndContests": false,
+    "gambling": false,
+    "frequentIntenseCartoonFantasyOrRealisticViolence": false,
+    "profanityOrCrudeHumor": false,
+    "frequentIntenseMatureOrSuggestiveThemes": false,
+    "horrorFearThemes": "NONE",
+    "medicalOrTreatmentInformation": false,
+    "matureOrSuggestiveThemes": "NONE",
+    "profanityOrCrudeHumour": "NONE",
+    "sexualContentOrNudity": "NONE",
+    "sexualContentGraphicAndNudity": false,
+    "violenceCartoonOrFantasy": "NONE",
+    "violenceRealisticProlongedGraphicOrSadistic": false,
+    "violenceRealistic": "NONE",
+    "unrestrictedWebAccess": false,
+    "gamblingSimulated": false,
+    "ageRatingOverride": "NONE",
+    "koreaAgeRatingOverride": "NONE",
+    "seventeenPlus": false,
+    "madeForKids": false,
+    "expectedRating": "4+"
+  },
+  "appStoreConnectInfo": {
+    "copyright": "© 2026 LockSafe Ltd",
+    "contentRightsDeclaration": "doesNotContainThirdPartyContent",
+    "availableTerritories": ["GB"],
+    "pricing": "Free",
+    "inAppPurchases": false
+  },
+  "screenshots": {
+    "iphone67": {
+      "size": "1290x2796",
+      "files": [
+        "ios-screenshots/01_landing_page.png",
+        "ios-screenshots/02_login_screen.png",
+        "ios-screenshots/03_dashboard.png",
+        "ios-screenshots/04_jobs_available.png",
+        "ios-screenshots/05_earnings.png",
+        "ios-screenshots/06_settings.png"
+      ]
+    }
+  },
+  "screenshotCaptions": {
+    "01_landing_page": "Welcome to LockSafe — Professional Locksmith Platform",
+    "02_login_screen": "Secure sign-in for verified locksmith partners",
+    "03_dashboard": "Dashboard — manage availability, view stats & nearby jobs",
+    "04_jobs_available": "Browse and accept jobs in your coverage area",
+    "05_earnings": "Track earnings, commissions & Stripe Connect payouts",
+    "06_settings": "Profile settings, notifications & payment configuration"
+  },
+  "reviewNotes": "This app is designed for professional locksmiths who are partners of the LockSafe platform. Test credentials: Email: amiosif@icloud.com, Password: demo1234. The app requires a verified locksmith account to access full features. GPS location is used to match locksmiths with nearby jobs and for real-time tracking during active jobs."
+}
