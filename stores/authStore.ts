@@ -1,11 +1,6 @@
 import { create } from 'zustand';
-import * as SecureStore from 'expo-secure-store';
 import { post, get as apiGet, setAuthToken, clearAuthToken, setUserData, getUserData, API_BASE_URL } from '../services/api';
 import type { Customer, Locksmith } from '../types';
-
-// Token and user storage keys
-const TOKEN_KEY = 'auth_token';
-const USER_KEY = 'user_data';
 
 // User types matching web app
 export type UserType = 'customer' | 'locksmith' | 'admin';
@@ -178,9 +173,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false;
     } catch (error: any) {
       console.error('Customer login error:', error);
+      // Extract error message from API response if available, otherwise use generic message
+      const apiError = error.response?.data?.error || error.response?.data?.message;
       set({
         isLoading: false,
-        error: error.message || 'An error occurred during login',
+        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during login'),
       });
       return false;
     }
@@ -261,9 +258,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false;
     } catch (error: any) {
       console.error('Locksmith login error:', error);
+      const apiError = error.response?.data?.error || error.response?.data?.message;
       set({
         isLoading: false,
-        error: error.message || 'An error occurred during login',
+        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during login'),
       });
       return false;
     }
@@ -304,9 +302,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false;
     } catch (error: any) {
       console.error('Customer registration error:', error);
+      const apiError = error.response?.data?.error || error.response?.data?.message;
       set({
         isLoading: false,
-        error: error.message || 'An error occurred during registration',
+        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during registration'),
       });
       return false;
     }
@@ -386,9 +385,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false;
     } catch (error: any) {
       console.error('Locksmith registration error:', error);
+      const apiError = error.response?.data?.error || error.response?.data?.message;
       set({
         isLoading: false,
-        error: error.message || 'An error occurred during registration',
+        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during registration'),
       });
       return false;
     }

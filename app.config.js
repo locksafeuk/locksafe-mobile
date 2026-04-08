@@ -24,7 +24,8 @@ const getBundleId = () => {
 };
 
 module.exports = () => {
-  const API_URL = process.env.API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://locksafe.uk';
+  // Use www.locksafe.uk - the non-www domain returns 307 redirects that break POST requests
+  const API_URL = process.env.API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://www.locksafe.uk';
   const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
   const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_YOUR_STRIPE_KEY';
   const ONESIGNAL_APP_ID = process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID || 'YOUR_ONESIGNAL_APP_ID';
