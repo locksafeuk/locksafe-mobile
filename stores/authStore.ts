@@ -1,9 +1,20 @@
 import { create } from 'zustand';
-import { post, get as apiGet, setAuthToken, clearAuthToken, setUserData, getUserData, API_BASE_URL } from '../services/api';
+import {
+  post,
+  get as apiGet,
+  clearAuthToken,
+  setUserData,
+  getUserData,
+  getAuthToken,
+  setStorageItem,
+  getStorageItem,
+} from '../services/api';
 import type { Locksmith } from '../types';
 
 // User type - locksmith only
 export type UserType = 'locksmith';
+
+const REMEMBER_ME_KEY = 'remember_me';
 
 export interface AuthUser {
   id: string;
@@ -69,16 +80,18 @@ interface AuthState {
   user: AuthUser | null;
   isLoading: boolean;
   isInitialized: boolean;
+  rememberMe: boolean;
   error: string | null;
 
   // Actions
   initialize: () => Promise<void>;
-  loginLocksmith: (email: string, password: string) => Promise<boolean>;
+  loginLocksmith: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
   registerLocksmith: (data: LocksmithRegisterData) => Promise<boolean>;
   logout: () => Promise<void>;
   clearError: () => void;
   updateUser: (updates: Partial<AuthUser>) => void;
   checkSession: () => Promise<boolean>;
+  setRememberMe: (rememberMe: boolean) => Promise<void>;
 }
 
 export interface LocksmithRegisterData {
@@ -93,36 +106,82 @@ export interface LocksmithRegisterData {
   services?: string[];
 }
 
+function mapAuthUser(user: Partial<AuthUser> | undefined): AuthUser | null {
+  if (!user || !user.id || !user.name || !user.email) {
+    return null;
+  }
+
+  if (user.type && user.type !== 'locksmith') {
+    return null;
+  }
+
+  return {
+    ...user,
+    type: 'locksmith',
+  } as AuthUser;
+}
+
+async function loadRememberMePreference(): Promise<boolean> {
+  const saved = await getStorageItem(REMEMBER_ME_KEY);
+  // Default to true for production "stay signed in" behavior
+  return saved !== 'false';
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isLoading: false,
   isInitialized: false,
+  rememberMe: true,
   error: null,
 
   // Initialize auth state from secure storage on app load
   initialize: async () => {
+    set({ isLoading: true });
+
     try {
-      const userData = await getUserData<AuthUser>();
-      if (userData) {
-        // Verify the session is still valid
-        const isValid = await get().checkSession();
-        if (!isValid) {
-          await clearAuthToken();
-          set({ user: null, isInitialized: true });
-          return;
-        }
-        set({ user: userData, isInitialized: true });
-      } else {
-        set({ isInitialized: true });
+      const rememberMe = await loadRememberMePreference();
+      set({ rememberMe });
+
+      if (!rememberMe) {
+        await clearAuthToken();
+        set({ user: null, isInitialized: true, isLoading: false });
+        return;
       }
+
+      const [userData, token] = await Promise.all([getUserData<AuthUser>(), getAuthToken()]);
+
+      if (!token) {
+        set({ user: null, isInitialized: true, isLoading: false });
+        return;
+      }
+
+      if (userData) {
+        set({ user: userData });
+      }
+
+      // Verify session using backend, but don't log out user on transient network issues.
+      const isValid = await get().checkSession();
+      if (!isValid) {
+        await clearAuthToken();
+        set({ user: null, isInitialized: true, isLoading: false });
+        return;
+      }
+
+      // If checkSession succeeded but did not return user payload, keep cached user.
+      const latestUser = get().user || userData;
+      if (latestUser) {
+        await setUserData(latestUser);
+      }
+
+      set({ user: latestUser ?? null, isInitialized: true, isLoading: false, error: null });
     } catch (error) {
       console.error('Auth initialization error:', error);
-      set({ isInitialized: true });
+      set({ isInitialized: true, isLoading: false });
     }
   },
 
   // Locksmith login - uses unified /api/auth/login endpoint
-  loginLocksmith: async (email: string, password: string) => {
+  loginLocksmith: async (email: string, password: string, rememberMe = true) => {
     set({ isLoading: true, error: null });
 
     try {
@@ -141,51 +200,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           return false;
         }
 
-        const user: AuthUser = {
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-          phone: response.user.phone,
-          type: 'locksmith',
-          companyName: response.user.companyName,
-          isVerified: response.user.isVerified,
-          stripeConnectOnboarded: response.user.stripeConnectOnboarded,
-          onboardingCompleted: response.user.onboardingCompleted,
-          rating: response.user.rating,
-          totalJobs: response.user.totalJobs,
-          totalEarnings: response.user.totalEarnings,
-          isActive: response.user.isActive,
-          licenseNumber: response.user.licenseNumber,
-          insuranceNumber: response.user.insuranceNumber,
-          coverageAreas: response.user.coverageAreas,
-          services: response.user.services,
-          yearsExperience: response.user.yearsExperience,
-          baseLat: response.user.baseLat,
-          baseLng: response.user.baseLng,
-          baseAddress: response.user.baseAddress,
-          coverageRadius: response.user.coverageRadius,
-          defaultAssessmentFee: response.user.defaultAssessmentFee,
-          stripeConnectId: response.user.stripeConnectId,
-          stripeConnectVerified: response.user.stripeConnectVerified,
-          smsNotifications: response.user.smsNotifications,
-          emailNotifications: response.user.emailNotifications,
-          pushNotifications: response.user.pushNotifications,
-          isAvailable: response.user.isAvailable,
-          lastAvailabilityChange: response.user.lastAvailabilityChange,
-          scheduleEnabled: response.user.scheduleEnabled,
-          scheduleTimezone: response.user.scheduleTimezone,
-          scheduleStartTime: response.user.scheduleStartTime,
-          scheduleEndTime: response.user.scheduleEndTime,
-          scheduleDays: response.user.scheduleDays,
-          oneSignalPlayerId: response.user.oneSignalPlayerId,
-          termsAcceptedAt: response.user.termsAcceptedAt,
-          profileImage: response.user.profileImage,
-          createdAt: response.user.createdAt,
-          updatedAt: response.user.updatedAt,
-        };
+        const user = mapAuthUser(response.user);
+        if (!user) {
+          set({
+            isLoading: false,
+            error: 'Invalid user response from server.',
+          });
+          return false;
+        }
 
         await setUserData(user);
-        set({ user, isLoading: false, error: null });
+        await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
+
+        set({
+          user,
+          rememberMe,
+          isLoading: false,
+          isInitialized: true,
+          error: null,
+        });
+
         return true;
       }
 
@@ -199,7 +233,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const apiError = error.response?.data?.error || error.response?.data?.message;
       set({
         isLoading: false,
-        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during login'),
+        error:
+          apiError ||
+          (error.code === 'ERR_NETWORK'
+            ? 'Unable to connect to server. Please check your internet connection.'
+            : 'An error occurred during login'),
       });
       return false;
     }
@@ -224,51 +262,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Registration now returns user and token directly for mobile apps
       if (response.success && response.user) {
-        const user: AuthUser = {
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-          phone: response.user.phone,
-          type: 'locksmith',
-          companyName: response.user.companyName,
-          isVerified: response.user.isVerified,
-          stripeConnectOnboarded: response.user.stripeConnectOnboarded,
-          onboardingCompleted: response.user.onboardingCompleted,
-          rating: response.user.rating,
-          totalJobs: response.user.totalJobs,
-          totalEarnings: response.user.totalEarnings,
-          isActive: response.user.isActive,
-          licenseNumber: response.user.licenseNumber,
-          insuranceNumber: response.user.insuranceNumber,
-          coverageAreas: response.user.coverageAreas,
-          services: response.user.services,
-          yearsExperience: response.user.yearsExperience,
-          baseLat: response.user.baseLat,
-          baseLng: response.user.baseLng,
-          baseAddress: response.user.baseAddress,
-          coverageRadius: response.user.coverageRadius,
-          defaultAssessmentFee: response.user.defaultAssessmentFee,
-          stripeConnectId: response.user.stripeConnectId,
-          stripeConnectVerified: response.user.stripeConnectVerified,
-          smsNotifications: response.user.smsNotifications,
-          emailNotifications: response.user.emailNotifications,
-          pushNotifications: response.user.pushNotifications,
-          isAvailable: response.user.isAvailable,
-          lastAvailabilityChange: response.user.lastAvailabilityChange,
-          scheduleEnabled: response.user.scheduleEnabled,
-          scheduleTimezone: response.user.scheduleTimezone,
-          scheduleStartTime: response.user.scheduleStartTime,
-          scheduleEndTime: response.user.scheduleEndTime,
-          scheduleDays: response.user.scheduleDays,
-          oneSignalPlayerId: response.user.oneSignalPlayerId,
-          termsAcceptedAt: response.user.termsAcceptedAt,
-          profileImage: response.user.profileImage,
-          createdAt: response.user.createdAt,
-          updatedAt: response.user.updatedAt,
-        };
+        const user = mapAuthUser(response.user);
+
+        if (!user) {
+          set({
+            isLoading: false,
+            error: 'Invalid user response from server.',
+          });
+          return false;
+        }
 
         await setUserData(user);
-        set({ user, isLoading: false, error: null });
+        await setStorageItem(REMEMBER_ME_KEY, 'true');
+
+        set({
+          user,
+          rememberMe: true,
+          isLoading: false,
+          isInitialized: true,
+          error: null,
+        });
         return true;
       }
 
@@ -282,7 +295,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const apiError = error.response?.data?.error || error.response?.data?.message;
       set({
         isLoading: false,
-        error: apiError || (error.code === 'ERR_NETWORK' ? 'Unable to connect to server. Please check your internet connection.' : 'An error occurred during registration'),
+        error:
+          apiError ||
+          (error.code === 'ERR_NETWORK'
+            ? 'Unable to connect to server. Please check your internet connection.'
+            : 'An error occurred during registration'),
       });
       return false;
     }
@@ -300,9 +317,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Logout API error:', error);
     }
 
-    // Clear local storage
     await clearAuthToken();
-    set({ user: null, isLoading: false, error: null });
+    set({ user: null, isLoading: false, error: null, isInitialized: true });
   },
 
   // Clear error message
@@ -314,7 +330,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   updateUser: (updates: Partial<AuthUser>) => {
     const currentUser = get().user;
     if (currentUser) {
-      const updatedUser = { ...currentUser, ...updates };
+      const updatedUser = { ...currentUser, ...updates, type: 'locksmith' as const };
       setUserData(updatedUser);
       set({ user: updatedUser });
     }
@@ -329,18 +345,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user?: AuthUser;
       }>('/api/auth/session');
 
-      if (response && response.success && response.authenticated && response.user) {
-        // Update local user data with server data
-        await setUserData(response.user);
-        set({ user: response.user });
+      if (response?.success && response.authenticated) {
+        const mappedUser = mapAuthUser(response.user);
+        if (mappedUser) {
+          await setUserData(mappedUser);
+          set({ user: mappedUser });
+        }
         return true;
       }
 
       return false;
-    } catch (error) {
-      console.error('Session check error:', error);
+    } catch (error: any) {
+      const status = error?.response?.status;
+
+      if (status === 401 || status === 403) {
+        return false;
+      }
+
+      // Network/transient backend issue:
+      // keep local session and avoid forcing logout.
+      const token = await getAuthToken();
+      const hasLocalSession = !!(token && (get().user || (await getUserData<AuthUser>())));
+
+      if (hasLocalSession) {
+        console.warn('Session check skipped due transient error, keeping local session.');
+        return true;
+      }
+
       return false;
     }
+  },
+
+  setRememberMe: async (rememberMe: boolean) => {
+    await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
+    set({ rememberMe });
   },
 }));
 

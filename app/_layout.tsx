@@ -1,5 +1,5 @@
 import '../global.css';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -8,7 +8,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import Constants from 'expo-constants';
 import { useAuthStore } from '../stores/authStore';
-import { pushNotificationService } from '../services/pushNotifications';
+import {
+  pushNotificationService,
+  usePushNotificationNavigation,
+} from '../services/pushNotifications';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,12 +29,34 @@ const STRIPE_KEY =
 
 export default function RootLayout() {
   const initialize = useAuthStore((state) => state.initialize);
+  const user = useAuthStore((state) => state.user);
+  const previousUserIdRef = useRef<string | null>(null);
+
+  usePushNotificationNavigation();
 
   useEffect(() => {
     initialize();
-    // Initialize push notifications (stubbed for now)
-    pushNotificationService.initialize();
+    void pushNotificationService.initialize();
   }, [initialize]);
+
+  useEffect(() => {
+    const currentUserId = user?.id || null;
+
+    const syncPushRegistration = async () => {
+      if (currentUserId && user?.type === 'locksmith') {
+        await pushNotificationService.registerUser(currentUserId, 'locksmith');
+      }
+
+      // Explicitly unregister previous user on logout/switch account
+      if (!currentUserId && previousUserIdRef.current) {
+        await pushNotificationService.unregisterUser(previousUserIdRef.current, 'locksmith');
+      }
+
+      previousUserIdRef.current = currentUserId;
+    };
+
+    void syncPushRegistration();
+  }, [user?.id, user?.type]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
