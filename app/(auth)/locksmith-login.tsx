@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Switch,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,7 +18,14 @@ import { useAuthStore } from '../../stores/authStore';
 
 export default function LocksmithLoginScreen() {
   const router = useRouter();
-  const { loginLocksmith, isLoading, error, clearError } = useAuthStore();
+  const {
+    loginLocksmith,
+    isLoading,
+    error,
+    clearError,
+    rememberMe,
+    setRememberMe,
+  } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +37,7 @@ export default function LocksmithLoginScreen() {
       return;
     }
 
-    const success = await loginLocksmith(email.toLowerCase().trim(), password);
+    const success = await loginLocksmith(email.toLowerCase().trim(), password, rememberMe);
     if (success) {
       router.replace('/(locksmith)/(tabs)');
     }
@@ -57,15 +65,11 @@ export default function LocksmithLoginScreen() {
             <View className="flex-row items-center mb-4">
               <View className="bg-slate-900 px-3 py-1 rounded-full flex-row items-center">
                 <Wrench size={14} color="white" />
-                <Text className="text-white text-sm font-medium ml-1">
-                  Professional
-                </Text>
+                <Text className="text-white text-sm font-medium ml-1">Professional</Text>
               </View>
             </View>
 
-            <Text className="text-3xl font-bold text-slate-900 mb-2">
-              Welcome back
-            </Text>
+            <Text className="text-3xl font-bold text-slate-900 mb-2">Welcome back</Text>
             <Text className="text-slate-500 text-lg mb-8">
               Sign in to your LockSafe account
             </Text>
@@ -99,7 +103,7 @@ export default function LocksmithLoginScreen() {
             </View>
 
             {/* Password Input */}
-            <View className="mb-6">
+            <View className="mb-4">
               <Text className="text-slate-700 font-medium mb-2">Password</Text>
               <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
                 <Lock size={20} color="#64748b" />
@@ -125,11 +129,28 @@ export default function LocksmithLoginScreen() {
               </View>
             </View>
 
+            {/* Remember Me */}
+            <View className="flex-row items-center justify-between bg-slate-50 rounded-xl px-4 py-3 mb-6">
+              <View className="flex-1 pr-3">
+                <Text className="text-slate-900 font-medium">Remember me</Text>
+                <Text className="text-slate-500 text-xs mt-1">
+                  Keep me signed in on this device
+                </Text>
+              </View>
+              <Switch
+                value={rememberMe}
+                onValueChange={(value) => {
+                  clearError();
+                  void setRememberMe(value);
+                }}
+                trackColor={{ false: '#cbd5e1', true: '#0f172a' }}
+                thumbColor="#ffffff"
+              />
+            </View>
+
             {/* Forgot Password */}
             <Pressable className="mb-8">
-              <Text className="text-slate-900 text-center font-medium">
-                Forgot password?
-              </Text>
+              <Text className="text-slate-900 text-center font-medium">Forgot password?</Text>
             </Pressable>
 
             {/* Login Button */}

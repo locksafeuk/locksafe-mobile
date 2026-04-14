@@ -77,37 +77,25 @@ async function secureDeleteItem(key: string): Promise<void> {
 // We must use the www subdomain directly to avoid redirect issues.
 
 function resolveApiUrl(): string {
-  // Hard-coded canonical URL - the backend lives here
   const CANONICAL_URL = 'https://www.locksafe.uk';
 
-  // For web development, ALWAYS use the CORS proxy server to avoid cross-origin issues.
-  // The proxy runs on port 3001 and forwards /api/* to www.locksafe.uk.
-  // Start it with: node proxy-server.js
-  //
-  // When accessed via the Abacus AI preview URL, localhost:3001 won't work
-  // because the JS runs in the user's browser. Use the proxy's public URL instead.
   if (isWeb && typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname.includes('preview.abacusai.app')) {
-      // Replace the app's preview subdomain with the proxy's port-specific subdomain
-      // e.g. 13a18d74ac-8081.na104.preview.abacusai.app → 13a18d74ac-3001.na104.preview.abacusai.app
       const proxyHost = hostname.replace(/-\d+\./, '-3001.');
       return `https://${proxyHost}`;
     }
     return 'http://localhost:3001';
   }
 
-  // For native platforms, check environment/config for overrides
   const envUrl = Constants.expoConfig?.extra?.apiUrl;
 
-  // If the env URL is a locksafe.uk domain, always use www version
   if (envUrl && typeof envUrl === 'string') {
     if (envUrl.includes('locksafe.uk') && !envUrl.includes('www.locksafe.uk')) {
       return CANONICAL_URL;
     }
-    // Only use env URL if it's actually a locksafe domain
     if (envUrl.includes('locksafe.uk')) {
-      return envUrl.replace(/\/$/, ''); // strip trailing slash
+      return envUrl.replace(/\/$/, '');
     }
   }
 
@@ -128,13 +116,88 @@ const api: AxiosInstance = axios.create({
     'x-platform': Platform.OS,
     'x-app-version': Constants.expoConfig?.version || '1.0.0',
   },
-  // Only send credentials (cookies) for same-origin requests on web
-  // For cross-origin (native), we use Bearer tokens
+  // For native platforms, cookies may be used in addition to Bearer auth.
+  // Web proxy flow relies on Bearer tokens in storage.
   withCredentials: !isWeb,
 });
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user_data';
+
+type ApiRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+};
+
+let refreshPromise: Promise<string | null> | null = null;
+
+function shouldSkipRefresh(config?: ApiRequestConfig): boolean {
+  if (!config) return true;
+  if (config.headers?.['x-skip-auth-refresh']) return true;
+
+  const url = config.url || '';
+  return (
+    url.includes('/api/auth/login') ||
+    url.includes('/api/auth/logout') ||
+    url.includes('/api/auth/refresh')
+  );
+}
+
+async function extractAndPersistTokenFromResponse(response: AxiosResponse): Promise<string | null> {
+  if (response.data?.token) {
+    await secureSetItem(TOKEN_KEY, response.data.token);
+    return response.data.token;
+  }
+
+  if (!isWeb) {
+    const setCookie = response.headers?.['set-cookie'];
+    if (setCookie) {
+      const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+      for (const cookie of cookies) {
+        const match = cookie.match(/auth_token=([^;]+)/);
+        if (match && match[1]) {
+          await secureSetItem(TOKEN_KEY, match[1]);
+          return match[1];
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+async function refreshAuthToken(): Promise<string | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const refreshResponse = await api.post(
+        '/api/auth/refresh',
+        {},
+        {
+          headers: {
+            'x-skip-auth-refresh': 'true',
+          },
+        }
+      );
+
+      const refreshedToken = await extractAndPersistTokenFromResponse(refreshResponse);
+      if (refreshedToken) {
+        console.log('[API Client] Token refresh successful');
+      }
+      return refreshedToken;
+    } catch (refreshError: any) {
+      // If refresh endpoint is unavailable or refresh fails, return null and allow caller to handle.
+      console.log('[API Client] Token refresh unavailable/failed:', refreshError?.response?.status || refreshError?.message);
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
 
 // Request interceptor - add auth token to requests
 api.interceptors.request.use(
@@ -155,47 +218,32 @@ api.interceptors.request.use(
 // Response interceptor - handle token from response and 401 errors
 api.interceptors.response.use(
   async (response: AxiosResponse) => {
-    // If response includes a token in the body (from login/register), save it
-    // The proxy server injects the token from Set-Cookie into the response body for web
-    if (response.data?.token) {
-      try {
-        await secureSetItem(TOKEN_KEY, response.data.token);
-        console.log('[API Client] Auth token saved from response body');
-      } catch (error) {
-        console.error('Error saving token:', error);
-      }
-    }
-
-    // For native platforms, also check Set-Cookie header for auth_token
-    if (!isWeb && !response.data?.token) {
-      const setCookie = response.headers?.['set-cookie'];
-      if (setCookie) {
-        const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
-        for (const cookie of cookies) {
-          const match = cookie.match(/auth_token=([^;]+)/);
-          if (match && match[1]) {
-            try {
-              await secureSetItem(TOKEN_KEY, match[1]);
-              console.log('[API Client] Auth token saved from Set-Cookie header');
-            } catch (error) {
-              console.error('Error saving token from cookie:', error);
-            }
-            break;
-          }
-        }
-      }
-    }
-
+    await extractAndPersistTokenFromResponse(response);
     return response;
   },
   async (error) => {
-    if (error.response?.status === 401) {
-      // Clear auth data on unauthorized
+    const status = error.response?.status;
+    const originalRequest = error.config as ApiRequestConfig | undefined;
+
+    if (status === 401 && originalRequest && !originalRequest._retry && !shouldSkipRefresh(originalRequest)) {
+      originalRequest._retry = true;
+
+      const refreshedToken = await refreshAuthToken();
+      if (refreshedToken) {
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${refreshedToken}`;
+        return api(originalRequest);
+      }
+
       await secureDeleteItem(TOKEN_KEY);
       await secureDeleteItem(USER_KEY);
     }
 
-    // Provide more helpful error messages
+    if (status === 401 && shouldSkipRefresh(originalRequest)) {
+      await secureDeleteItem(TOKEN_KEY);
+      await secureDeleteItem(USER_KEY);
+    }
+
     if (error.code === 'ERR_NETWORK') {
       console.error('[API Client] Network error - check backend connectivity');
     }
@@ -224,6 +272,18 @@ export async function setUserData(user: unknown): Promise<void> {
 export async function getUserData<T>(): Promise<T | null> {
   const data = await secureGetItem(USER_KEY);
   return data ? JSON.parse(data) : null;
+}
+
+export async function setStorageItem(key: string, value: string): Promise<void> {
+  await secureSetItem(key, value);
+}
+
+export async function getStorageItem(key: string): Promise<string | null> {
+  return await secureGetItem(key);
+}
+
+export async function deleteStorageItem(key: string): Promise<void> {
+  await secureDeleteItem(key);
 }
 
 export async function get<T>(endpoint: string): Promise<T> {

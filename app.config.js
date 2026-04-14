@@ -78,6 +78,7 @@ module.exports = () => {
           'ACCESS_FINE_LOCATION',
           'ACCESS_BACKGROUND_LOCATION',
           'CAMERA',
+          'POST_NOTIFICATIONS',
           'READ_EXTERNAL_STORAGE',
           'WRITE_EXTERNAL_STORAGE',
         ],
@@ -96,6 +97,12 @@ module.exports = () => {
         'expo-asset',
         'expo-secure-store',
         'expo-dev-client',
+        [
+          'onesignal-expo-plugin',
+          {
+            mode: IS_DEV ? 'development' : 'production',
+          },
+        ],
         [
           'expo-build-properties',
           {
