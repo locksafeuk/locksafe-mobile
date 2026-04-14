@@ -34,7 +34,7 @@ module.exports = () => {
     expo: {
       name: getAppName(),
       slug: 'locksafe-mobile',
-      version: '1.0.0',
+      version: '1.0.1',
       orientation: 'portrait',
       icon: './assets/icon.png',
       userInterfaceStyle: 'light',
@@ -48,7 +48,7 @@ module.exports = () => {
       ios: {
         supportsTablet: true,
         bundleIdentifier: getBundleId(),
-        buildNumber: '1',
+        buildNumber: '2',
         infoPlist: {
           NSLocationWhenInUseUsageDescription:
             'LockSafe needs your location to find nearby locksmiths and track job progress.',
@@ -72,7 +72,7 @@ module.exports = () => {
           backgroundColor: '#f97316',
         },
         package: getBundleId(),
-        versionCode: 1,
+        versionCode: 10,
         permissions: [
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',
