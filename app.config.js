@@ -72,7 +72,7 @@ module.exports = () => {
           backgroundColor: '#f97316',
         },
         package: getBundleId(),
-        versionCode: 11,
+        versionCode: 12,
         permissions: [
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',
@@ -108,6 +108,8 @@ module.exports = () => {
           {
             android: {
               kotlinVersion: '2.0.21',
+              compileSdkVersion: 35,
+              targetSdkVersion: 35,
             },
           },
         ],
