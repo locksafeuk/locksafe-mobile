@@ -107,7 +107,16 @@ export interface LocksmithRegisterData {
 }
 
 function mapAuthUser(user: Partial<AuthUser> | undefined): AuthUser | null {
-  if (!user || !user.id || !user.name || !user.email) {
+  if (!user) {
+    return null;
+  }
+
+  const sanitizedName = user.name?.trim();
+  const sanitizedEmail = user.email?.trim().toLowerCase();
+  const sanitizedPhone = user.phone?.trim();
+  const sanitizedCompanyName = user.companyName?.trim();
+
+  if (!user.id || !sanitizedName || !sanitizedEmail) {
     return null;
   }
 
@@ -117,6 +126,10 @@ function mapAuthUser(user: Partial<AuthUser> | undefined): AuthUser | null {
 
   return {
     ...user,
+    name: sanitizedName,
+    email: sanitizedEmail,
+    phone: sanitizedPhone,
+    companyName: sanitizedCompanyName,
     type: 'locksmith',
   } as AuthUser;
 }

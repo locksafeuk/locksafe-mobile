@@ -33,8 +33,8 @@
       },
       "env": {
         "APP_VARIANT": "development",
-        "API_URL": "https://locksafe.uk",
-        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "API_URL": "https://www.locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
         "EXPO_PUBLIC_ONESIGNAL_APP_ID": "os_v2_app_zum5e4ckorf57njugkd47ofu4rcdyx2ce7feswm64qwyyqgmhhub3w4gqfehs4i4x53jeo5bjvd5gtelc7kmnciym6d47dottzvjddy",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
@@ -50,8 +50,8 @@
       },
       "env": {
         "APP_VARIANT": "preview",
-        "API_URL": "https://locksafe.uk",
-        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "API_URL": "https://www.locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
         "EXPO_PUBLIC_ONESIGNAL_APP_ID": "os_v2_app_zum5e4ckorf57njugkd47ofu4rcdyx2ce7feswm64qwyyqgmhhub3w4gqfehs4i4x53jeo5bjvd5gtelc7kmnciym6d47dottzvjddy",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
@@ -63,8 +63,8 @@
       },
       "distribution": "internal",
       "env": {
-        "API_URL": "https://locksafe.uk",
-        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "API_URL": "https://www.locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
         "EXPO_PUBLIC_ONESIGNAL_APP_ID": "os_v2_app_zum5e4ckorf57njugkd47ofu4rcdyx2ce7feswm64qwyyqgmhhub3w4gqfehs4i4x53jeo5bjvd5gtelc7kmnciym6d47dottzvjddy",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
@@ -79,8 +79,8 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "API_URL": "https://locksafe.uk",
-        "EXPO_PUBLIC_API_URL": "https://locksafe.uk",
+        "API_URL": "https://www.locksafe.uk",
+        "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
         "EXPO_PUBLIC_ONESIGNAL_APP_ID": "os_v2_app_zum5e4ckorf57njugkd47ofu4rcdyx2ce7feswm64qwyyqgmhhub3w4gqfehs4i4x53jeo5bjvd5gtelc7kmnciym6d47dottzvjddy",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"

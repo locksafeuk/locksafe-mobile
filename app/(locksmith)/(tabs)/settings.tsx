@@ -1,5 +1,6 @@
 import { View, Text, Pressable, ScrollView, Alert, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   User,
@@ -76,6 +77,7 @@ export default function LocksmithSettingsScreen() {
   const { user, logout, updateUser } = useAuthStore();
 
   const locksmith = user as Locksmith;
+  const appVersion = Constants.expoConfig?.version || '1.0.0';
 
   const handleLogout = () => {
     Alert.alert('Log Out', 'Are you sure you want to log out?', [
@@ -85,7 +87,7 @@ export default function LocksmithSettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           await logout();
-          router.replace('/');
+          router.replace('/locksmith-login');
         },
       },
     ]);
@@ -203,7 +205,7 @@ export default function LocksmithSettingsScreen() {
         </View>
 
         <Text className="text-center text-slate-400 text-sm mb-8">
-          LockSafe Partner v1.0.0
+          LockSafe Partner v{appVersion}
         </Text>
       </ScrollView>
     </SafeAreaView>
