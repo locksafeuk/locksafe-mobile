@@ -71,7 +71,7 @@
       }
     },
     "production": {
-      "autoIncrement": true,
+      "autoIncrement": false,
       "ios": {
         "credentialsSource": "remote"
       },
