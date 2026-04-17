@@ -10,6 +10,12 @@ The app now:
 - Unsubscribes on logout via `POST /api/onesignal/unsubscribe`
 - Deep-links notification taps into relevant in-app screens
 
+## Current Status (April 2026)
+
+- ✅ OneSignal iOS is now configured in the mobile app and EAS build profiles.
+- ✅ APNs credentials are set up in OneSignal for bundle ID `uk.locksafe.app`.
+- ✅ iOS notifications are ready to work (native build + real device required for end-to-end validation).
+
 ---
 
 ## 1) Required Backend Endpoints

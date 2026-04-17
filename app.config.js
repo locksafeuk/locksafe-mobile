@@ -28,7 +28,7 @@ module.exports = () => {
   const API_URL = process.env.API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://www.locksafe.uk';
   const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
   const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_YOUR_STRIPE_KEY';
-  const ONESIGNAL_APP_ID = process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID || 'YOUR_ONESIGNAL_APP_ID';
+  const ONESIGNAL_APP_ID = process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID || 'cd19d270-4a74-4bdf-b534-3287cfb8b4e4';
 
   return {
     expo: {

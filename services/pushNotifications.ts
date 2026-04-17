@@ -8,7 +8,7 @@ import {
 } from './api';
 
 const ONESIGNAL_APP_ID =
-  Constants.expoConfig?.extra?.oneSignalAppId || process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID || '';
+  Constants.expoConfig?.extra?.oneSignalAppId || process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID || 'cd19d270-4a74-4bdf-b534-3287cfb8b4e4';
 
 export type NotificationType =
   | 'NEW_JOB_AVAILABLE'
