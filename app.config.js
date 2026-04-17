@@ -58,6 +58,7 @@ module.exports = () => {
             'LockSafe needs camera access to take photos for job documentation.',
           NSPhotoLibraryUsageDescription:
             'LockSafe needs photo library access to select photos for job documentation.',
+          ITSAppUsesNonExemptEncryption: false,
         },
         config: {
           googleMapsApiKey: GOOGLE_MAPS_API_KEY,
