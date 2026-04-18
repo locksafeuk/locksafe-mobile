@@ -15,6 +15,8 @@ The app now:
 - ✅ OneSignal iOS is now configured in the mobile app and EAS build profiles.
 - ✅ APNs credentials are set up in OneSignal for bundle ID `uk.locksafe.app`.
 - ✅ iOS notifications are ready to work (native build + real device required for end-to-end validation).
+- ✅ OneSignal backend security patch verification completed (2026-04-18).
+- ✅ Security fixes confirmed in production for send/subscribe/unsubscribe endpoint protections.
 
 ---
 
@@ -54,6 +56,31 @@ Disable a specific OneSignal subscription for a locksmith.
 - Mark mapping inactive (preferred) or delete mapping
 - Return `{ "success": true }`
 
+### Security-sensitive companion endpoints (web/admin)
+
+These endpoints are part of backend security scope and were verified in production on 2026-04-18:
+
+1. `POST /api/onesignal/send`
+   - Admin authentication is required.
+   - Unauthenticated requests return `401`.
+   - Non-admin authenticated users are rejected.
+
+2. `GET /api/onesignal/subscribe?userId=...&userType=...`
+   - Authentication is required.
+   - Users can query only their own status.
+   - Cross-user queries return `403`.
+
+3. `POST /api/onesignal/unsubscribe`
+   - Non-existent player IDs now return `404` (instead of incorrectly returning success).
+
+### API compatibility notes (April 2026 security update)
+
+- Mobile app compatibility remains intact: app flows use `POST /api/onesignal/subscribe` and `POST /api/onesignal/unsubscribe`.
+- Security hardening was applied without breaking request/response contracts used by mobile clients.
+- Backend teams should preserve HTTP status semantics introduced by the fix:
+  - `401` for unauthenticated access,
+  - `403` for authenticated-but-forbidden access,
+  - `404` for non-existent unsubscribe targets.
 ---
 
 ## 2) Suggested DB Model
@@ -147,10 +174,13 @@ To ensure correct navigation, include `jobId` whenever event is tied to a job.
 
 ## 7) Security & Validation
 
-- Validate authenticated caller for subscribe/unsubscribe
-- Verify `userId` belongs to authenticated locksmith
+- Require admin authentication for `POST /api/onesignal/send`
+- Require authentication for `GET /api/onesignal/subscribe`
+- Enforce authorization: non-admin users can only query their own `userId`
+- Validate authenticated caller for `POST /api/onesignal/subscribe` and `POST /api/onesignal/unsubscribe`
 - Reject unsupported `userType`
-- Rate-limit subscribe/unsubscribe endpoints
+- Return explicit HTTP statuses (`401`, `403`, `404`) for auth/not-found cases
+- Rate-limit OneSignal endpoints
 
 ---
 
@@ -171,3 +201,4 @@ To ensure correct navigation, include `jobId` whenever event is tied to a job.
 - iOS requires valid APNs setup in OneSignal.
 - Android requires valid FCM credentials in OneSignal.
 - For production rollout, keep a staging OneSignal app for QA before sending to live users.
+
