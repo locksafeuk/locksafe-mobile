@@ -47,3 +47,6 @@ coverage/
 *.log
 tmp/
 temp/
+
+# Local Apple API key material
+api_key.json
