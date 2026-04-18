@@ -36,23 +36,28 @@ export default function RootLayout() {
 
   useEffect(() => {
     initialize();
-    void pushNotificationService.initialize();
   }, [initialize]);
 
   useEffect(() => {
     const currentUserId = user?.id || null;
 
     const syncPushRegistration = async () => {
-      if (currentUserId && user?.type === 'locksmith') {
-        await pushNotificationService.registerUser(currentUserId, 'locksmith');
-      }
+      try {
+        if (currentUserId && user?.type === 'locksmith') {
+          // Initialize lazily for authenticated users only.
+          // This avoids startup races during app launch.
+          await pushNotificationService.registerUser(currentUserId, 'locksmith');
+        }
 
-      // Explicitly unregister previous user on logout/switch account
-      if (!currentUserId && previousUserIdRef.current) {
-        await pushNotificationService.unregisterUser(previousUserIdRef.current, 'locksmith');
-      }
+        // Explicitly unregister previous user on logout/switch account
+        if (!currentUserId && previousUserIdRef.current) {
+          await pushNotificationService.unregisterUser(previousUserIdRef.current, 'locksmith');
+        }
 
-      previousUserIdRef.current = currentUserId;
+        previousUserIdRef.current = currentUserId;
+      } catch (error) {
+        console.error('[Push] Failed during push registration sync:', error);
+      }
     };
 
     void syncPushRegistration();

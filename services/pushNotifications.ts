@@ -63,6 +63,7 @@ type OneSignalForegroundEvent = {
 
 class PushNotificationService {
   private initialized = false;
+  private initializingPromise: Promise<void> | null = null;
   private oneSignal: OneSignalModule['OneSignal'] | null = null;
   private playerId: string | null = null;
   private currentUserId: string | null = null;
@@ -159,60 +160,73 @@ class PushNotificationService {
       return;
     }
 
-    if (Platform.OS === 'web') {
-      console.log('[Push] OneSignal disabled on web platform.');
-      this.initialized = true;
+    if (this.initializingPromise) {
+      await this.initializingPromise;
       return;
     }
 
-    if (!ONESIGNAL_APP_ID || ONESIGNAL_APP_ID === 'YOUR_ONESIGNAL_APP_ID') {
-      console.warn('[Push] Missing OneSignal App ID. Push notifications are disabled.');
-      this.initialized = true;
-      return;
-    }
+    this.initializingPromise = (async () => {
+      if (Platform.OS === 'web') {
+        console.log('[Push] OneSignal disabled on web platform.');
+        this.initialized = true;
+        return;
+      }
+
+      if (!ONESIGNAL_APP_ID || ONESIGNAL_APP_ID === 'YOUR_ONESIGNAL_APP_ID') {
+        console.warn('[Push] Missing OneSignal App ID. Push notifications are disabled.');
+        this.initialized = true;
+        return;
+      }
+
+      try {
+        const oneSignalModule = await import('react-native-onesignal');
+        this.oneSignal = oneSignalModule.OneSignal;
+
+        this.oneSignal.initialize(ONESIGNAL_APP_ID);
+
+        // Permission prompt may be denied by user; app should keep working.
+        await this.oneSignal.Notifications.requestPermission(true).catch(() => undefined);
+
+        this.oneSignal.Notifications.addEventListener('click', (event) => {
+          const payload = this.mapOneSignalEventToPayload(event as unknown as OneSignalClickEvent);
+          this.notificationOpenedHandlers.forEach((handler) => handler(payload));
+        });
+
+        this.oneSignal.Notifications.addEventListener('foregroundWillDisplay', (event) => {
+          const foregroundEvent = event as unknown as OneSignalForegroundEvent;
+          const payload = this.mapOneSignalEventToPayload(foregroundEvent);
+
+          // Ensure system banner still appears while app is foregrounded.
+          foregroundEvent.preventDefault?.();
+          foregroundEvent.notification?.display?.();
+
+          this.notificationReceivedHandlers.forEach((handler) => handler(payload));
+        });
+
+        this.pushSubscriptionListener = async () => {
+          await this.getPlayerIdFromSDK();
+          if (this.currentUserId) {
+            await this.syncPlayerIdWithBackend(this.currentUserId);
+          }
+        };
+
+        this.oneSignal.User.pushSubscription.addEventListener('change', this.pushSubscriptionListener);
+
+        await this.getPlayerIdFromSDK();
+
+        this.initialized = true;
+        console.log('[Push] OneSignal initialized successfully.');
+      } catch (error) {
+        console.error('[Push] OneSignal initialization failed:', error);
+        // Mark as initialized to avoid repeated init loops that could destabilize app launch.
+        this.initialized = true;
+      }
+    })();
 
     try {
-      const oneSignalModule = await import('react-native-onesignal');
-      this.oneSignal = oneSignalModule.OneSignal;
-
-      this.oneSignal.initialize(ONESIGNAL_APP_ID);
-      this.oneSignal.Notifications.requestPermission(true).catch(() => {
-        // Permission prompt may be denied by user; app should keep working.
-      });
-
-      this.oneSignal.Notifications.addEventListener('click', (event) => {
-        const payload = this.mapOneSignalEventToPayload(event as unknown as OneSignalClickEvent);
-        this.notificationOpenedHandlers.forEach((handler) => handler(payload));
-      });
-
-      this.oneSignal.Notifications.addEventListener('foregroundWillDisplay', (event) => {
-        const foregroundEvent = event as unknown as OneSignalForegroundEvent;
-        const payload = this.mapOneSignalEventToPayload(foregroundEvent);
-
-        // Ensure system banner still appears while app is foregrounded.
-        foregroundEvent.preventDefault?.();
-        foregroundEvent.notification?.display?.();
-
-        this.notificationReceivedHandlers.forEach((handler) => handler(payload));
-      });
-
-      this.pushSubscriptionListener = async () => {
-        await this.getPlayerIdFromSDK();
-        if (this.currentUserId) {
-          await this.syncPlayerIdWithBackend(this.currentUserId);
-        }
-      };
-
-      this.oneSignal.User.pushSubscription.addEventListener('change', this.pushSubscriptionListener);
-
-      await this.getPlayerIdFromSDK();
-
-      this.initialized = true;
-      console.log('[Push] OneSignal initialized successfully.');
-    } catch (error) {
-      console.error('[Push] OneSignal initialization failed:', error);
-      // Mark as initialized to avoid repeated crashes/loops.
-      this.initialized = true;
+      await this.initializingPromise;
+    } finally {
+      this.initializingPromise = null;
     }
   }
 
