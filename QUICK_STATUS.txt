@@ -10,19 +10,29 @@ Android:
 - Production still gated by Google closed-testing requirements
 
 iOS:
-- Build 4 (1.0.2 (4)) uploaded via EAS Submit successfully
-- Build 4 selected in App Store Connect
+- Build 5 (1.0.2 (5)) created with iOS 26.2 SDK (Xcode 2620)
+- Build 5 uploaded via EAS Submit and processed by Apple
+- Build 5 selected in App Store Connect (Build 4 replaced)
 - Resubmitted for review
+- Date Submitted: Apr 20, 2026 at 3:10 PM (Europe/London)
 - Current App Store status: Waiting for Review
+- SDK compliance status: ✅ COMPLIANT (Apple warning 90725 addressed)
+
+CRITICAL SDK COMPLIANCE NOTE
+----------------------------
+- Apple warning: 90725 (requires iOS 26 SDK or later)
+- Enforcement deadline: Apr 28, 2026
+- Compliance completed ahead of deadline with Build 5
 
 DONE TODAY (APR 20)
 -------------------
 1) Analyzed 4 iOS crash logs from Apple Review
-   - Confirmed all logs are from Build 3 (pre-fix), not Build 4
+   - Confirmed all logs are from Build 3 (pre-fix)
 2) Confirmed root cause aligns with known OneSignal startup race issue in old binary path
-3) Uploaded iOS Build 4 to App Store Connect (EAS Submit)
-4) Replaced Build 3 with Build 4 in review flow and resubmitted
-5) Confirmed Android deployment remains on track operationally (closed testing stage)
+3) Uploaded Build 4 and initially resubmitted
+4) Identified Apple SDK warning 90725 and upgraded release path to Build 5
+5) Uploaded Build 5, selected it in App Store Connect, and resubmitted at 3:10 PM
+6) Confirmed Android deployment remains on track operationally (closed testing stage)
 
 ANDROID CHECKPOINT
 ------------------
@@ -38,8 +48,9 @@ ANDROID CHECKPOINT
 KEY DATES
 ---------
 - Apr 15, 2026: Android closed testing started
-- Apr 20, 2026: iOS Build 4 uploaded + resubmitted
+- Apr 20, 2026: iOS Build 5 submitted and resubmitted for review (3:10 PM)
 - Apr 21, 2026: earliest no-earlier-than date configured for iOS auto-release (if approved)
+- Apr 28, 2026: Apple iOS 26 SDK enforcement date
 - Apr 29, 2026: earliest Android production eligibility date
 
 WHAT'S PENDING
@@ -49,16 +60,16 @@ Android:
 - On/after Apr 29, apply for production access and publish production release
 
 iOS:
-- Wait for Apple review result (expected ~24-48h typical)
+- Wait for Apple review result for Build 5
 - If approved, monitor release and startup stability
-- If rejected, map feedback directly to Build 4 binary evidence
+- If rejected, map feedback directly to Build 5 binary evidence
 
 IMPORTANT FILES
 ---------------
 - Master log (Apr 20): /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-20.md
-- Consolidated log (Apr 18): /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-18.md
-- iOS crash analysis: /home/ubuntu/locksafe-mobile/IOS_CRASH_ANALYSIS.md
-- iOS upload report: /home/ubuntu/locksafe-mobile/IOS_BUILD4_UPLOAD_SUCCESS.md
-- iOS resubmission report: /home/ubuntu/locksafe-mobile/IOS_BUILD4_RESUBMISSION_COMPLETE.md
+- Build 5 SDK update log: /home/ubuntu/locksafe-mobile/IOS_BUILD5_SDK_UPDATE.md
+- Build 5 submission completion: /home/ubuntu/locksafe-mobile/IOS_BUILD5_SUBMISSION_COMPLETE.md
+- Build 5 summary: /home/ubuntu/locksafe-mobile/BUILD5_SUMMARY.md
+- Final EOD status: /home/ubuntu/locksafe-mobile/CURRENT_STATUS_APRIL_20_FINAL.md
 - Android deployment report: /home/ubuntu/locksafe-mobile/ANDROID_DEPLOYMENT_REPORT.md
 - OneSignal FCM status: /home/ubuntu/locksafe-mobile/ONESIGNAL_FCM_V1_CONFIG.md

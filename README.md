@@ -17,12 +17,15 @@
 - **Earliest production eligibility:** **29 Apr 2026**
 
 ### iOS (App Store Connect)
-- **Current state:** Build `1.0.2 (4)` resubmitted and **Waiting for Review**
-- **Context:** Build 3 crash reports analyzed; Build 4 includes OneSignal launch stability fix
+- **Current state:** Build `1.0.2 (5)` submitted and **Waiting for Review**
+- **Context:** Apple warning `90725` addressed by rebuilding with **iOS 26.2 SDK (Xcode 2620)**
+- **Submission timestamp:** **Apr 20, 2026 at 3:10 PM (Europe/London)**
 - **Expected review window:** typically 24–48 hours
 
 ### Work Logs / Handoff Docs
 - Master log (Apr 20): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
+- Build 5 SDK update: [`IOS_BUILD5_SDK_UPDATE.md`](./IOS_BUILD5_SDK_UPDATE.md)
+- Build 5 quick summary: [`BUILD5_SUMMARY.md`](./BUILD5_SUMMARY.md)
 - Consolidated log (Apr 18): [`WORK_LOG_2026-04-18.md`](./WORK_LOG_2026-04-18.md)
 - Logs index: [`WORK_LOGS_INDEX.md`](./WORK_LOGS_INDEX.md)
 - Quick checkpoint: [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)
