@@ -91,8 +91,8 @@
     "production": {
       "ios": {
         "appleId": "locksafeuk@icloud.com",
-        "ascAppId": "YOUR_ASC_APP_ID",
-        "appleTeamId": "YOUR_TEAM_ID"
+        "ascAppId": "6762475008",
+        "appleTeamId": "4ZNRAB4A2S"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
