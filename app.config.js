@@ -48,7 +48,7 @@ module.exports = () => {
       ios: {
         supportsTablet: true,
         bundleIdentifier: getBundleId(),
-        buildNumber: '4',
+        buildNumber: '5',
         infoPlist: {
           NSLocationWhenInUseUsageDescription:
             'LockSafe needs your location to find nearby locksmiths and track job progress.',
@@ -73,7 +73,7 @@ module.exports = () => {
           backgroundColor: '#f97316',
         },
         package: getBundleId(),
-        versionCode: 12,
+        versionCode: 13,
         permissions: [
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',

@@ -73,7 +73,9 @@
     "production": {
       "autoIncrement": false,
       "ios": {
-        "credentialsSource": "remote"
+        "credentialsSource": "remote",
+        "image": "latest",
+        "buildConfiguration": "Release"
       },
       "android": {
         "buildType": "app-bundle"
