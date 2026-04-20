@@ -1,0 +1,64 @@
+LOCKSAFE MOBILE — QUICK STATUS (Apr 20, 2026)
+==========================================
+
+CURRENT STATUS
+--------------
+Android:
+- In Google Play CLOSED TESTING (Alpha)
+- Build: 1.0.2 (versionCode 12)
+- Package: uk.locksafe.app
+- Production still gated by Google closed-testing requirements
+
+iOS:
+- Build 4 (1.0.2 (4)) uploaded via EAS Submit successfully
+- Build 4 selected in App Store Connect
+- Resubmitted for review
+- Current App Store status: Waiting for Review
+
+DONE TODAY (APR 20)
+-------------------
+1) Analyzed 4 iOS crash logs from Apple Review
+   - Confirmed all logs are from Build 3 (pre-fix), not Build 4
+2) Confirmed root cause aligns with known OneSignal startup race issue in old binary path
+3) Uploaded iOS Build 4 to App Store Connect (EAS Submit)
+4) Replaced Build 3 with Build 4 in review flow and resubmitted
+5) Confirmed Android deployment remains on track operationally (closed testing stage)
+
+ANDROID CHECKPOINT
+------------------
+- Security fixes already applied:
+  - api_key.json moved out of repo + ignored in .gitignore
+  - locksmith auth guard enforced in app/(locksmith)/_layout.tsx
+- OneSignal FCM V1: configured/active
+- Remaining gate to production:
+  - 12 testers opted-in required
+  - currently 3 opted-in
+  - closed test must run 14 days total (started Apr 15)
+
+KEY DATES
+---------
+- Apr 15, 2026: Android closed testing started
+- Apr 20, 2026: iOS Build 4 uploaded + resubmitted
+- Apr 21, 2026: earliest no-earlier-than date configured for iOS auto-release (if approved)
+- Apr 29, 2026: earliest Android production eligibility date
+
+WHAT'S PENDING
+--------------
+Android:
+- Increase opted-in testers from 3 to 12+
+- On/after Apr 29, apply for production access and publish production release
+
+iOS:
+- Wait for Apple review result (expected ~24-48h typical)
+- If approved, monitor release and startup stability
+- If rejected, map feedback directly to Build 4 binary evidence
+
+IMPORTANT FILES
+---------------
+- Master log (Apr 20): /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-20.md
+- Consolidated log (Apr 18): /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-18.md
+- iOS crash analysis: /home/ubuntu/locksafe-mobile/IOS_CRASH_ANALYSIS.md
+- iOS upload report: /home/ubuntu/locksafe-mobile/IOS_BUILD4_UPLOAD_SUCCESS.md
+- iOS resubmission report: /home/ubuntu/locksafe-mobile/IOS_BUILD4_RESUBMISSION_COMPLETE.md
+- Android deployment report: /home/ubuntu/locksafe-mobile/ANDROID_DEPLOYMENT_REPORT.md
+- OneSignal FCM status: /home/ubuntu/locksafe-mobile/ONESIGNAL_FCM_V1_CONFIG.md

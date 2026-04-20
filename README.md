@@ -8,6 +8,27 @@
 
 ---
 
+## 📌 Current Deployment Status (Updated: 20 Apr 2026)
+
+### Android (Google Play)
+- **Current state:** Closed Testing (Alpha) for `uk.locksafe.app`
+- **Release build:** `1.0.2 (versionCode 12)`
+- **Production access gate:** Requires 12 opted-in testers and 14-day closed testing period
+- **Earliest production eligibility:** **29 Apr 2026**
+
+### iOS (App Store Connect)
+- **Current state:** Build `1.0.2 (4)` resubmitted and **Waiting for Review**
+- **Context:** Build 3 crash reports analyzed; Build 4 includes OneSignal launch stability fix
+- **Expected review window:** typically 24–48 hours
+
+### Work Logs / Handoff Docs
+- Master log (Apr 20): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
+- Consolidated log (Apr 18): [`WORK_LOG_2026-04-18.md`](./WORK_LOG_2026-04-18.md)
+- Logs index: [`WORK_LOGS_INDEX.md`](./WORK_LOGS_INDEX.md)
+- Quick checkpoint: [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)
+
+---
+
 ## 📱 Features
 
 ### Customer Features
