@@ -94,7 +94,10 @@
       "ios": {
         "appleId": "locksafeuk@icloud.com",
         "ascAppId": "6762475008",
-        "appleTeamId": "4ZNRAB4A2S"
+        "appleTeamId": "4ZNRAB4A2S",
+        "ascApiKeyPath": "../Downloads/AuthKey_CN472U9F7K.p8",
+        "ascApiKeyIssuerId": "7472da00-ebbf-4c36-a6e4-bd8a6b4e769d",
+        "ascApiKeyId": "CN472U9F7K"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
