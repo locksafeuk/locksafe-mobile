@@ -1,43 +1,52 @@
-# Current Status — April 20, 2026 (Final EOD)
+# Current Status — April 21, 2026 (Build 6 Update)
 
 ## 1) Executive Summary
 
-LockSafe mobile release work is in a strong position at end of day:
+LockSafe mobile release operations were updated after Apple rejected Build 5 for a persistent iPad crash pattern.
 
-- **iOS:** Build 5 (`1.0.2 (5)`) is submitted and currently **Waiting for Review**.
-- **Android:** App remains in **Google Play Closed Testing** and on track toward production eligibility.
-- **Critical compliance outcome:** Apple SDK warning `90725` has been resolved before the Apr 28 deadline.
+- **iOS:** Build `1.0.2 (6)` (complete OneSignal fix) is now submitted and **Waiting for Review**.
+- **Android:** App remains in **Google Play Closed Testing** and still requires tester/elapsed-time policy completion.
+- **Critical release outcome:** Build 6 replaces Build 5 with a full startup-architecture fix (deferred permission + deferred push registration).
 
 ---
 
-## 2) iOS Final Status (App Store Connect)
+## 2) iOS Latest Status (App Store Connect)
 
 ### Current State
-- **Version / Build:** `1.0.2 (5)`
+- **Version / Build:** `1.0.2 (6)`
 - **Review status:** **Waiting for Review**
-- **Date Submitted:** **Apr 20, 2026 at 3:10 PM (Europe/London)**
 - **Bundle ID:** `uk.locksafe.app`
+- **Build selected for iOS 1.0.2 submission:** Build 6
 
-### Build 5 Compliance Outcome
-- Build 5 compiled with **iOS 26.2 SDK** (`DTSDKName: iphoneos26.2`)
-- Toolchain confirmed at **Xcode 2620**
-- Apple warning **90725** addressed
-- Completed before Apple enforcement date (**Apr 28, 2026**)
+### Build 5 Rejection Context
+- **Rejected build:** `1.0.2 (5)`
+- **Guideline:** `2.1(a) Performance — App Completeness`
+- **Rejection trigger:** app crash during login on iPad Air 11-inch (M3), iPadOS 26.4.1
+- **Crash family:** `EXC_CRASH (SIGABRT)` via `com.facebook.react.ExceptionsManagerQueue`
 
-### Stability Context
-- Build 3 crash logs were analyzed and confirmed as pre-fix
-- Build 4 introduced launch stability hardening
-- Build 5 preserves the same crash-fix lineage while adding SDK compliance
+### Build 6 Fix Scope (Complete)
+- Removed OneSignal permission prompt from startup initialization path
+- Added explicit separate permission request method (`requestPermission`)
+- Deferred push registration + permission request using `InteractionManager.runAfterInteractions()`
+- Kept initialization concurrency guard and added broader OneSignal error hardening
+
+### Build 6 Build/Submission Metadata
+- **Code commit:** `1551f333b050817eb4cb649a9304be7a735f0c67`
+- **EAS Build ID:** `88c239f7-845b-4d4a-8071-634cd746b31c`
+- **EAS Submission ID:** `4358e5b9-8a54-4817-a678-f714c6a62aeb`
+- **IPA:** `https://expo.dev/artifacts/eas/hTtH4oMxc366FEKyJYNjBW.ipa`
+- **Local IPA:** `build/build6/locksafe-v1.0.2-build6-ios.ipa`
+- **Binary verification:** `CFBundleVersion=6`, `CFBundleShortVersionString=1.0.2`
 
 ---
 
-## 3) Android Final Status (Google Play)
+## 3) Android Status (Google Play)
 
 ### Current State
 - **Track:** Closed Testing (Alpha)
-- **Version:** `1.0.2 (versionCode 12)`
+- **Version line in code:** `1.0.2 (versionCode 14 prepared)`
 - **Package:** `uk.locksafe.app`
-- **Submission readiness:** Technically ready; policy gate still active
+- **Submission readiness:** technically ready; policy gate still active
 
 ### Production Gate Requirements
 - Minimum test period: **14 days** (started Apr 15)
@@ -47,57 +56,40 @@ LockSafe mobile release work is in a strong position at end of day:
 
 ---
 
-## 4) Pending Items
+## 4) Build 6 Timeline (Europe/London)
 
-### iOS Pending
-1. Await Apple App Review result for Build 5.
-2. If approved, verify final release behavior and monitor launch stability metrics.
-3. If rejected, map feedback directly to Build 5 submission/build metadata.
-
-### Android Pending
-1. Increase closed-testing opted-in testers from 3 to 12+.
-2. Maintain closed test until minimum duration requirement is fully met.
-3. Apply for production access on/after Apr 29, then prepare production rollout.
-
-### Cross-Platform Pending
-1. Final QA pass on push delivery and deep links on physical devices.
-2. Confirm store metadata consistency (privacy policy/support links/version notes).
-3. Prepare launch support workflow (issue triage + user communication).
+- **Apr 20, 2026 (~3:03 PM):** Build 5 rejected by Apple (Guideline 2.1(a))
+- **Apr 21, 2026:** Build 5 crash log (`crashlog-2F0ED...`) analyzed and mapped to persistent crash family
+- **Apr 21, 2026:** Complete Build 6 patch finalized and committed
+- **Apr 21, 2026 (EAS):** Build started `16:03:06 UTC`, finished `16:10:55 UTC`
+- **Apr 21, 2026:** Build 6 uploaded, processed, selected in ASC, and resubmitted
+- **Current state:** Waiting for Review (Build 6)
 
 ---
 
-## 5) Timeline Snapshot
+## 5) Updated Next Steps
 
-- **Apr 15, 2026:** Android closed testing started.
-- **Apr 20, 2026 (earlier):** Build 4 previously in App Review flow.
-- **Apr 20, 2026 (critical update):** Apple warning `90725` identified as urgent SDK compliance requirement.
-- **Apr 20, 2026:** Build 5 generated with iOS 26.2 SDK and uploaded.
-- **Apr 20, 2026, 3:10 PM:** Build 5 selected and app resubmitted for review.
-- **Apr 28, 2026:** Apple SDK enforcement date (now covered).
-- **Apr 29, 2026:** Earliest Android production eligibility date.
+### iOS (Immediate)
+1. Monitor App Store Connect for Build 6 reviewer updates.
+2. If approved, confirm release behavior and monitor startup/login crash telemetry.
+3. If rejected, symbolicate against matching dSYM and map exact offending frame.
 
----
+### Android (Immediate)
+1. Raise opted-in testers from 3 to 12+.
+2. Keep closed testing active through minimum duration.
+3. Apply for production access on/after Apr 29, 2026.
 
-## 6) Recommended Next-Step Plan
-
-### Next 24 Hours
-- Track iOS App Store Connect status updates and respond quickly to reviewer feedback if any.
-- Continue tester acquisition for Android to close the +9 tester gap.
-
-### Next 3–7 Days
-- If iOS approved, move into release monitoring mode.
-- Keep Android closed testing active and prepare production submission package.
-
-### On/After Apr 29
-- Submit Android production access request and initiate production rollout sequence.
+### Cross-Platform
+1. Complete final physical-device push-notification and deep-link validation.
+2. Keep store metadata/docs aligned with Build 6 as latest iOS review build.
 
 ---
 
-## 7) Reference Documents
+## 6) Reference Documents
 
 - [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
 - [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)
-- [`IOS_BUILD5_SDK_UPDATE.md`](./IOS_BUILD5_SDK_UPDATE.md)
-- [`IOS_BUILD5_SUBMISSION_COMPLETE.md`](./IOS_BUILD5_SUBMISSION_COMPLETE.md)
-- [`BUILD5_SUMMARY.md`](./BUILD5_SUMMARY.md)
+- [`IOS_BUILD6_COMPLETE_FIX.md`](./IOS_BUILD6_COMPLETE_FIX.md)
+- [`IOS_BUILD5_REJECTION_DETAILS.md`](./IOS_BUILD5_REJECTION_DETAILS.md)
+- [`IOS_BUILD5_CRASH_ANALYSIS.md`](./IOS_BUILD5_CRASH_ANALYSIS.md)
 - [`ANDROID_DEPLOYMENT_REPORT.md`](./ANDROID_DEPLOYMENT_REPORT.md)

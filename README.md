@@ -8,24 +8,26 @@
 
 ---
 
-## 📌 Current Deployment Status (Updated: 20 Apr 2026)
+## 📌 Current Deployment Status (Updated: 21 Apr 2026)
 
 ### Android (Google Play)
 - **Current state:** Closed Testing (Alpha) for `uk.locksafe.app`
-- **Release build:** `1.0.2 (versionCode 12)`
+- **Current build line:** `1.0.2 (versionCode 14 prepared in code)`
 - **Production access gate:** Requires 12 opted-in testers and 14-day closed testing period
 - **Earliest production eligibility:** **29 Apr 2026**
 
 ### iOS (App Store Connect)
-- **Current state:** Build `1.0.2 (5)` submitted and **Waiting for Review**
-- **Context:** Apple warning `90725` addressed by rebuilding with **iOS 26.2 SDK (Xcode 2620)**
-- **Submission timestamp:** **Apr 20, 2026 at 3:10 PM (Europe/London)**
-- **Expected review window:** typically 24–48 hours
+- **Current state:** Build `1.0.2 (6)` submitted and **Waiting for Review**
+- **Build 5 context:** Rejected under Guideline 2.1(a) for iPad crash during login/startup path
+- **Build 6 fix:** Deferred permission request + `InteractionManager.runAfterInteractions()` startup stabilization
+- **Build 6 submission:** Processed, selected, and resubmitted successfully
 
 ### Work Logs / Handoff Docs
-- Master log (Apr 20): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
-- Build 5 SDK update: [`IOS_BUILD5_SDK_UPDATE.md`](./IOS_BUILD5_SDK_UPDATE.md)
-- Build 5 quick summary: [`BUILD5_SUMMARY.md`](./BUILD5_SUMMARY.md)
+- Master log (Apr 20 + Build 6 update): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
+- Build 6 complete report: [`IOS_BUILD6_COMPLETE_FIX.md`](./IOS_BUILD6_COMPLETE_FIX.md)
+- Build 5 rejection details: [`IOS_BUILD5_REJECTION_DETAILS.md`](./IOS_BUILD5_REJECTION_DETAILS.md)
+- Build 5 crash analysis: [`IOS_BUILD5_CRASH_ANALYSIS.md`](./IOS_BUILD5_CRASH_ANALYSIS.md)
+- iOS build history: [`IOS_BUILD_HISTORY.md`](./IOS_BUILD_HISTORY.md)
 - Consolidated log (Apr 18): [`WORK_LOG_2026-04-18.md`](./WORK_LOG_2026-04-18.md)
 - Logs index: [`WORK_LOGS_INDEX.md`](./WORK_LOGS_INDEX.md)
 - Quick checkpoint: [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)

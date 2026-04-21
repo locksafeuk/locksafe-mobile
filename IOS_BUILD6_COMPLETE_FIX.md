@@ -10,10 +10,21 @@
 
 Build 6 has been fully implemented, built, uploaded, selected in App Store Connect, and **resubmitted to Apple review**.
 
+### Completion Status
+
+- ✅ Code fix implemented
+- ✅ Build generated
+- ✅ Build uploaded and processed
+- ✅ Build selected in App Store Connect
+- ✅ Reviewer notes updated
+- ✅ Resubmitted to App Review
+- ✅ Current ASC state: `Waiting for Review`
+
 Current App Store Connect submission state is now:
 
-- **iOS Submission:** `Waiting for Review`
+- **Submission state:** `Waiting for Review`
 - **Build attached to version 1.0.2:** `6`
+- **Submission completeness:** **Complete and Submitted**
 
 This build includes the complete OneSignal startup-stability fix:
 
