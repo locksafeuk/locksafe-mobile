@@ -2,6 +2,7 @@ import '../global.css';
 import { useEffect, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { InteractionManager } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -40,27 +41,57 @@ export default function RootLayout() {
 
   useEffect(() => {
     const currentUserId = user?.id || null;
+    let cancelled = false;
 
-    const syncPushRegistration = async () => {
+    let interactionTask: { cancel?: () => void } | undefined;
+
+    void (async () => {
       try {
-        if (currentUserId && user?.type === 'locksmith') {
-          // Initialize lazily for authenticated users only.
-          // This avoids startup races during app launch.
-          await pushNotificationService.registerUser(currentUserId, 'locksmith');
-        }
-
         // Explicitly unregister previous user on logout/switch account
         if (!currentUserId && previousUserIdRef.current) {
           await pushNotificationService.unregisterUser(previousUserIdRef.current, 'locksmith');
         }
-
-        previousUserIdRef.current = currentUserId;
       } catch (error) {
-        console.error('[Push] Failed during push registration sync:', error);
+        console.error('[Push] Failed during push unregistration sync:', {
+          error,
+          currentUserId,
+          previousUserId: previousUserIdRef.current,
+        });
       }
-    };
 
-    void syncPushRegistration();
+      if (!currentUserId || user?.type !== 'locksmith') {
+        previousUserIdRef.current = currentUserId;
+        return;
+      }
+
+      interactionTask = InteractionManager.runAfterInteractions(() => {
+        void (async () => {
+          if (cancelled) {
+            return;
+          }
+
+          try {
+            // Initialize lazily for authenticated users only and only after UI settles.
+            // This avoids startup races during app launch.
+            await pushNotificationService.registerUser(currentUserId, 'locksmith');
+            await pushNotificationService.requestPermission(true);
+          } catch (error) {
+            console.error('[Push] Failed during deferred push initialization sync:', {
+              error,
+              currentUserId,
+              userType: user?.type,
+            });
+          }
+        })();
+      });
+
+      previousUserIdRef.current = currentUserId;
+    })();
+
+    return () => {
+      cancelled = true;
+      interactionTask?.cancel?.();
+    };
   }, [user?.id, user?.type]);
 
   return (

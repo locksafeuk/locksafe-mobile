@@ -71,6 +71,22 @@ class PushNotificationService {
   private notificationReceivedHandlers: Array<(notification: NotificationPayload) => void> = [];
   private pushSubscriptionListener?: (event: any) => void;
 
+  private logOneSignalError(context: string, error: unknown, metadata?: Record<string, unknown>): void {
+    const parsedError =
+      error instanceof Error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : error;
+
+    console.error(`[Push] ${context}`, {
+      error: parsedError,
+      ...(metadata || {}),
+    });
+  }
+
   private parseNotificationType(rawType: unknown): NotificationType {
     if (!rawType || typeof rawType !== 'string') {
       return 'GENERAL_ALERT';
@@ -129,7 +145,7 @@ class PushNotificationService {
       }
       return id || null;
     } catch (error) {
-      console.error('[Push] Failed to get OneSignal player ID:', error);
+      this.logOneSignalError('Failed to get OneSignal player ID', error);
       return null;
     }
   }
@@ -150,7 +166,10 @@ class PushNotificationService {
       });
       return true;
     } catch (error) {
-      console.error('[Push] Failed to sync OneSignal player ID with backend:', error);
+      this.logOneSignalError('Failed to sync OneSignal player ID with backend', error, {
+        userId,
+        playerId,
+      });
       return false;
     }
   }
@@ -181,52 +200,147 @@ class PushNotificationService {
       try {
         const oneSignalModule = await import('react-native-onesignal');
         this.oneSignal = oneSignalModule.OneSignal;
+      } catch (error) {
+        this.logOneSignalError('Failed to import OneSignal SDK during initialize()', error);
+        this.initialized = true;
+        return;
+      }
 
+      if (!this.oneSignal) {
+        console.warn('[Push] OneSignal SDK import returned no module instance.');
+        this.initialized = true;
+        return;
+      }
+
+      try {
         this.oneSignal.initialize(ONESIGNAL_APP_ID);
+      } catch (error) {
+        this.logOneSignalError('OneSignal.initialize failed', error, {
+          appIdConfigured: Boolean(ONESIGNAL_APP_ID),
+        });
+        this.initialized = true;
+        return;
+      }
 
-        // Permission prompt may be denied by user; app should keep working.
-        await this.oneSignal.Notifications.requestPermission(true).catch(() => undefined);
-
+      try {
         this.oneSignal.Notifications.addEventListener('click', (event) => {
-          const payload = this.mapOneSignalEventToPayload(event as unknown as OneSignalClickEvent);
-          this.notificationOpenedHandlers.forEach((handler) => handler(payload));
+          try {
+            const payload = this.mapOneSignalEventToPayload(event as unknown as OneSignalClickEvent);
+            this.notificationOpenedHandlers.forEach((handler) => {
+              try {
+                handler(payload);
+              } catch (handlerError) {
+                this.logOneSignalError('Notification opened handler failed', handlerError, {
+                  notificationType: payload.type,
+                  jobId: payload.jobId,
+                });
+              }
+            });
+          } catch (eventError) {
+            this.logOneSignalError('Failed to process OneSignal click event', eventError);
+          }
         });
+      } catch (error) {
+        this.logOneSignalError('Failed to add OneSignal click event listener', error);
+      }
 
+      try {
         this.oneSignal.Notifications.addEventListener('foregroundWillDisplay', (event) => {
-          const foregroundEvent = event as unknown as OneSignalForegroundEvent;
-          const payload = this.mapOneSignalEventToPayload(foregroundEvent);
+          try {
+            const foregroundEvent = event as unknown as OneSignalForegroundEvent;
+            const payload = this.mapOneSignalEventToPayload(foregroundEvent);
 
-          // Ensure system banner still appears while app is foregrounded.
-          foregroundEvent.preventDefault?.();
-          foregroundEvent.notification?.display?.();
+            // Ensure system banner still appears while app is foregrounded.
+            try {
+              foregroundEvent.preventDefault?.();
+              foregroundEvent.notification?.display?.();
+            } catch (displayError) {
+              this.logOneSignalError('Failed to display foreground notification', displayError, {
+                notificationType: payload.type,
+                jobId: payload.jobId,
+              });
+            }
 
-          this.notificationReceivedHandlers.forEach((handler) => handler(payload));
+            this.notificationReceivedHandlers.forEach((handler) => {
+              try {
+                handler(payload);
+              } catch (handlerError) {
+                this.logOneSignalError('Notification received handler failed', handlerError, {
+                  notificationType: payload.type,
+                  jobId: payload.jobId,
+                });
+              }
+            });
+          } catch (eventError) {
+            this.logOneSignalError('Failed to process OneSignal foreground event', eventError);
+          }
         });
+      } catch (error) {
+        this.logOneSignalError('Failed to add OneSignal foreground listener', error);
+      }
 
-        this.pushSubscriptionListener = async () => {
+      this.pushSubscriptionListener = async () => {
+        try {
           await this.getPlayerIdFromSDK();
           if (this.currentUserId) {
             await this.syncPlayerIdWithBackend(this.currentUserId);
           }
-        };
+        } catch (error) {
+          this.logOneSignalError('Push subscription change handler failed', error, {
+            currentUserId: this.currentUserId,
+          });
+        }
+      };
 
+      try {
         this.oneSignal.User.pushSubscription.addEventListener('change', this.pushSubscriptionListener);
-
-        await this.getPlayerIdFromSDK();
-
-        this.initialized = true;
-        console.log('[Push] OneSignal initialized successfully.');
       } catch (error) {
-        console.error('[Push] OneSignal initialization failed:', error);
-        // Mark as initialized to avoid repeated init loops that could destabilize app launch.
-        this.initialized = true;
+        this.logOneSignalError('Failed to add push subscription change listener', error);
       }
+
+      await this.getPlayerIdFromSDK();
+
+      this.initialized = true;
+      console.log('[Push] OneSignal initialized successfully (permission request deferred).');
     })();
 
     try {
       await this.initializingPromise;
+    } catch (error) {
+      this.logOneSignalError('OneSignal initialization promise failed', error);
+      this.initialized = true;
     } finally {
       this.initializingPromise = null;
+    }
+  }
+
+  async requestPermission(fallbackToSettings = true): Promise<boolean> {
+    if (Platform.OS === 'web') {
+      console.log('[Push] requestPermission skipped on web platform.');
+      return false;
+    }
+
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    if (!this.oneSignal) {
+      console.warn('[Push] requestPermission called before OneSignal SDK became available.');
+      return false;
+    }
+
+    try {
+      const granted = await this.oneSignal.Notifications.requestPermission(fallbackToSettings);
+      console.log('[Push] OneSignal permission result:', {
+        granted,
+        fallbackToSettings,
+      });
+      return Boolean(granted);
+    } catch (error) {
+      this.logOneSignalError('OneSignal permission request failed', error, {
+        fallbackToSettings,
+      });
+      return false;
     }
   }
 
@@ -253,7 +367,10 @@ class PushNotificationService {
 
       return await this.syncPlayerIdWithBackend(userId);
     } catch (error) {
-      console.error('[Push] Failed to register user with OneSignal:', error);
+      this.logOneSignalError('Failed to register user with OneSignal', error, {
+        userId,
+        userType,
+      });
       return false;
     }
   }
@@ -278,13 +395,19 @@ class PushNotificationService {
         });
       }
     } catch (error) {
-      console.error('[Push] Failed to unsubscribe player from backend:', error);
+      this.logOneSignalError('Failed to unsubscribe player from backend', error, {
+        userId,
+        userType,
+        playerId: this.playerId,
+      });
     }
 
     try {
       this.oneSignal?.logout();
     } catch (error) {
-      console.error('[Push] Failed to logout OneSignal user:', error);
+      this.logOneSignalError('Failed to logout OneSignal user', error, {
+        userId,
+      });
     }
 
     this.currentUserId = null;
@@ -299,7 +422,9 @@ class PushNotificationService {
     try {
       this.oneSignal.User.addTags(tags);
     } catch (error) {
-      console.error('[Push] Failed to update tags:', error);
+      this.logOneSignalError('Failed to update tags', error, {
+        tags,
+      });
     }
   }
 
