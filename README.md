@@ -11,15 +11,15 @@
 ## 📌 Current Deployment Status (Updated: 22 Apr 2026)
 
 ### Android (Google Play)
-- **Current state:** Closed Testing (Alpha) for `uk.locksafe.app`
-- **Current build line:** `1.0.2 (versionCode 15 prepared in code)`
+- **Current state:** Native push Build `1.0.2 (15)` completed (AAB generated)
+- **Submit status:** EAS submit blocked locally because `google-service-account.json` is missing
 - **Production access gate:** Requires 12 opted-in testers and 14-day closed testing period
 - **Earliest production eligibility:** **29 Apr 2026**
 
 ### iOS (App Store Connect)
-- **Current state:** Native push migration complete in source code (Build target `1.0.2 (7)`)
-- **Build 7 objective:** remove OneSignal SDK entirely and use native APNs/FCM registration via `expo-notifications`
-- **Submission target:** Build 7 will be submitted with native push stability notes once build processing completes
+- **Current state:** Native push Build `1.0.2 (7)` completed (IPA generated)
+- **Build 7 objective:** OneSignal fully removed; native APNs/FCM registration via `expo-notifications`
+- **Submit status:** iOS EAS submissions were scheduled but need App Store Connect dashboard confirmation due CLI generic completion error
 
 ### Work Logs / Handoff Docs
 - Master log (Apr 20 + Build 6 update): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)

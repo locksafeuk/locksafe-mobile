@@ -5,14 +5,18 @@ CURRENT STATUS
 --------------
 Android:
 - Native push migration completed in source
-- Target build line updated to 1.0.2 (versionCode 15)
-- EAS Android production build started (Build ID: c57ae58e-5458-40a1-b805-dc3c04805b68)
+- Production build completed: 1.0.2 (versionCode 15)
+- EAS Build ID: 8b76b3db-228d-42fe-b1f7-e193ae22b2f6
+- AAB artifact: https://expo.dev/artifacts/eas/idRmY5brYXEptgA7wtoPZh.aab
+- EAS Submit blocked: `google-service-account.json` missing in repo root
 
 iOS:
-- OneSignal removed from app runtime/config/dependencies
+- OneSignal removed from runtime/config/dependencies
 - Native APNs/FCM token registration implemented via expo-notifications
-- Target build updated to 1.0.2 (buildNumber 7)
-- EAS iOS production build started (Build ID: 36598884-9a4b-4d68-af72-054e865e8637)
+- Production build completed: 1.0.2 (buildNumber 7)
+- EAS Build ID: cf6e04b7-c48f-48f0-89d8-8b657c26325a
+- IPA artifact: https://expo.dev/artifacts/eas/rBCxse4RsnFwB936Y64Vnu.ipa
+- EAS Submit attempts created submission jobs but returned final error; needs App Store Connect confirmation
 
 MIGRATION SUMMARY
 -----------------
