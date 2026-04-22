@@ -1,37 +1,40 @@
 LOCKSAFE MOBILE — QUICK STATUS (Apr 22, 2026)
 ==========================================
 
-CURRENT STATUS
---------------
-Android:
-- Native push migration completed in source
-- Production build completed: 1.0.2 (versionCode 15)
-- EAS Build ID: 8b76b3db-228d-42fe-b1f7-e193ae22b2f6
-- AAB artifact: https://expo.dev/artifacts/eas/idRmY5brYXEptgA7wtoPZh.aab
-- EAS Submit blocked: `google-service-account.json` missing in repo root
-
+FINAL RELEASE STATUS
+--------------------
 iOS:
-- OneSignal removed from runtime/config/dependencies
-- Native APNs/FCM token registration implemented via expo-notifications
-- Production build completed: 1.0.2 (buildNumber 7)
-- EAS Build ID: cf6e04b7-c48f-48f0-89d8-8b657c26325a
-- IPA artifact: https://expo.dev/artifacts/eas/rBCxse4RsnFwB936Y64Vnu.ipa
-- App Store Connect submission completed manually for Build 7
-- Current App Review status: Waiting for Review (Submission ID: 60358e7a-21ec-4571-804a-f3a80f618c66)
+- Build: 1.0.2 (Build 7)
+- Push stack: Native APNs (expo-notifications)
+- Status: Waiting for Review
+- Submission: iOS App 1.0.2 (7)
 
-MIGRATION SUMMARY
+Android:
+- Build: 1.0.2 (Build 15 / versionCode 15)
+- Push stack: Native FCM (expo-notifications)
+- Status: In Review
+- Submission: Production release with Build 15 under review
+
+MIGRATION OUTCOME
 -----------------
-1) Removed: react-native-onesignal + onesignal-expo-plugin
-2) Added: expo-notifications + expo-device
-3) Replaced service: services/pushNotifications.ts -> services/nativePushNotifications.ts
-4) App config updated to native notification plugin and background remote notifications
-5) Backend contract switched to native token endpoints:
-   - POST /api/push/register-device
-   - POST /api/push/unregister-device
+- Native push migration complete
+- OneSignal completely removed from app runtime/config/dependencies
+- Both platforms now use native push token registration
+- Backend contract switched to:
+  - POST /api/push/register-device
+  - POST /api/push/unregister-device
 
-KEY FILES
----------
-- Migration report: /home/ubuntu/locksafe-mobile/NATIVE_PUSH_MIGRATION_COMPLETE.md
-- Master log: /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-20.md
-- Root config: /home/ubuntu/locksafe-mobile/app.config.js
-- Native push service: /home/ubuntu/locksafe-mobile/services/nativePushNotifications.ts
+WHAT CHANGED (FINAL)
+--------------------
+1) Removed OneSignal SDK + plugin and all OneSignal env/config references
+2) Implemented services/nativePushNotifications.ts
+3) Updated app bootstrap push registration flow (post-interactions)
+4) Shipped final builds: iOS 7 and Android 15
+5) Submitted both builds; currently in platform review queues
+
+REFERENCE FILES
+---------------
+- /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-20.md
+- /home/ubuntu/locksafe-mobile/CURRENT_STATUS_APRIL_20_FINAL.md
+- /home/ubuntu/locksafe-mobile/SESSION_SUMMARY_2026-04-20.md
+- /home/ubuntu/locksafe-mobile/IOS_BUILD_HISTORY.md

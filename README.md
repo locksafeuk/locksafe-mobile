@@ -8,28 +8,30 @@
 
 ---
 
-## 📌 Current Deployment Status (Updated: 22 Apr 2026)
+## 📌 Current Deployment Status (FINAL: 22 Apr 2026)
 
-### Android (Google Play)
-- **Current state:** Native push Build `1.0.2 (15)` completed (AAB generated)
-- **Submit status:** EAS submit blocked locally because `google-service-account.json` is missing
-- **Production access gate:** Requires 12 opted-in testers and 14-day closed testing period
-- **Earliest production eligibility:** **29 Apr 2026**
+### Native Push Migration (Final Outcome)
+- ✅ OneSignal fully removed from runtime, config, and dependencies
+- ✅ Native push stack active on both platforms (`expo-notifications` + `expo-device`)
+- ✅ Backend token contract switched to native device endpoints
 
 ### iOS (App Store Connect)
-- **Current state:** Native push Build `1.0.2 (7)` completed (IPA generated)
-- **Build 7 objective:** OneSignal fully removed; native APNs/FCM registration via `expo-notifications`
-- **Submit status:** Submitted successfully in App Store Connect; currently **Waiting for Review** (`iOS App 1.0.2 (7)`)
+- **Current review build:** `1.0.2 (7)`
+- **Push implementation:** Native APNs token registration
+- **Submission status:** **Waiting for Review** (`iOS App 1.0.2 (7)`)
 
-### Work Logs / Handoff Docs
-- Master log (Apr 20 + Build 6 update): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
-- Build 6 complete report: [`IOS_BUILD6_COMPLETE_FIX.md`](./IOS_BUILD6_COMPLETE_FIX.md)
-- Build 5 rejection details: [`IOS_BUILD5_REJECTION_DETAILS.md`](./IOS_BUILD5_REJECTION_DETAILS.md)
-- Build 5 crash analysis: [`IOS_BUILD5_CRASH_ANALYSIS.md`](./IOS_BUILD5_CRASH_ANALYSIS.md)
-- iOS build history: [`IOS_BUILD_HISTORY.md`](./IOS_BUILD_HISTORY.md)
-- Consolidated log (Apr 18): [`WORK_LOG_2026-04-18.md`](./WORK_LOG_2026-04-18.md)
-- Logs index: [`WORK_LOGS_INDEX.md`](./WORK_LOGS_INDEX.md)
+### Android (Google Play)
+- **Current review build:** `1.0.2 (15)`
+- **Push implementation:** Native FCM token registration
+- **Submission status:** **In Review**
+
+### Work Logs / Final Handoff Docs
+- Master log + final update: [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
+- Final status report: [`CURRENT_STATUS_APRIL_20_FINAL.md`](./CURRENT_STATUS_APRIL_20_FINAL.md)
+- Complete session summary: [`SESSION_SUMMARY_2026-04-20.md`](./SESSION_SUMMARY_2026-04-20.md)
+- iOS build history (through Build 7): [`IOS_BUILD_HISTORY.md`](./IOS_BUILD_HISTORY.md)
 - Quick checkpoint: [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)
+- Migration implementation report: [`NATIVE_PUSH_MIGRATION_COMPLETE.md`](./NATIVE_PUSH_MIGRATION_COMPLETE.md)
 
 ---
 

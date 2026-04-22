@@ -1,65 +1,64 @@
 # iOS Build History — LockSafe (`uk.locksafe.app`)
 
-**Last Updated:** 2026-04-21 (Europe/London)
+**Last Updated:** 2026-04-22 (Europe/London)  
 **Version Line:** `1.0.2`
 
 ---
 
-## Build Progression Summary (Builds 3 → 6)
+## Build Progression Summary (Builds 3 → 7)
 
 | Build | Status | What was fixed/changed | Result / Outcome |
 |---|---|---|---|
-| **3** | Rejected | Baseline submission before startup crash hardening | Rejected under Guideline 2.1(a), crash family observed (`EXC_CRASH/SIGABRT`) on iPad startup path |
-| **4** | Submitted after Build 3 triage | Initial OneSignal launch-stability hardening (removed eager startup init path + added init race guard) | Improved architecture, but later rejection pattern persisted in subsequent review cycle |
-| **5** | Rejected | Apple SDK compliance update for warning `90725` (iOS 26.2 SDK / Xcode 2620) while preserving prior crash mitigation | SDK compliance achieved, but Apple still reported crash during login/startup on iPad; rejection triggered Build 6 full fix |
-| **6** | **Current active review build** | Complete OneSignal startup fix: removed permission prompt from init, deferred registration/permission via `InteractionManager.runAfterInteractions()`, expanded defensive error handling | Uploaded, selected in App Store Connect, resubmitted; current state: **Waiting for Review** |
+| **3** | Rejected | Baseline submission before crash hardening | Rejected under Guideline 2.1(a); startup crash family observed (`EXC_CRASH/SIGABRT`) |
+| **4** | Submitted / Resubmitted | Initial startup hardening and race mitigation | Improved path, but crash-family concerns persisted in later cycle |
+| **5** | Rejected | iOS 26.2 SDK compliance update (warning 90725) while keeping prior crash mitigation | SDK compliance achieved; rejection still reported startup/login crash |
+| **6** | Submitted then superseded | Enhanced OneSignal timing hardening (deferred permission + deferred post-interaction registration) | Mitigation improved, but not accepted as final stable architecture |
+| **7** | **Current final review build** | **OneSignal removed entirely; native push (APNs) migration via Expo Notifications** | **Submitted and Waiting for Review** |
 
 ---
 
 ## Detailed Build Notes
 
 ### Build 3 (`1.0.2 (3)`)
-- Crash logs from App Review repeatedly pointed to:
-  - `EXC_CRASH (SIGABRT)`
-  - `com.facebook.react.ExceptionsManagerQueue`
-  - Objective-C exception rethrow path terminating app
-- Device context repeatedly iPad-class hardware on iPadOS 26.4.1.
+- App Review crash logs repeatedly indicated startup abort path (`EXC_CRASH (SIGABRT)`).
+- Used as primary rejection baseline for subsequent remediation.
 
 ### Build 4 (`1.0.2 (4)`)
-- Introduced first wave startup stabilization for OneSignal orchestration.
-- Focus: reduce launch-time race conditions and duplicate initialization paths.
-- Uploaded and moved into App Review flow after Build 3 analysis.
+- Introduced first-wave startup stabilization and reduced eager push init behavior.
+- Uploaded and used in post-triage resubmission flow.
 
 ### Build 5 (`1.0.2 (5)`)
-- Built to satisfy Apple SDK policy warning 90725 before enforcement deadline.
-- Confirmed new toolchain/SDK compliance.
-- Rejected again for crash during login/startup.
-- Build 5 rejection crash (`crashlog-2F0EDDB4...`) confirmed same crash family, leading to architectural remediation in Build 6.
+- Created to satisfy Apple SDK warning `90725` before enforcement deadline.
+- Verified iOS 26.2 SDK toolchain update.
+- Rejected for persistent startup/login crash behavior.
 
 ### Build 6 (`1.0.2 (6)`)
-- Complete OneSignal fix shipped:
-  1. Permission request removed from `initialize()`
-  2. Added explicit deferred permission API
-  3. Deferred push registration and permission until post-interactions in root layout
-  4. Added granular try/catch and OneSignal error instrumentation
-- Build and submission metadata:
-  - Commit: `1551f333b050817eb4cb649a9304be7a735f0c67`
-  - EAS Build ID: `88c239f7-845b-4d4a-8071-634cd746b31c`
-  - EAS Submission ID: `4358e5b9-8a54-4817-a678-f714c6a62aeb`
-- Current App Store Connect status: **Waiting for Review**.
+- Added deeper OneSignal stabilization:
+  1. Permission request removed from init path
+  2. Explicit permission API
+  3. Deferred post-interaction registration flow
+  4. Additional defensive error handling
+- Became transitional build before final architectural change.
+
+### Build 7 (`1.0.2 (7)`) — Final Solution Build
+- Complete migration from OneSignal to native push:
+  - Removed OneSignal SDK/plugin/runtime integration
+  - Added native APNs token flow using `expo-notifications` + `expo-device`
+  - Updated backend registration to native token endpoints
+- Build submitted successfully in App Store Connect.
+- **Current state:** Waiting for Review.
 
 ---
 
-## Why Build 6 is the Completion Build
+## Why Build 7 Is the Final/Permanent Solution
 
-Builds 3–5 progressively identified and narrowed the crash family. Build 6 is the first build where permission timing and push registration timing are both moved out of startup-critical execution, with added fault tolerance and retained init concurrency protection. This closes the previously recurring startup-risk architecture.
+Build 7 is the first iOS release that fully removes the third-party OneSignal startup dependency and transitions to platform-native push lifecycle control. This resolves the prior strategy limitation (mitigating around OneSignal timing) by eliminating the dependency path itself. The resulting architecture is simpler, deterministic at startup, and aligned with long-term stability.
 
 ---
 
-## Related Reports
+## Related Documents
 
-- [`IOS_BUILD5_REJECTION_DETAILS.md`](./IOS_BUILD5_REJECTION_DETAILS.md)
-- [`IOS_BUILD5_CRASH_ANALYSIS.md`](./IOS_BUILD5_CRASH_ANALYSIS.md)
-- [`IOS_BUILD6_COMPLETE_FIX.md`](./IOS_BUILD6_COMPLETE_FIX.md)
 - [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
 - [`CURRENT_STATUS_APRIL_20_FINAL.md`](./CURRENT_STATUS_APRIL_20_FINAL.md)
+- [`SESSION_SUMMARY_2026-04-20.md`](./SESSION_SUMMARY_2026-04-20.md)
+- [`NATIVE_PUSH_MIGRATION_COMPLETE.md`](./NATIVE_PUSH_MIGRATION_COMPLETE.md)

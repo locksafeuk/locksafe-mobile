@@ -1,95 +1,88 @@
-# Current Status — April 21, 2026 (Build 6 Update)
+# FINAL Status Update — Native Push Migration Complete (Apr 22, 2026)
 
-## 1) Executive Summary
+## 1) Final Executive Summary
 
-LockSafe mobile release operations were updated after Apple rejected Build 5 for a persistent iPad crash pattern.
+This is the definitive final session update for the April 20–22 release cycle.
 
-- **iOS:** Build `1.0.2 (6)` (complete OneSignal fix) is now submitted and **Waiting for Review**.
-- **Android:** App remains in **Google Play Closed Testing** and still requires tester/elapsed-time policy completion.
-- **Critical release outcome:** Build 6 replaces Build 5 with a full startup-architecture fix (deferred permission + deferred push registration).
+- **iOS final review build:** `1.0.2 (7)` using **native APNs** token flow.
+- **Android final review build:** `1.0.2 (15)` using **native FCM** token flow.
+- **Architectural outcome:** OneSignal has been completely removed from runtime/config/dependencies.
+- **Platform status now:**
+  - **iOS Build 7:** Waiting for Review
+  - **Android Build 15:** In Review
 
----
-
-## 2) iOS Latest Status (App Store Connect)
-
-### Current State
-- **Version / Build:** `1.0.2 (6)`
-- **Review status:** **Waiting for Review**
-- **Bundle ID:** `uk.locksafe.app`
-- **Build selected for iOS 1.0.2 submission:** Build 6
-
-### Build 5 Rejection Context
-- **Rejected build:** `1.0.2 (5)`
-- **Guideline:** `2.1(a) Performance — App Completeness`
-- **Rejection trigger:** app crash during login on iPad Air 11-inch (M3), iPadOS 26.4.1
-- **Crash family:** `EXC_CRASH (SIGABRT)` via `com.facebook.react.ExceptionsManagerQueue`
-
-### Build 6 Fix Scope (Complete)
-- Removed OneSignal permission prompt from startup initialization path
-- Added explicit separate permission request method (`requestPermission`)
-- Deferred push registration + permission request using `InteractionManager.runAfterInteractions()`
-- Kept initialization concurrency guard and added broader OneSignal error hardening
-
-### Build 6 Build/Submission Metadata
-- **Code commit:** `1551f333b050817eb4cb649a9304be7a735f0c67`
-- **EAS Build ID:** `88c239f7-845b-4d4a-8071-634cd746b31c`
-- **EAS Submission ID:** `4358e5b9-8a54-4817-a678-f714c6a62aeb`
-- **IPA:** `https://expo.dev/artifacts/eas/hTtH4oMxc366FEKyJYNjBW.ipa`
-- **Local IPA:** `build/build6/locksafe-v1.0.2-build6-ios.ipa`
-- **Binary verification:** `CFBundleVersion=6`, `CFBundleShortVersionString=1.0.2`
+The repeated crash/rejection cycle on OneSignal-based builds was resolved by a full native push migration, not incremental OneSignal hardening.
 
 ---
 
-## 3) Android Status (Google Play)
+## 2) Complete Session Summary (Build Journey)
 
-### Current State
-- **Track:** Closed Testing (Alpha)
-- **Version line in code:** `1.0.2 (versionCode 14 prepared)`
-- **Package:** `uk.locksafe.app`
-- **Submission readiness:** technically ready; policy gate still active
+### iOS builds covered in this session
+- **Build 3:** Rejected (startup crash family identified)
+- **Build 4:** Uploaded/resubmitted after initial crash triage hardening
+- **Build 5:** SDK compliance update (iOS 26.2 SDK), then rejected for persistent crash
+- **Build 6:** Complete OneSignal timing hardening build, later still not accepted as final stable path
+- **Build 7:** Native push migration build (OneSignal removed) submitted; Waiting for Review
 
-### Production Gate Requirements
-- Minimum test period: **14 days** (started Apr 15)
-- Minimum testers opted-in: **12**
-- Current testers opted-in: **3**
-- Earliest production eligibility date: **Apr 29, 2026**
-
----
-
-## 4) Build 6 Timeline (Europe/London)
-
-- **Apr 20, 2026 (~3:03 PM):** Build 5 rejected by Apple (Guideline 2.1(a))
-- **Apr 21, 2026:** Build 5 crash log (`crashlog-2F0ED...`) analyzed and mapped to persistent crash family
-- **Apr 21, 2026:** Complete Build 6 patch finalized and committed
-- **Apr 21, 2026 (EAS):** Build started `16:03:06 UTC`, finished `16:10:55 UTC`
-- **Apr 21, 2026:** Build 6 uploaded, processed, selected in ASC, and resubmitted
-- **Current state:** Waiting for Review (Build 6)
+### Android builds covered in this session
+- **Build 12:** Security/deployment baseline in closed testing
+- **Build 14:** Intermediate version line during Build 6-era OneSignal fix sequence
+- **Build 15:** Native push migration build submitted; In Review
 
 ---
 
-## 5) Updated Next Steps
+## 3) Why the Native Push Migration Was Required
 
-### iOS (Immediate)
-1. Monitor App Store Connect for Build 6 reviewer updates.
-2. If approved, confirm release behavior and monitor startup/login crash telemetry.
-3. If rejected, symbolicate against matching dSYM and map exact offending frame.
+### Rejection chain that drove the decision
+1. Build 5 rejection confirmed startup crash persisted despite earlier mitigation.
+2. Build 6 introduced deeper OneSignal timing controls but did not provide confidence as a permanent architecture.
+3. The team moved from mitigation-only strategy to full dependency removal.
 
-### Android (Immediate)
-1. Raise opted-in testers from 3 to 12+.
-2. Keep closed testing active through minimum duration.
-3. Apply for production access on/after Apr 29, 2026.
+### Permanent fix implemented
+- Removed `react-native-onesignal` and `onesignal-expo-plugin`
+- Removed OneSignal app/plugin/env wiring from app config and build config
+- Implemented `services/nativePushNotifications.ts` using `expo-notifications` + `expo-device`
+- Switched backend integration to:
+  - `POST /api/push/register-device`
+  - `POST /api/push/unregister-device`
+- Kept startup-safe deferred registration using `InteractionManager.runAfterInteractions()`
 
-### Cross-Platform
-1. Complete final physical-device push-notification and deep-link validation.
-2. Keep store metadata/docs aligned with Build 6 as latest iOS review build.
+This is the permanent solution because the problematic third-party startup dependency was removed entirely, reducing startup crash surface area and giving deterministic first-party control over permission and token lifecycle.
 
 ---
 
-## 6) Reference Documents
+## 4) Final Build + Review Status
+
+### iOS
+- **Version/Build:** `1.0.2 (7)`
+- **Push implementation:** Native APNs via Expo Notifications
+- **Submission state:** **Waiting for Review**
+- **Submission item:** `iOS App 1.0.2 (7)`
+
+### Android
+- **Version/Build:** `1.0.2 (15)`
+- **Push implementation:** Native FCM via Expo Notifications
+- **Submission state:** **In Review**
+- **Submission item:** Production release based on Build 15
+
+---
+
+## 5) Final Next Steps
+
+1. Monitor iOS Build 7 App Review result and release when approved.
+2. Monitor Android Build 15 review result and promote according to rollout plan.
+3. After both approvals, run post-release validation:
+   - Push delivery on physical devices (iOS + Android)
+   - Deep-link handling from notification taps
+   - Startup stability checks and crash monitoring
+4. Keep all release docs aligned to Build 7 / Build 15 as the final migration baseline.
+
+---
+
+## 6) References
 
 - [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
+- [`SESSION_SUMMARY_2026-04-20.md`](./SESSION_SUMMARY_2026-04-20.md)
 - [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)
-- [`IOS_BUILD6_COMPLETE_FIX.md`](./IOS_BUILD6_COMPLETE_FIX.md)
-- [`IOS_BUILD5_REJECTION_DETAILS.md`](./IOS_BUILD5_REJECTION_DETAILS.md)
-- [`IOS_BUILD5_CRASH_ANALYSIS.md`](./IOS_BUILD5_CRASH_ANALYSIS.md)
-- [`ANDROID_DEPLOYMENT_REPORT.md`](./ANDROID_DEPLOYMENT_REPORT.md)
+- [`IOS_BUILD_HISTORY.md`](./IOS_BUILD_HISTORY.md)
+- [`NATIVE_PUSH_MIGRATION_COMPLETE.md`](./NATIVE_PUSH_MIGRATION_COMPLETE.md)
