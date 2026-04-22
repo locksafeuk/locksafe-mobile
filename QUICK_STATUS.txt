@@ -16,7 +16,8 @@ iOS:
 - Production build completed: 1.0.2 (buildNumber 7)
 - EAS Build ID: cf6e04b7-c48f-48f0-89d8-8b657c26325a
 - IPA artifact: https://expo.dev/artifacts/eas/rBCxse4RsnFwB936Y64Vnu.ipa
-- EAS Submit attempts created submission jobs but returned final error; needs App Store Connect confirmation
+- App Store Connect submission completed manually for Build 7
+- Current App Review status: Waiting for Review (Submission ID: 60358e7a-21ec-4571-804a-f3a80f618c66)
 
 MIGRATION SUMMARY
 -----------------

@@ -99,13 +99,12 @@ Payload includes:
 
 ## 8) Submission execution status
 
-### iOS submit attempts
-- Submissions scheduled via EAS:
-  - `f5b1af5a-0a22-4a6a-83be-542b4acb30c4`
-  - `fa97fd79-fda2-43fa-846c-69dffc3cc3a6`
-  - `18f33a5b-40d3-47d9-a783-5bb1f5d8e919`
-  - `9d67b185-a708-4631-a32f-eb55ace4c3be`
-- EAS CLI returned generic final failure message during wait step; App Store Connect confirmation required in dashboard.
+### iOS submission (final)
+- EAS automated submit created jobs but returned generic completion errors in CLI.
+- Finalized in App Store Connect UI after reselecting build 7 and correcting invalid scheduled release date.
+- Final status: **Waiting for Review**
+- Submission ID: `60358e7a-21ec-4571-804a-f3a80f618c66`
+- Submitted item: `iOS App 1.0.2 (7)`
 
 ### Android submit attempt
 - EAS submit failed locally due missing file: `./google-service-account.json`

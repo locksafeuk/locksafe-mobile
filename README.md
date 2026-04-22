@@ -19,7 +19,7 @@
 ### iOS (App Store Connect)
 - **Current state:** Native push Build `1.0.2 (7)` completed (IPA generated)
 - **Build 7 objective:** OneSignal fully removed; native APNs/FCM registration via `expo-notifications`
-- **Submit status:** iOS EAS submissions were scheduled but need App Store Connect dashboard confirmation due CLI generic completion error
+- **Submit status:** Submitted successfully in App Store Connect; currently **Waiting for Review** (`iOS App 1.0.2 (7)`)
 
 ### Work Logs / Handoff Docs
 - Master log (Apr 20 + Build 6 update): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
