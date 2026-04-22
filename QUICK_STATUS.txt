@@ -1,52 +1,32 @@
-LOCKSAFE MOBILE — QUICK STATUS (Apr 21, 2026)
+LOCKSAFE MOBILE — QUICK STATUS (Apr 22, 2026)
 ==========================================
 
 CURRENT STATUS
 --------------
 Android:
-- In Google Play CLOSED TESTING (Alpha)
-- Current build line: 1.0.2 (versionCode 14 prepared in code)
-- Package: uk.locksafe.app
-- Production still gated by Google closed-testing requirements
+- Native push migration completed in source
+- Target build line updated to 1.0.2 (versionCode 15)
+- EAS Android production build started (Build ID: c57ae58e-5458-40a1-b805-dc3c04805b68)
 
 iOS:
-- Build 5 was rejected (Guideline 2.1(a): crash on iPad login path)
-- Build 6 (1.0.2 (6)) created as complete OneSignal architectural fix
-- Build 6 uploaded via EAS Submit and processed by Apple
-- Build 6 selected for App Store version 1.0.2
-- Reviewer notes updated with deferred permission + InteractionManager fix details
-- Resubmitted to App Review
-- Current App Store status: Waiting for Review (Build 6)
-- Fix completeness note: permission prompt removed from startup path + registration deferred until post-interactions
+- OneSignal removed from app runtime/config/dependencies
+- Native APNs/FCM token registration implemented via expo-notifications
+- Target build updated to 1.0.2 (buildNumber 7)
+- EAS iOS production build started (Build ID: 36598884-9a4b-4d68-af72-054e865e8637)
 
-BUILD 6 RELEASE DETAILS
------------------------
-- Git commit: 1551f333b050817eb4cb649a9304be7a735f0c67
-- Commit message: fix: defer OneSignal permission prompt and stabilize UI initialization for Build 6
-- EAS build ID: 88c239f7-845b-4d4a-8071-634cd746b31c
-- EAS submission ID: 4358e5b9-8a54-4817-a678-f714c6a62aeb
-- IPA artifact: https://expo.dev/artifacts/eas/hTtH4oMxc366FEKyJYNjBW.ipa
-- Local IPA: /home/ubuntu/locksafe-mobile/build/build6/locksafe-v1.0.2-build6-ios.ipa
-- SHA256: 6adce1d7b2c04bf1581330409bce1913a3e4973f8b210dfbfca8283aef1ef39a
-
-IOS FIX INCLUDED IN BUILD 6
----------------------------
-1) OneSignal permission prompt removed from initialize()
-2) New requestPermission() method added and called later
-3) registerUser/permission call deferred with InteractionManager.runAfterInteractions()
-4) Comprehensive OneSignal try-catch/error logging added
-5) Concurrency guard (initializingPromise) retained
-
-ANDROID CHECKPOINT
-------------------
-- Security fixes remain applied
-- OneSignal FCM V1 remains configured
-- Remaining gate to production:
-  - 12 testers opted-in required
-  - closed test duration requirement must be met
+MIGRATION SUMMARY
+-----------------
+1) Removed: react-native-onesignal + onesignal-expo-plugin
+2) Added: expo-notifications + expo-device
+3) Replaced service: services/pushNotifications.ts -> services/nativePushNotifications.ts
+4) App config updated to native notification plugin and background remote notifications
+5) Backend contract switched to native token endpoints:
+   - POST /api/push/register-device
+   - POST /api/push/unregister-device
 
 KEY FILES
 ---------
-- Build 6 full report: /home/ubuntu/locksafe-mobile/IOS_BUILD6_COMPLETE_FIX.md
+- Migration report: /home/ubuntu/locksafe-mobile/NATIVE_PUSH_MIGRATION_COMPLETE.md
 - Master log: /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-20.md
-- Screenshots: /home/ubuntu/locksafe-mobile/docs/screenshots/build6/
+- Root config: /home/ubuntu/locksafe-mobile/app.config.js
+- Native push service: /home/ubuntu/locksafe-mobile/services/nativePushNotifications.ts

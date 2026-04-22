@@ -11,10 +11,28 @@ export interface NotificationsResponse {
   unreadCount: number;
 }
 
-export interface OneSignalSubscribeResponse {
+export interface NativePushRegistrationResponse {
   success: boolean;
   message?: string;
   error?: string;
+}
+
+export interface NativePushRegistrationPayload {
+  userId: string;
+  userType: 'locksmith';
+  deviceToken: string;
+  tokenType: string;
+  platform: string;
+  deviceName?: string | null;
+  isDevice?: boolean;
+}
+
+export interface NativePushUnregisterPayload {
+  userId: string;
+  userType: 'locksmith';
+  deviceToken: string;
+  tokenType: string;
+  platform: string;
 }
 
 // ==========================================
@@ -56,29 +74,21 @@ export async function markAllLocksmithNotificationsAsRead(
 }
 
 /**
- * Subscribe to push notifications with OneSignal
+ * Register native push token for APNs/FCM delivery.
  */
-export async function subscribeToOneSignal(data: {
-  playerId: string;
-  userId: string;
-  userType: 'locksmith';
-}): Promise<OneSignalSubscribeResponse> {
-  return post<OneSignalSubscribeResponse>('/api/onesignal/subscribe', {
-    playerId: data.playerId,
-    userId: data.userId,
-    userType: data.userType,
-  });
+export async function registerNativePushToken(
+  data: NativePushRegistrationPayload
+): Promise<NativePushRegistrationResponse> {
+  return post<NativePushRegistrationResponse>('/api/push/register-device', data);
 }
 
 /**
- * Unsubscribe from push notifications
+ * Unregister native push token.
  */
-export async function unsubscribeFromOneSignal(data: {
-  playerId: string;
-  userId: string;
-  userType: 'locksmith';
-}): Promise<ApiResponse> {
-  return post<ApiResponse>('/api/onesignal/unsubscribe', data);
+export async function unregisterNativePushToken(
+  data: NativePushUnregisterPayload
+): Promise<ApiResponse> {
+  return post<ApiResponse>('/api/push/unregister-device', data);
 }
 
 /**

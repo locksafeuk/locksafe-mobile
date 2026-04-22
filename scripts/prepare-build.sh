@@ -10,9 +10,14 @@ echo "🔧 LockSafe Mobile App - Build Preparation"
 echo "==========================================="
 
 # Check if we're in the right directory
-if [ ! -f "package.json" ] || [ ! -f "app.json" ]; then
-    echo "❌ Error: Please run this script from the locksafe-uk-mobile-app directory"
+if [ ! -f "package.json" ] || { [ ! -f "app.config.js" ] && [ ! -f "app.json" ]; }; then
+    echo "❌ Error: Please run this script from the locksafe-mobile directory"
     exit 1
+fi
+
+CONFIG_FILE="app.config.js"
+if [ -f "app.json" ]; then
+    CONFIG_FILE="app.json"
 fi
 
 # Check for EAS CLI
@@ -41,7 +46,7 @@ if [ -f ".env" ]; then
     echo "✅ .env file found"
 
     # Check for required variables
-    required_vars=("API_URL" "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY" "EXPO_PUBLIC_ONESIGNAL_APP_ID")
+    required_vars=("API_URL" "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY" "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY")
     missing_vars=()
 
     for var in "${required_vars[@]}"; do
@@ -62,22 +67,22 @@ else
     echo "⚠️  .env file not found. Copy .env.example to .env and configure."
 fi
 
-# Check app.json configuration
+# Check app config configuration
 echo ""
-echo "📋 Checking app.json configuration..."
+echo "📋 Checking ${CONFIG_FILE} configuration..."
 
 # Check for placeholder values
-if grep -q "YOUR_" app.json; then
-    echo "⚠️  app.json contains placeholder values (YOUR_*):"
-    grep -n "YOUR_" app.json | while read -r line; do
+if grep -q "YOUR_" "${CONFIG_FILE}"; then
+    echo "⚠️  ${CONFIG_FILE} contains placeholder values (YOUR_*):"
+    grep -n "YOUR_" "${CONFIG_FILE}" | while read -r line; do
         echo "   $line"
     done
 else
-    echo "✅ No placeholder values found in app.json"
+    echo "✅ No placeholder values found in ${CONFIG_FILE}"
 fi
 
 # Check EAS project ID
-if grep -q '"projectId": "YOUR_EAS_PROJECT_ID"' app.json; then
+if grep -q '"projectId": "YOUR_EAS_PROJECT_ID"' "${CONFIG_FILE}"; then
     echo ""
     echo "⚠️  EAS Project ID not configured."
     echo "   Run: eas init"

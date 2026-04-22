@@ -10,9 +10,9 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 import Constants from 'expo-constants';
 import { useAuthStore } from '../stores/authStore';
 import {
-  pushNotificationService,
-  usePushNotificationNavigation,
-} from '../services/pushNotifications';
+  nativePushNotificationService,
+  useNativePushNotificationNavigation,
+} from '../services/nativePushNotifications';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,7 +33,7 @@ export default function RootLayout() {
   const user = useAuthStore((state) => state.user);
   const previousUserIdRef = useRef<string | null>(null);
 
-  usePushNotificationNavigation();
+  useNativePushNotificationNavigation();
 
   useEffect(() => {
     initialize();
@@ -49,10 +49,10 @@ export default function RootLayout() {
       try {
         // Explicitly unregister previous user on logout/switch account
         if (!currentUserId && previousUserIdRef.current) {
-          await pushNotificationService.unregisterUser(previousUserIdRef.current, 'locksmith');
+          await nativePushNotificationService.unregisterUser(previousUserIdRef.current, 'locksmith');
         }
       } catch (error) {
-        console.error('[Push] Failed during push unregistration sync:', {
+        console.error('[Push][Native] Failed during push unregistration sync:', {
           error,
           currentUserId,
           previousUserId: previousUserIdRef.current,
@@ -73,10 +73,10 @@ export default function RootLayout() {
           try {
             // Initialize lazily for authenticated users only and only after UI settles.
             // This avoids startup races during app launch.
-            await pushNotificationService.registerUser(currentUserId, 'locksmith');
-            await pushNotificationService.requestPermission(true);
+            await nativePushNotificationService.initialize();
+            await nativePushNotificationService.registerUser(currentUserId, 'locksmith');
           } catch (error) {
-            console.error('[Push] Failed during deferred push initialization sync:', {
+            console.error('[Push][Native] Failed during deferred push initialization sync:', {
               error,
               currentUserId,
               userType: user?.type,

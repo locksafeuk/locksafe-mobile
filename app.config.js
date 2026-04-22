@@ -28,7 +28,6 @@ module.exports = () => {
   const API_URL = process.env.API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://www.locksafe.uk';
   const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
   const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_YOUR_STRIPE_KEY';
-  const ONESIGNAL_APP_ID = process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID || 'cd19d270-4a74-4bdf-b534-3287cfb8b4e4';
 
   return {
     expo: {
@@ -48,7 +47,7 @@ module.exports = () => {
       ios: {
         supportsTablet: true,
         bundleIdentifier: getBundleId(),
-        buildNumber: '6',
+        buildNumber: '7',
         infoPlist: {
           NSLocationWhenInUseUsageDescription:
             'LockSafe needs your location to find nearby locksmiths and track job progress.',
@@ -59,6 +58,7 @@ module.exports = () => {
           NSPhotoLibraryUsageDescription:
             'LockSafe needs photo library access to select photos for job documentation.',
           ITSAppUsesNonExemptEncryption: false,
+          UIBackgroundModes: ['remote-notification'],
         },
         config: {
           googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -73,7 +73,7 @@ module.exports = () => {
           backgroundColor: '#f97316',
         },
         package: getBundleId(),
-        versionCode: 14,
+        versionCode: 15,
         permissions: [
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',
@@ -99,9 +99,12 @@ module.exports = () => {
         'expo-secure-store',
         'expo-dev-client',
         [
-          'onesignal-expo-plugin',
+          'expo-notifications',
           {
-            mode: IS_DEV ? 'development' : 'production',
+            icon: './assets/android-icon-monochrome.png',
+            color: '#f97316',
+            defaultChannel: 'default',
+            enableBackgroundRemoteNotifications: true,
           },
         ],
         [
@@ -145,7 +148,6 @@ module.exports = () => {
       extra: {
         apiUrl: API_URL,
         stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
-        oneSignalAppId: ONESIGNAL_APP_ID,
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
         eas: {
           projectId: '7a0be99b-8116-409b-8203-e08e7f023e4a',

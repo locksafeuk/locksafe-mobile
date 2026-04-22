@@ -8,19 +8,18 @@
 
 ---
 
-## 📌 Current Deployment Status (Updated: 21 Apr 2026)
+## 📌 Current Deployment Status (Updated: 22 Apr 2026)
 
 ### Android (Google Play)
 - **Current state:** Closed Testing (Alpha) for `uk.locksafe.app`
-- **Current build line:** `1.0.2 (versionCode 14 prepared in code)`
+- **Current build line:** `1.0.2 (versionCode 15 prepared in code)`
 - **Production access gate:** Requires 12 opted-in testers and 14-day closed testing period
 - **Earliest production eligibility:** **29 Apr 2026**
 
 ### iOS (App Store Connect)
-- **Current state:** Build `1.0.2 (6)` submitted and **Waiting for Review**
-- **Build 5 context:** Rejected under Guideline 2.1(a) for iPad crash during login/startup path
-- **Build 6 fix:** Deferred permission request + `InteractionManager.runAfterInteractions()` startup stabilization
-- **Build 6 submission:** Processed, selected, and resubmitted successfully
+- **Current state:** Native push migration complete in source code (Build target `1.0.2 (7)`)
+- **Build 7 objective:** remove OneSignal SDK entirely and use native APNs/FCM registration via `expo-notifications`
+- **Submission target:** Build 7 will be submitted with native push stability notes once build processing completes
 
 ### Work Logs / Handoff Docs
 - Master log (Apr 20 + Build 6 update): [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
@@ -99,7 +98,6 @@ nano .env
 | `API_URL` | Backend API URL | Your server deployment |
 | `EXPO_PUBLIC_API_URL` | Same as above (client-accessible) | Same |
 | `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | [Stripe Dashboard](https://dashboard.stripe.com/apikeys) |
-| `EXPO_PUBLIC_ONESIGNAL_APP_ID` | OneSignal app ID | [OneSignal Dashboard](https://app.onesignal.com) |
 | `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` | Google Maps API key | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) |
 
 #### Google Maps API Setup
@@ -171,7 +169,7 @@ locksafe-mobile/
 │   ├── location.ts               # GPS location service
 │   ├── locationStreaming.ts      # Real-time location streaming
 │   ├── tracking.ts               # SSE tracking service + hook
-│   └── pushNotifications.ts     # Push notification service (OneSignal stub)
+│   └── nativePushNotifications.ts # Native push notification service (APNs/FCM)
 ├── stores/                       # Zustand state stores
 │   ├── authStore.ts              # Authentication state
 │   └── jobStore.ts               # Job state management
@@ -208,12 +206,12 @@ locksafe-mobile/
 4. **Restrict the key** to your app's bundle ID (`uk.locksafe.app`)
 5. Set `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` in `.env`
 
-### Step 3: OneSignal
+### Step 3: Native Push (Expo Notifications)
 
-1. Go to [OneSignal Dashboard](https://app.onesignal.com)
-2. Create an app or select existing
-3. Copy the **App ID** from Settings → Keys & IDs
-4. Set `EXPO_PUBLIC_ONESIGNAL_APP_ID` in `.env`
+1. Ensure APNs is enabled for iOS app identifier in Apple Developer
+2. Ensure Android Firebase project is linked and credentials are configured in EAS
+3. Keep `expo-notifications` + `expo-device` installed
+4. Test permission flow and token registration on physical devices
 
 ### Step 4: EAS Production Build
 
@@ -225,7 +223,6 @@ Update `eas.json` → `production` → `env` with your live keys:
     "production": {
       "env": {
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_YOUR_KEY",
-        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "your-real-app-id",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIza-your-real-key"
       }
     }
@@ -345,7 +342,7 @@ These items require account setup or external configuration:
 2. **Google Play Developer Account** — Required for Android builds and Play Store submission  
 3. **EAS Project Setup** — Run `npx eas init` and `npx eas login`
 4. **Stripe Account** — Create account at stripe.com, get API keys
-5. **OneSignal Account** — Create account at onesignal.com, configure for iOS (APNS) and Android (FCM)
+5. **Firebase Project** — Ensure FCM/APNs credentials are linked for native push delivery
 6. **Google Maps** — Enable APIs and restrict key to app bundle ID
 7. **App Store Assets** — Screenshots, descriptions, privacy policy URLs
 8. **Google Service Account** — Create and download JSON for Play Store submission

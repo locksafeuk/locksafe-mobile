@@ -18,7 +18,6 @@
         "API_URL": "http://localhost:3000",
         "EXPO_PUBLIC_API_URL": "http://localhost:3000",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_xxx",
-        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "cd19d270-4a74-4bdf-b534-3287cfb8b4e4",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaxxx"
       }
     },
@@ -36,7 +35,6 @@
         "API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
-        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "cd19d270-4a74-4bdf-b534-3287cfb8b4e4",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
       }
     },
@@ -53,7 +51,6 @@
         "API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
-        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "cd19d270-4a74-4bdf-b534-3287cfb8b4e4",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
       }
     },
@@ -66,7 +63,6 @@
         "API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
-        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "cd19d270-4a74-4bdf-b534-3287cfb8b4e4",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
       }
     },
@@ -84,7 +80,6 @@
         "API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_API_URL": "https://www.locksafe.uk",
         "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51T5TBsDLjTqWpr1gpLefHTwDx4F3Ru4ahXVIiDwTiP279GCSyEEu2DU6pbDxqGzqgL8Z6816fhqU0L3nW9GTjHr700Mk90WZIW",
-        "EXPO_PUBLIC_ONESIGNAL_APP_ID": "cd19d270-4a74-4bdf-b534-3287cfb8b4e4",
         "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBm5KYat5616yL119HC6_9JydHRjperMwM"
       }
     }
