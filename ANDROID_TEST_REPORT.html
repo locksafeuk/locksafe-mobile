@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LockSafe Android v1.0.2 (Build 12) — Pre-Deployment Test Report</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 28px; margin-bottom: 8px; color: #0f172a; }
+  h2 { font-size: 22px; margin: 32px 0 16px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  h3 { font-size: 17px; margin: 20px 0 10px; color: #334155; }
+  .meta { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+  .verdict { padding: 20px; border-radius: 12px; margin: 24px 0; font-size: 18px; font-weight: 600; }
+  .verdict-block { background: #fef2f2; border: 2px solid #ef4444; color: #991b1b; }
+  .verdict-caution { background: #fffbeb; border: 2px solid #f59e0b; color: #92400e; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+  .stat-card { background: white; border-radius: 10px; padding: 16px; text-align: center; border: 1px solid #e2e8f0; }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
+  .stat-card .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+  .critical { color: #dc2626; }
+  .high { color: #ea580c; }
+  .medium { color: #d97706; }
+  .low { color: #2563eb; }
+  .pass { color: #16a34a; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+  th { background: #f1f5f9; font-weight: 600; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:hover { background: #f8fafc; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge-critical { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .badge-high { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+  .badge-medium { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .badge-low { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+  .badge-pass { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .badge-fail { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .badge-info { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+  .bug-card { background: white; border-radius: 10px; padding: 16px; margin: 12px 0; border-left: 4px solid; }
+  .bug-critical { border-color: #dc2626; }
+  .bug-high { border-color: #ea580c; }
+  .bug-medium { border-color: #d97706; }
+  .bug-low { border-color: #2563eb; }
+  .bug-card h4 { font-size: 15px; margin-bottom: 6px; }
+  .bug-card p { font-size: 13px; color: #475569; margin: 4px 0; }
+  .code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 12px; }
+  .section-note { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: #0c4a6e; }
+  .rec-list { list-style: none; padding: 0; }
+  .rec-list li { padding: 8px 0 8px 24px; position: relative; font-size: 14px; }
+  .rec-list li::before { content: "→"; position: absolute; left: 0; color: #f97316; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🔒 LockSafe Android v1.0.2 (Build 12) — Pre-Deployment Test Report</h1>
+<p class="meta">Date: 18 April 2026 &nbsp;|&nbsp; Tester: Automated QA &nbsp;|&nbsp; Package: uk.locksafe.app &nbsp;|&nbsp; Build: locksafe-v1.0.2-build12.aab</p>
+
+<div class="verdict verdict-block">
+  ⛔ DEPLOYMENT RECOMMENDATION: <strong>DO NOT DEPLOY</strong> — 2 critical issues and 1 high-severity issue must be resolved first.
+</div>
+
+<div class="summary-grid">
+  <div class="stat-card"><div class="num critical">2</div><div class="label">Critical</div></div>
+  <div class="stat-card"><div class="num high">1</div><div class="label">High</div></div>
+  <div class="stat-card"><div class="num medium">5</div><div class="label">Medium</div></div>
+  <div class="stat-card"><div class="num low">2</div><div class="label">Low / Info</div></div>
+</div>
+
+<h2>Test Case Results</h2>
+<table>
+  <tr><th>TC#</th><th>Test Case</th><th>Result</th><th>Bugs Found</th></tr>
+  <tr><td>TC1</td><td>Build Integrity & Configuration</td><td><span class="badge badge-fail">FAIL</span></td><td>BUG-01 (Critical), BUG-06, BUG-07</td></tr>
+  <tr><td>TC2</td><td>App Launch & Init Stability</td><td><span class="badge badge-pass">PASS</span></td><td>None — OneSignal lazy init pattern correct</td></tr>
+  <tr><td>TC3</td><td>Authentication Flow</td><td><span class="badge badge-pass">PASS</span></td><td>BUG-03 (Medium), BUG-08 (Low)</td></tr>
+  <tr><td>TC4</td><td>Registration Flow</td><td><span class="badge badge-fail">FAIL</span></td><td>BUG-04, BUG-05</td></tr>
+  <tr><td>TC5</td><td>OneSignal API Security Fixes</td><td><span class="badge badge-pass">PASS</span></td><td>BUG-09 (Medium)</td></tr>
+  <tr><td>TC6</td><td>Dashboard & Navigation Auth Guard</td><td><span class="badge badge-fail">FAIL</span></td><td>BUG-02 (Critical)</td></tr>
+  <tr><td>TC7</td><td>API Client Robustness</td><td><span class="badge badge-fail">FAIL</span></td><td>BUG-10 (Medium)</td></tr>
+  <tr><td>TC8</td><td>Sensitive Data Exposure Audit</td><td><span class="badge badge-fail">FAIL</span></td><td>BUG-11 (High)</td></tr>
+</table>
+
+<h2>Bugs & Issues</h2>
+
+<div class="bug-card bug-critical">
+  <h4><span class="badge badge-critical">CRITICAL</span> BUG-01: OneSignal App ID Mismatch Between Source and Production AAB</h4>
+  <p><strong>Location:</strong> <span class="code">base/assets/app.config</span> inside AAB vs <span class="code">.env</span>, <span class="code">eas.json</span>, <span class="code">app.config.js</span></p>
+  <p><strong>Detail:</strong> The production AAB embeds OneSignal App ID <span class="code">os_v2_app_zum5e4ck...</span> but every source file and build profile references <span class="code">cd19d270-4a74-4bdf-b534-3287cfb8b4e4</span>. The runtime resolution chain in <span class="code">pushNotifications.ts</span> reads <span class="code">Constants.expoConfig?.extra?.oneSignalAppId</span> first, which resolves to the AAB-embedded value. This means the production build initialises OneSignal with a completely different App ID than what's configured in the repo and eas.json.</p>
+  <p><strong>Impact:</strong> Push notifications may be sent to the wrong OneSignal project, or fail entirely. If the embedded ID is the correct one, then the repo config is stale and misleading. Either way, this discrepancy is a deployment blocker — it must be clarified which ID is canonical and all sources must be aligned.</p>
+</div>
+
+<div class="bug-card bug-critical">
+  <h4><span class="badge badge-critical">CRITICAL</span> BUG-02: No Authentication Guard on Locksmith Routes</h4>
+  <p><strong>Location:</strong> <span class="code">app/(locksmith)/_layout.tsx</span></p>
+  <p><strong>Detail:</strong> The locksmith dashboard, jobs, earnings, and settings screens have zero authentication checks. Navigating directly to <span class="code">/(locksmith)/(tabs)</span> renders the full dashboard without login. Verified on web — all four tabs (Dashboard, Jobs, Earnings, Settings) are fully accessible without any auth token.</p>
+  <p><strong>Impact:</strong> On Android, deep links via <span class="code">locksafe://</span> scheme or push notification navigation could land unauthenticated users on protected screens. The dashboard renders with default/empty data ("Hello, Partner", 5.0 Rating) which could confuse users. API calls from these screens will fail with 401, but the UI is still exposed. On web, this is a direct security issue.</p>
+  <p><strong>Fix:</strong> Add an auth guard in <span class="code">(locksmith)/_layout.tsx</span> that checks <span class="code">useAuthStore</span> and redirects to login if <span class="code">user</span> is null.</p>
+</div>
+
+<div class="bug-card bug-high">
+  <h4><span class="badge badge-high">HIGH</span> BUG-11: Apple App Store Connect API Private Key Exposed on Disk</h4>
+  <p><strong>Location:</strong> <span class="code">/home/ubuntu/locksafe-mobile/api_key.json</span></p>
+  <p><strong>Detail:</strong> Contains Apple App Store Connect API private key (Key ID: CN472U9F7K, Issuer: 7472da00). While not currently tracked in git, the file is not in <span class="code">.gitignore</span> (only <span class="code">*.p8</span> and <span class="code">*.key</span> are ignored). A single <span class="code">git add .</span> would commit this key to the repository.</p>
+  <p><strong>Impact:</strong> If committed, anyone with repo access could upload builds to the App Store, modify app metadata, or access App Store Connect API on behalf of the developer account.</p>
+  <p><strong>Fix:</strong> Add <span class="code">api_key.json</span> to <span class="code">.gitignore</span> immediately. Consider rotating the key if the repo has been shared.</p>
+</div>
+
+<div class="bug-card bug-medium">
+  <h4><span class="badge badge-medium">MEDIUM</span> BUG-03: "Forgot Password?" Link is Non-Functional</h4>
+  <p><strong>Location:</strong> <span class="code">app/(auth)/locksmith-login.tsx</span></p>
+  <p><strong>Detail:</strong> The "Forgot password?" element is a <span class="code">Pressable</span> with no <span class="code">onPress</span> handler. Tapping it does nothing on any platform.</p>
+  <p><strong>Impact:</strong> Locksmiths who forget their password have no recovery path in the app. They would need to contact support or use the website.</p>
+</div>
+
+<div class="bug-card bug-medium">
+  <h4><span class="badge badge-medium">MEDIUM</span> BUG-04: Backend Missing Server-Side Validation for Registration</h4>
+  <p><strong>Location:</strong> <span class="code">POST /api/locksmiths/register</span></p>
+  <p><strong>Detail:</strong> The backend does not validate password length or email format. A 3-character password ("abc") passes the password check — the only validation failure is "Base location is required". Similarly, "notanemail" is accepted as a valid email. Client-side validation catches these, but the API is unprotected against direct calls.</p>
+  <p><strong>Impact:</strong> Weak passwords and invalid emails could be registered via direct API calls, bypassing the mobile app's client-side validation.</p>
+</div>
+
+<div class="bug-card bug-medium">
+  <h4><span class="badge badge-medium">MEDIUM</span> BUG-05: Registration Validation Uses Alert.alert() Only — No Inline Errors</h4>
+  <p><strong>Location:</strong> <span class="code">app/(auth)/locksmith-register.tsx</span></p>
+  <p><strong>Detail:</strong> Registration validation errors (missing fields, password mismatch, weak password) use <span class="code">Alert.alert()</span> exclusively. Unlike the login screen which has an inline error banner, registration has no visible error state in the UI. On web, these alerts may be blocked by popup blockers.</p>
+  <p><strong>Impact:</strong> Inconsistent UX between login and registration. On web, users get no feedback at all when validation fails.</p>
+</div>
+
+<div class="bug-card bug-medium">
+  <h4><span class="badge badge-medium">MEDIUM</span> BUG-09: OneSignal Subscribe POST Endpoint Not Authenticated</h4>
+  <p><strong>Location:</strong> <span class="code">POST /api/onesignal/subscribe</span></p>
+  <p><strong>Detail:</strong> While the security fixes correctly added auth to GET subscribe and POST send, the POST subscribe endpoint accepts unauthenticated requests. It returns 404 (user not found) for invalid users, but anyone who knows a valid locksmith userId could register a playerId for push notifications.</p>
+  <p><strong>Impact:</strong> Potential for push notification hijacking if user IDs are enumerable or leaked.</p>
+</div>
+
+<div class="bug-card bug-medium">
+  <h4><span class="badge badge-medium">MEDIUM</span> BUG-10: Token Refresh Endpoint Does Not Exist</h4>
+  <p><strong>Location:</strong> <span class="code">POST /api/auth/refresh</span> (backend) / <span class="code">services/api/client.ts</span> (mobile)</p>
+  <p><strong>Detail:</strong> The mobile API client implements a token refresh mechanism that calls <span class="code">/api/auth/refresh</span>, but this endpoint returns the Next.js 404 page (HTML). The client handles this gracefully (silent failure), but token refresh is completely non-functional.</p>
+  <p><strong>Impact:</strong> When auth tokens expire, users will be silently logged out instead of having their session refreshed. This could cause unexpected logouts during active use.</p>
+</div>
+
+<div class="bug-card bug-low">
+  <h4><span class="badge badge-low">LOW</span> BUG-06: iOS buildNumber Stale in AAB Embedded Config</h4>
+  <p><strong>Detail:</strong> The AAB's embedded <span class="code">app.config</span> shows iOS buildNumber as "3", but the current <span class="code">app.config.js</span> source has "4". This indicates the AAB was built before the iOS build number was bumped. No functional impact on Android, but suggests the AAB may not include the latest code changes.</p>
+</div>
+
+<div class="bug-card bug-low">
+  <h4><span class="badge badge-low">LOW</span> BUG-07: Duplicate Permissions in AAB Config</h4>
+  <p><strong>Detail:</strong> <span class="code">ACCESS_COARSE_LOCATION</span>, <span class="code">ACCESS_FINE_LOCATION</span>, and <span class="code">CAMERA</span> are each declared twice in the AAB's embedded permission list. This is caused by plugin config merging and has no functional impact, but indicates sloppy configuration.</p>
+</div>
+
+<div class="bug-card bug-low">
+  <h4><span class="badge badge-info">INFO</span> BUG-08: Remember Me Toggle Not Visible on Web</h4>
+  <p><strong>Detail:</strong> The login screen's Remember Me section with Switch component doesn't render on the web version. This is likely a React Native Web rendering issue with the Switch component. On native Android, this would render correctly.</p>
+</div>
+
+<h2>Positive Findings</h2>
+<div class="section-note">
+  <strong>✅ OneSignal Race Condition Fix Verified:</strong> The lazy initialization pattern in <span class="code">_layout.tsx</span> correctly defers OneSignal init until after authentication. The <span class="code">pushNotificationService.initialize()</span> is only called via <span class="code">registerUser()</span> which is gated behind <span class="code">user?.type === 'locksmith'</span>. This matches the iOS fix and should prevent the startup crash.<br><br>
+  <strong>✅ AAB File Integrity:</strong> The AAB passes ZIP integrity checks, contains all expected native libraries (arm64-v8a, armeabi-v7a, x86, x86_64), 6 DEX files, and the JS bundle.<br><br>
+  <strong>✅ Security Fixes Verified:</strong> All three OneSignal API security vulnerabilities (BUG-001, BUG-002, BUG-003 from the security doc) are confirmed fixed on the production backend.<br><br>
+  <strong>✅ API Error Handling:</strong> Login with invalid credentials, empty body, and injection attempts all return appropriate error messages. Network errors show user-friendly messages.<br><br>
+  <strong>✅ Non-www Redirect Protection:</strong> The API client correctly uses <span class="code">www.locksafe.uk</span> and has a guard to rewrite bare <span class="code">locksafe.uk</span> URLs, preventing the 307 redirect issue that breaks POST requests.
+</div>
+
+<h2>Deployment Blockers (Must Fix)</h2>
+<ul class="rec-list">
+  <li><strong>Resolve OneSignal App ID mismatch (BUG-01):</strong> Determine which ID is canonical. If the AAB-embedded <span class="code">os_v2_app_...</span> is correct, update all source files. If <span class="code">cd19d270-...</span> is correct, rebuild the AAB. Either way, rebuild and re-verify.</li>
+  <li><strong>Add auth guard to locksmith routes (BUG-02):</strong> Add a check in <span class="code">(locksmith)/_layout.tsx</span> that redirects to login when <span class="code">user</span> is null. This is a 5-line fix.</li>
+  <li><strong>Add <span class="code">api_key.json</span> to .gitignore (BUG-11):</strong> Prevent accidental commit of Apple API key.</li>
+</ul>
+
+<h2>Recommended Before Deployment</h2>
+<ul class="rec-list">
+  <li>Implement the <span class="code">/api/auth/refresh</span> endpoint on the backend, or remove the refresh logic from the mobile client to avoid silent failures.</li>
+  <li>Add server-side validation for password length (≥6 chars) and email format on the registration endpoint.</li>
+  <li>Wire up the "Forgot password?" link to a password reset flow or remove it from the UI.</li>
+  <li>Add authentication to <span class="code">POST /api/onesignal/subscribe</span> to match the security posture of the other OneSignal endpoints.</li>
+  <li>Verify the AAB was built from the latest commit that includes the iOS Build 4 race condition fix — the stale iOS buildNumber (3 vs 4) suggests it may predate the fix.</li>
+</ul>
+
+<h2>Testing Limitations</h2>
+<div class="section-note">
+  <strong>Android-native testing was not possible</strong> in this environment — no Android emulator or physical device is available. Testing was performed via the Expo web export (React Native Web) and direct API testing against the production backend. The AAB was inspected at the binary level (manifest, embedded config, file structure). Key findings like the OneSignal App ID mismatch and missing auth guard are code-level issues that affect all platforms equally. Push notification runtime behaviour and native Android UI rendering could not be verified and should be tested on a physical device before deployment.
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "app_name": "LockSafe - Locksmith Partner",
+  "package_name": "uk.locksafe.app",
+  "version": "1.0.2",
+  "default_language": "en-GB",
+  "category": {
+    "primary": "Business",
+    "secondary": "Tools"
+  },
+  "content_rating": {
+    "suggested": "Everyone",
+    "notes": "No user-generated content visible to other users; professional business tool only."
+  },
+  "target_audience": {
+    "age_group": "18+",
+    "description": "Professional locksmiths and locksmith businesses operating in the United Kingdom",
+    "geographic_focus": "United Kingdom"
+  },
+  "tags_keywords": [
+    "locksmith",
+    "locksmith jobs",
+    "locksmith app",
+    "locksafe",
+    "locksmith partner",
+    "trade jobs UK",
+    "locksmith earnings",
+    "job management",
+    "field service",
+    "locksmith work",
+    "emergency locksmith",
+    "locksmith platform",
+    "trade professional",
+    "locksmith business",
+    "UK locksmith"
+  ],
+  "contact_details": {
+    "website": "https://www.locksafe.uk",
+    "email": "support@locksafe.uk"
+  },
+  "distribution": {
+    "countries": ["GB"],
+    "pricing": "Free",
+    "contains_ads": false,
+    "in_app_purchases": false
+  }
+}

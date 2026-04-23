@@ -1,0 +1,51 @@
+{
+  "id": "cbf6389c-e7fb-4828-bfa8-2c068e897752",
+  "status": "FINISHED",
+  "platform": "IOS",
+  "artifacts": {
+    "buildUrl": "https://expo.dev/artifacts/eas/rbMX2Hdcn7UfR7wrEkMQMG.ipa",
+    "xcodeBuildLogsUrl": "https://job-logs.eascdn.net/production-xcode-logs/cbf6389c-e7fb-4828-bfa8-2c068e897752?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260418%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260418T141133Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=17d92a5674608e72650e754a8ffe797606cb96b16bf0ce973c4f3627c6d537f92342f6c251afea775308983ff81c017f3360e62e26a9e5e9ad57e549928cfae7c6e7899161a83d5b5471c9b0d11c35537ca5e397c2cd5cd8204d8d54e909a52c9e8ed42bfdf899b2e35e0b8719fe65d14ed72efd61458f72bcabada2c93c1c170043d2c40150a0b801cbd0d1f505e6d960817039bec0e37df9329caf9bbcb7c80ea0e9494b7415566f1d21744e5d01370051d2a784d604bb03246d58e6563a93d6b7fd96fa072c2dc8a7f427f40fa5385cc69c669274ccd65f205500b6c4cea07e32343073bca3effe6731c266a1a94a1152bfb9597263276a2b757a3adf3e90",
+    "applicationArchiveUrl": "https://expo.dev/artifacts/eas/rbMX2Hdcn7UfR7wrEkMQMG.ipa"
+  },
+  "fingerprint": {
+    "id": "019da0e8-003c-7078-9a25-12d07268617d",
+    "hash": "ade9762fcec43e55320cca3c9714ed767c7c94e5"
+  },
+  "initiatingActor": {
+    "id": "6aef1c93-a99c-4a96-9580-a0c9fa0fd295",
+    "displayName": "locksafeuk26"
+  },
+  "logFiles": [
+    "https://job-logs.eascdn.net/production/cbf6389c-e7fb-4828-bfa8-2c068e897752/1776521052467-fed2936f-cbc8-4148-88fa-c1f9a722fc8e.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260418%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260418T141133Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=87a51c5dcda085aa90881aa612a2fe5025f0f0405326471ec9f6ec2cee00dbf2001c937875af6212892cedfb9fd4b5dc342f9d4284aa87789248dd164725d0655fbdfcbc58f96102abf5f66a91f61b4330967e47da6f420b446bdf38a58ba30a2684f3645c058f2a388334bda18c5db25cc3e45db4a92fd43f9649b221bb69a4b3923390865fd3e307eecb1ed4f22606f7895afed6658925bf68910695e6fd340129afdd853bf8718134219800e9e7735dc4e4e899dae712f620d9194f53849fb79d8d600d31581ff32227fe8c1abd52252cc9d2617fb218db33a2d9a0ff826dedb82e1c34fc24f30312f718362d2a9fc3b91581093fc79ed0e8043b50aa0b40",
+    "https://job-logs.eascdn.net/production/cbf6389c-e7fb-4828-bfa8-2c068e897752/1776521054720-eb0f4a40-38c8-4b35-8679-3cee89ea0300.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260418%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260418T141133Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=4bddf705dd44adc50aa6c13803a4f8c64339d12c4d322904175a7558a427a2f64861286c4bdf91676cc7ecd517a5cec96eeb0815598a260592202e8bb2fa5415efb266d333d12bd42d876257c6c895fcf3c2b7164495642b8f5104b49cef13d378a54c1122bee635b419c81ca7fb1386972c78ba0fbd65c4d44bcc46db342853bee825944731b6f8409fc40a35af251c74d795266fdace26461d88770c18dd4b9649ad94c1e85f32df9085ff5fca31bf77b1199c3c23aef4804fd6f474c989d6f9b1dc12cbdca580094baece0ed86e65fa92dcd26f999db436d54bb965fcdd23649c582f0c01601d2b1747730df92d7088773b39912779f4a0e318e813af5f80",
+    "https://job-logs.eascdn.net/production/cbf6389c-e7fb-4828-bfa8-2c068e897752/1776521054990-709eaa63-4146-4bd7-94c8-2fc9ad0b0a4a.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260418%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260418T141133Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=1b200eb1989cf064a85c480e9ddbe94e13543af396e0a9ce1c5d2c39a4e768119a4a045f1c7f94582234bc85582b4bb4eb8be474162da7f04f772282cfdbaf37d094a5ea890a2a3c541e63f9d8a2bfe2f2d56579ed4dc7b4f4dc5398714baa315fd183b159d542eed3348d53ef7f4cb4f008fbfe2b44518818977ffdd5afe789c86e19bccc0b6005e413494fe5db3847c72731e7a598a66c5b8354b99ca70b7375772d5fc19fdf27012a3e2a06885263e87af488e2778ce50daa3f9d204fd6e635ddb35f01bb2f84a800f14ace7bb3ca5f06c15161ada0f22c08886b83c0d963d3efb86d9edfb707158d24ef3eeffb91a5025a0518a56fd896fa17c6efa711af",
+    "https://job-logs.eascdn.net/production/cbf6389c-e7fb-4828-bfa8-2c068e897752/1776521055209-bd53b3e6-56cd-41c3-abda-d04fba362f79.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260418%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260418T141133Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=29b885fcdd222ddba0b444b8fbd3ca1d95fec0629b4fd67acf85cd2ecb537f4e962803bc242315f548a249369e739bb6b4ce423911cdd761a4657045f803d73dffaec654e67f57dbfb05e844be6718021866a8fbedcef88d5f5fd9d498664ba57b426b34a9598f276d0936fe1bc06d92061a6afe1a69103e793ac810116dc956d503b66365315558406115f01561b8251bdd7c8c41d629675025bdd3bb3127c6a2c5bd93439955782cc12dcbd95a714210e67195275c889db7b48d231caf3e73d6ee35522daf4d4930957a2c3955f397cfcd63157d26a0b279c275486932f36615fff1c71f556ba7adf044a0defe3e37c9166beb37af210839495d606d1c19cd"
+  ],
+  "project": {
+    "id": "7a0be99b-8116-409b-8203-e08e7f023e4a",
+    "name": "locksafe-mobile",
+    "slug": "locksafe-mobile",
+    "ownerAccount": {
+      "id": "1b2fef01-82fc-429c-a581-ce51ddf75f8c",
+      "name": "locksafeuk26"
+    }
+  },
+  "distribution": "STORE",
+  "buildProfile": "production",
+  "sdkVersion": "52.0.0",
+  "appVersion": "1.0.2",
+  "appBuildVersion": "4",
+  "gitCommitHash": "d661ee425c3e3d30701ee0e2616373ad10b46cc6",
+  "gitCommitMessage": "Fix iOS launch stability around OneSignal init and bump build to 4",
+  "priority": "HIGH",
+  "createdAt": "2026-04-18T14:04:12.155Z",
+  "updatedAt": "2026-04-18T14:11:19.930Z",
+  "completedAt": "2026-04-18T14:11:09.288Z",
+  "expirationDate": "2026-05-18T14:04:12.209Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 184,
+    "buildQueueTime": 47266,
+    "buildDuration": 365471
+  }
+}

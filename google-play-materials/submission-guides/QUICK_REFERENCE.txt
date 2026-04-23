@@ -1,0 +1,77 @@
+╔══════════════════════════════════════════════════════════════════╗
+║       LOCKSAFE - LOCKSMITH PARTNER | QUICK REFERENCE            ║
+║       Google Play Store Submission                               ║
+╚══════════════════════════════════════════════════════════════════╝
+
+APP IDENTITY
+────────────────────────────────────────────────
+  App Name:        LockSafe - Locksmith Partner
+  Package Name:    uk.locksafe.app
+  Version:         1.0.2
+  Build/Code:      12
+  AAB File:        locksafe-v1.0.2-build12.aab
+  AAB Size:        51.7 MB
+  Category:        Business (primary) / Tools (secondary)
+  Pricing:         Free
+  Ads:             No
+  In-App Purchase: No
+
+DISTRIBUTION
+────────────────────────────────────────────────
+  Countries:       United Kingdom (initial launch)
+  Language:        English (United Kingdom) — en-GB
+  Target Audience: 18+ (Professional locksmiths)
+  Content Rating:  Everyone / PEGI 3 (expected)
+
+KEY URLS
+────────────────────────────────────────────────
+  Website:         https://www.locksafe.uk
+  Privacy Policy:  https://www.locksafe.uk/privacy
+  Support Email:   support@locksafe.uk
+  Play Console:    https://play.google.com/console
+
+TEXT CONTENT (Character Counts)
+────────────────────────────────────────────────
+  App Title:          27 / 30  chars  ✓
+  Short Description:  66 / 80  chars  ✓
+  Full Description:   3,402 / 4,000  chars  ✓
+  Promotional Text:   159 / 170  chars  ✓
+
+VISUAL ASSETS
+────────────────────────────────────────────────
+  App Icon:           512 × 512 px    147 KB   ✓ Ready
+  Feature Graphic:    1584 × 672 px   1.1 MB   ⚠ RESIZE to 1024×500
+  Screenshots (×6):   768 × 1376 px   5.5 MB   ✓ Ready
+
+KEY FILES
+────────────────────────────────────────────────
+  AAB:          release/locksafe-v1.0.2-build12.aab
+  Icon:         store-listing/graphics/app-icon.png
+  Feature:      store-listing/graphics/feature-graphic.png
+  Screenshots:  store-listing/screenshots/01-06
+  Description:  store-listing/text/FULL_DESCRIPTION.txt
+  Metadata:     store-listing/text/STORE_METADATA.json
+  Privacy:      policies/PRIVACY_POLICY.md
+
+⚠ ACTION ITEMS BEFORE SUBMISSION
+────────────────────────────────────────────────
+  1. RESIZE feature graphic to 1024 × 500 px
+  2. HOST privacy policy at public URL
+  3. CREATE test/reviewer login credentials
+  4. COMPLETE IARC content rating questionnaire
+  5. COMPLETE Data Safety form in Play Console
+  6. VALIDATE AAB with bundletool
+
+RECOMMENDED ROLLOUT PLAN
+────────────────────────────────────────────────
+  Day 1-3:  Internal testing → verify core flows
+  Day 4-5:  Closed testing → broader device coverage
+  Day 6+:   Production → staged rollout (20% → 50% → 100%)
+
+REVIEW TIMELINE
+────────────────────────────────────────────────
+  New app review: typically 1-7 business days
+  Updates:        typically 1-3 business days
+
+────────────────────────────────────────────────
+Generated: 18 April 2026

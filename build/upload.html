@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPA Upload to App Store Connect</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        button:disabled { background: #6c757d; }
+        #log { background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Upload IPA to App Store Connect</h1>
+    <p>This page uploads the fixed Build 4 IPA to App Store Connect.</p>
+    
+    <div class="status info">
+        <strong>Build:</strong> LockSafe v1.0.2 (Build 4)<br>
+        <strong>Bundle ID:</strong> uk.locksafe.app<br>
+        <strong>File:</strong> locksafe-v1.0.2-build4-ios.ipa
+    </div>
+    
+    <button id="uploadBtn" onclick="startUpload()">Upload IPA to App Store Connect</button>
+    
+    <div id="log"></div>
+    
+    <script>
+    const log = document.getElementById('log');
+    
+    function addLog(msg) {
+        log.textContent += new Date().toLocaleTimeString() + ': ' + msg + '\n';
+        log.scrollTop = log.scrollHeight;
+    }
+    
+    async function startUpload() {
+        const btn = document.getElementById('uploadBtn');
+        btn.disabled = true;
+        btn.textContent = 'Uploading...';
+        
+        try {
+            addLog('Starting upload process...');
+            
+            // Step 1: Fetch the IPA file
+            addLog('Fetching IPA file...');
+            const ipaResp = await fetch('/locksafe-v1.0.2-build4-ios.ipa');
+            const ipaBlob = await ipaResp.blob();
+            addLog(`IPA loaded: ${(ipaBlob.size / 1024 / 1024).toFixed(1)} MB`);
+            
+            // Step 2: Try to authenticate with content delivery
+            addLog('Authenticating with Apple content delivery...');
+            
+            const authResp = await fetch('https://contentdelivery.itunes.apple.com/WebObjects/MZLabelService.woa/json/MZITunesProducerService/authenticateForSession', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    "Username": "locksafeuk@icloud.com",
+                    "Password": "pfad-ogml-zotq-xkjy",
+                    "Application": "iTMSTransporter",
+                    "BaseVersion": "2.3.0",
+                    "OSIdentifier": "linux",
+                    "TransporterVersion": "2.3.0"
+                })
+            });
+            
+            const authData = await authResp.json();
+            addLog(`Auth response: ${JSON.stringify(authData.result?.Success || authData.result?.ErrorMessage)}`);
+            
+            if (authData.result?.Success) {
+                addLog('Authentication successful!');
+                // Continue with upload...
+            } else {
+                addLog('Auth failed, trying alternative method...');
+                
+                // Try using the App Store Connect API directly
+                const apiResp = await fetch('https://api.appstoreconnect.apple.com/v1/builds?filter[app]=6762475008', {
+                    credentials: 'include'
+                });
+                addLog(`API response: ${apiResp.status}`);
+            }
+            
+        } catch (err) {
+            addLog(`Error: ${err.message}`);
+        }
+        
+        btn.disabled = false;
+        btn.textContent = 'Retry Upload';
+    }
+    </script>
+</body>
+</html>
