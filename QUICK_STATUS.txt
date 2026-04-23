@@ -1,40 +1,32 @@
-LOCKSAFE MOBILE — QUICK STATUS (Apr 22, 2026)
+LOCKSAFE MOBILE — QUICK STATUS (Apr 23, 2026)
 ==========================================
 
-FINAL RELEASE STATUS
---------------------
+LATEST RELEASE STATUS
+---------------------
 iOS:
-- Build: 1.0.2 (Build 7)
-- Push stack: Native APNs (expo-notifications)
-- Status: Waiting for Review
-- Submission: iOS App 1.0.2 (7)
+- Version: 1.0.2
+- Build selected: 8
+- Submission status: Waiting for Review
+- Build ID: 6bb6eb56-6653-41e3-b69d-729fc21af921
+- EAS Submission ID: 9370db68-b51f-4c78-a585-2f519b200ee6
+- Reviewer note updated for Guideline 2.3.8 icon fix
 
 Android:
-- Build: 1.0.2 (Build 15 / versionCode 15)
+- Build: 1.0.2 (versionCode 15)
 - Push stack: Native FCM (expo-notifications)
-- Status: In Review
-- Submission: Production release with Build 15 under review
+- Status: In Review (last known)
 
-MIGRATION OUTCOME
------------------
-- Native push migration complete
-- OneSignal completely removed from app runtime/config/dependencies
-- Both platforms now use native push token registration
-- Backend contract switched to:
-  - POST /api/push/register-device
-  - POST /api/push/unregister-device
+BUILD 8 ICON FIX SUMMARY
+------------------------
+- Placeholder-style icon elements removed
+- Professional lock/key icon deployed across app assets
+- Build 7 replaced with Build 8 in App Store Connect version 1.0.2
+- App version resubmitted and accepted into review queue
 
-WHAT CHANGED (FINAL)
---------------------
-1) Removed OneSignal SDK + plugin and all OneSignal env/config references
-2) Implemented services/nativePushNotifications.ts
-3) Updated app bootstrap push registration flow (post-interactions)
-4) Shipped final builds: iOS 7 and Android 15
-5) Submitted both builds; currently in platform review queues
-
-REFERENCE FILES
----------------
+KEY EVIDENCE FILES
+------------------
+- /home/ubuntu/locksafe-mobile/BUILD8_SUBMISSION_COMPLETE.md
 - /home/ubuntu/locksafe-mobile/WORK_LOG_2026-04-20.md
-- /home/ubuntu/locksafe-mobile/CURRENT_STATUS_APRIL_20_FINAL.md
-- /home/ubuntu/locksafe-mobile/SESSION_SUMMARY_2026-04-20.md
-- /home/ubuntu/locksafe-mobile/IOS_BUILD_HISTORY.md
+- /home/ubuntu/locksafe-mobile/docs/screenshots/build8/testflight-build-uploads-build8.png
+- /home/ubuntu/locksafe-mobile/docs/screenshots/build8/build8-selected-in-version-page.png
+- /home/ubuntu/locksafe-mobile/docs/screenshots/build8/item-submitted-waiting-for-review-build8.png
