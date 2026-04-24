@@ -6,6 +6,7 @@ import {
   setUserData,
   getUserData,
   getAuthToken,
+  setAuthToken,
   setStorageItem,
   getStorageItem,
 } from '../services/api';
@@ -64,6 +65,7 @@ interface LoginResponse {
   success: boolean;
   user?: AuthUser;
   locksmith?: AuthUser;
+  token?: string;
   error?: string;
   redirectTo?: string;
 }
@@ -140,6 +142,46 @@ async function loadRememberMePreference(): Promise<boolean> {
   return saved !== 'false';
 }
 
+type AuthPayload = {
+  token?: unknown;
+  accessToken?: unknown;
+  authToken?: unknown;
+  user?: unknown;
+  locksmith?: unknown;
+  data?: {
+    token?: unknown;
+    user?: unknown;
+    locksmith?: unknown;
+  };
+};
+
+function extractAuthToken(payload: AuthPayload | undefined): string | null {
+  const tokenCandidates = [
+    payload?.token,
+    payload?.accessToken,
+    payload?.authToken,
+    payload?.data?.token,
+  ];
+
+  for (const candidate of tokenCandidates) {
+    if (typeof candidate === 'string' && candidate.trim().length > 0) {
+      return candidate.trim();
+    }
+  }
+
+  return null;
+}
+
+function extractAuthUser(payload: AuthPayload | undefined): AuthUser | null {
+  const candidate =
+    (payload?.user as Partial<AuthUser> | undefined) ||
+    (payload?.locksmith as Partial<AuthUser> | undefined) ||
+    (payload?.data?.user as Partial<AuthUser> | undefined) ||
+    (payload?.data?.locksmith as Partial<AuthUser> | undefined);
+
+  return mapAuthUser(candidate);
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isLoading: false,
@@ -161,18 +203,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return;
       }
 
-      const [userData, token] = await Promise.all([getUserData<AuthUser>(), getAuthToken()]);
+      const [cachedUserData, storedToken] = await Promise.all([
+        getUserData<AuthUser>(),
+        getAuthToken(),
+      ]);
+      const cachedUser = mapAuthUser(cachedUserData);
 
-      if (!token) {
-        set({ user: null, isInitialized: true, isLoading: false });
+      // If we already have local persisted auth, prefer restoring immediately so users remain
+      // signed in after app restart. Session revalidation runs in background.
+      if (cachedUser || storedToken) {
+        set({
+          user: cachedUser,
+          isInitialized: true,
+          isLoading: false,
+          error: null,
+        });
+
+        void (async () => {
+          const isValid = await get().checkSession();
+          if (isValid) {
+            const latestUser = get().user || cachedUser;
+            if (latestUser) {
+              await setUserData(latestUser);
+            }
+            return;
+          }
+
+          // Keep remembered local session instead of forcing immediate logout on startup.
+          // Backend auth may still be recovering (token propagation / transient edge conditions).
+          console.warn('Session validation failed during startup; preserving remembered local session.');
+        })();
+
         return;
       }
 
-      if (userData) {
-        set({ user: userData });
-      }
-
-      // Verify session using backend, but don't log out user on transient network issues.
       const isValid = await get().checkSession();
       if (!isValid) {
         await clearAuthToken();
@@ -180,8 +244,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return;
       }
 
-      // If checkSession succeeded but did not return user payload, keep cached user.
-      const latestUser = get().user || userData;
+      const latestUser = get().user || cachedUser;
       if (latestUser) {
         await setUserData(latestUser);
       }
@@ -203,9 +266,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         password,
       });
 
-      if (response.success && response.user) {
+      const user = extractAuthUser(response as AuthPayload);
+      if (response.success && user) {
         // Ensure user type is locksmith
-        if (response.user.type !== 'locksmith') {
+        if (user.type !== 'locksmith') {
           set({
             isLoading: false,
             error: 'This app is for locksmith professionals only. Please use the customer website.',
@@ -213,13 +277,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           return false;
         }
 
-        const user = mapAuthUser(response.user);
-        if (!user) {
-          set({
-            isLoading: false,
-            error: 'Invalid user response from server.',
-          });
-          return false;
+        const token = extractAuthToken(response as AuthPayload);
+        if (token) {
+          await setAuthToken(token);
         }
 
         await setUserData(user);
@@ -273,16 +333,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         services: data.services || [],
       });
 
-      // Registration now returns user and token directly for mobile apps
-      if (response.success && response.user) {
-        const user = mapAuthUser(response.user);
-
-        if (!user) {
-          set({
-            isLoading: false,
-            error: 'Invalid user response from server.',
-          });
-          return false;
+      // Registration may return user/locksmith and token in different payload shapes.
+      const user = extractAuthUser(response as AuthPayload);
+      if (response.success && user) {
+        const token = extractAuthToken(response as AuthPayload);
+        if (token) {
+          await setAuthToken(token);
         }
 
         await setUserData(user);
@@ -378,10 +434,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Network/transient backend issue:
       // keep local session and avoid forcing logout.
       const token = await getAuthToken();
-      const hasLocalSession = !!(token && (get().user || (await getUserData<AuthUser>())));
+      const cachedUser = get().user || mapAuthUser(await getUserData<AuthUser>());
+      const hasLocalSession = !!(token || cachedUser);
 
       if (hasLocalSession) {
         console.warn('Session check skipped due transient error, keeping local session.');
+        if (cachedUser && !get().user) {
+          set({ user: cachedUser });
+        }
         return true;
       }
 

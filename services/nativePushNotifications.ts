@@ -165,28 +165,52 @@ class NativePushNotificationService {
     }
   }
 
+  private resolveTokenType(rawType: unknown): string {
+    if (typeof rawType === 'string' && rawType.trim().length > 0) {
+      return rawType.trim().toLowerCase();
+    }
+    return Platform.OS === 'android' ? 'fcm' : 'apns';
+  }
+
   private async getNativePushTokenFromDevice(): Promise<{ token: string; tokenType: string } | null> {
     try {
       const nativeToken = await Notifications.getDevicePushTokenAsync();
-      const token = typeof nativeToken.data === 'string' ? nativeToken.data : '';
+      const token = typeof nativeToken.data === 'string' ? nativeToken.data.trim() : '';
       if (!token) {
         console.warn('[Push][Native] Device token call returned an empty token value.');
         return null;
       }
 
+      const tokenType = this.resolveTokenType(nativeToken.type);
+
+      console.log('[Push][Native] Device token acquired.', {
+        platform: Platform.OS,
+        tokenType,
+        tokenLength: token.length,
+      });
+
       return {
         token,
-        tokenType: nativeToken.type,
+        tokenType,
       };
     } catch (error) {
-      this.logPushError('Failed to read native push token from device', error);
+      this.logPushError('Failed to read native push token from device', error, {
+        platform: Platform.OS,
+        hint:
+          Platform.OS === 'android'
+            ? 'Ensure google-services.json is configured in app config for Android FCM token generation.'
+            : undefined,
+      });
       return null;
     }
   }
 
-  private async syncNativeTokenWithBackend(userId: string): Promise<boolean> {
+  private async syncNativeTokenWithBackend(
+    userId: string,
+    overrideTokenType?: string
+  ): Promise<boolean> {
     const token = this.nativePushToken;
-    const tokenType = this.nativePushTokenType;
+    const tokenType = overrideTokenType || this.nativePushTokenType;
 
     if (!token || !tokenType) {
       console.warn('[Push][Native] No native token available; backend sync deferred.');
@@ -366,7 +390,29 @@ class NativePushNotificationService {
     this.nativePushToken = nativeToken.token;
     this.nativePushTokenType = nativeToken.tokenType;
 
-    return this.syncNativeTokenWithBackend(userId);
+    const tokenTypeCandidates = Array.from(
+      new Set([
+        nativeToken.tokenType,
+        Platform.OS === 'android' ? 'fcm' : 'apns',
+        Platform.OS === 'android' ? 'fcmv1' : 'apns2',
+      ])
+    );
+
+    for (const tokenTypeCandidate of tokenTypeCandidates) {
+      const synced = await this.syncNativeTokenWithBackend(userId, tokenTypeCandidate);
+      if (synced) {
+        this.nativePushTokenType = tokenTypeCandidate;
+        return true;
+      }
+    }
+
+    this.logPushError('Failed to register native token with any tokenType variant', new Error('Push registration failed after retries'), {
+      userId,
+      tokenTypesTried: tokenTypeCandidates,
+      platform: Platform.OS,
+    });
+
+    return false;
   }
 
   async unregisterUser(userId: string, userType: 'locksmith' = 'locksmith'): Promise<void> {

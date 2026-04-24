@@ -236,12 +236,10 @@ api.interceptors.response.use(
       }
 
       await secureDeleteItem(TOKEN_KEY);
-      await secureDeleteItem(USER_KEY);
     }
 
     if (status === 401 && shouldSkipRefresh(originalRequest)) {
       await secureDeleteItem(TOKEN_KEY);
-      await secureDeleteItem(USER_KEY);
     }
 
     if (error.code === 'ERR_NETWORK') {

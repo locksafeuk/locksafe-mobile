@@ -87,7 +87,7 @@ export default function LocksmithSettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           await logout();
-          router.replace('/locksmith-login');
+          router.replace('/(auth)/locksmith-login');
         },
       },
     ]);

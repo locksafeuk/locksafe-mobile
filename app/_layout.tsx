@@ -74,7 +74,17 @@ export default function RootLayout() {
             // Initialize lazily for authenticated users only and only after UI settles.
             // This avoids startup races during app launch.
             await nativePushNotificationService.initialize();
-            await nativePushNotificationService.registerUser(currentUserId, 'locksmith');
+            const pushRegistered = await nativePushNotificationService.registerUser(
+              currentUserId,
+              'locksmith'
+            );
+
+            if (!pushRegistered) {
+              console.warn('[Push][Native] Registration did not complete for current user.', {
+                currentUserId,
+                platform: 'native',
+              });
+            }
           } catch (error) {
             console.error('[Push][Native] Failed during deferred push initialization sync:', {
               error,

@@ -8,6 +8,9 @@
  * For production builds, set env vars in eas.json or .env files.
  */
 
+const fs = require('fs');
+const path = require('path');
+
 const IS_DEV = process.env.APP_VARIANT === 'development';
 const IS_PREVIEW = process.env.APP_VARIANT === 'preview';
 
@@ -28,6 +31,39 @@ module.exports = () => {
   const API_URL = process.env.API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://www.locksafe.uk';
   const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
   const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_YOUR_STRIPE_KEY';
+
+  // Native Android push requires Firebase app config (google-services.json) so FCM device tokens can be issued.
+  const configuredGoogleServicesFile = process.env.GOOGLE_SERVICES_FILE || './google-services.json';
+  const generatedGoogleServicesFile = './google-services.generated.json';
+
+  let resolvedGoogleServicesFile = configuredGoogleServicesFile;
+  let hasGoogleServicesFile = fs.existsSync(path.resolve(__dirname, resolvedGoogleServicesFile));
+
+  // Support EAS secret injection via GOOGLE_SERVICES_JSON to avoid committing sensitive files.
+  if (!hasGoogleServicesFile && process.env.GOOGLE_SERVICES_JSON) {
+    try {
+      const targetPath = path.resolve(__dirname, generatedGoogleServicesFile);
+      fs.writeFileSync(targetPath, process.env.GOOGLE_SERVICES_JSON, 'utf8');
+      resolvedGoogleServicesFile = generatedGoogleServicesFile;
+      hasGoogleServicesFile = true;
+      console.log(`[app.config] Generated ${generatedGoogleServicesFile} from GOOGLE_SERVICES_JSON secret.`);
+    } catch (error) {
+      console.warn('[app.config] Failed to generate google-services file from GOOGLE_SERVICES_JSON.', error);
+    }
+  }
+
+  if (!hasGoogleServicesFile) {
+    const missingMessage = `[app.config] ${configuredGoogleServicesFile} not found. Android native push requires Firebase google-services.json.`;
+    const isAndroidBuildContext =
+      process.env.EAS_BUILD_PLATFORM === 'android' || process.env.EXPO_OS === 'android';
+
+    // Block Android non-dev builds from shipping without FCM configuration.
+    if (!IS_DEV && isAndroidBuildContext) {
+      throw new Error(`${missingMessage} Provide GOOGLE_SERVICES_FILE path or GOOGLE_SERVICES_JSON secret.`);
+    }
+
+    console.warn(`${missingMessage} Android native push will not work in this build.`);
+  }
 
   return {
     expo: {
@@ -73,7 +109,8 @@ module.exports = () => {
           backgroundColor: '#f97316',
         },
         package: getBundleId(),
-        versionCode: 15,
+        googleServicesFile: hasGoogleServicesFile ? resolvedGoogleServicesFile : undefined,
+        versionCode: 16,
         permissions: [
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',
