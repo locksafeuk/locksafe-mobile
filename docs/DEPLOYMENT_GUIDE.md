@@ -1,6 +1,6 @@
 # LockSafe Mobile App - Complete Deployment Guide
 
-> Last Updated: March 27, 2026
+> Last Updated: April 24, 2026
 
 This guide covers everything you need to deploy the LockSafe mobile app to both Google Play Store and iOS App Store.
 
@@ -28,7 +28,8 @@ Before you begin, ensure you have:
 - [ ] **Google Play Developer Account** - $25 one-time fee at [play.google.com/console](https://play.google.com/console)
 - [ ] **Apple Developer Account** - $99/year at [developer.apple.com](https://developer.apple.com)
 - [ ] **Stripe Account** - For payment processing
-- [ ] **OneSignal Account** - For push notifications
+- [ ] **Firebase Project (FCM)** - For Android native push notifications
+- [ ] **Apple Developer Push Capability** - For iOS APNs notifications
 
 ### Development Prerequisites
 - [ ] Node.js 18+ installed
@@ -88,15 +89,18 @@ Open `locksafe-mobile/app.json` and update the `extra` section:
 }
 ```
 
-### Step 3: Configure OneSignal
+### Step 3: Configure Native Push (Build 16+)
 
-1. Create app in [OneSignal Dashboard](https://app.onesignal.com)
-2. **For iOS:**
-   - Upload Apple Push Notification certificate (.p12)
-   - Or configure APNs Auth Key
-3. **For Android:**
-   - Add Firebase Server Key (FCM)
-4. Copy the OneSignal App ID to `app.json`
+Build 16 removed OneSignal runtime integration and uses native push infrastructure.
+
+1. **For Android (FCM):**
+   - Ensure `google-services.json` is present at project root (or injected via `GOOGLE_SERVICES_JSON` EAS secret)
+   - Confirm `app.config.js` resolves `android.googleServicesFile`
+   - Verify Firebase Cloud Messaging is enabled in your Firebase project
+2. **For iOS (APNs):**
+   - Ensure Push Notifications capability is enabled for the app identifier
+   - Ensure APNs credentials are configured in your EAS/Apple setup
+3. Confirm the app includes `expo-notifications` plugin config in `app.config.js` and physical-device testing is used
 
 ### Step 4: Configure Stripe
 
@@ -388,6 +392,29 @@ Or manually upload:
 4. Add release notes
 5. Save and submit for review
 
+### Build 16 Production Release (v1.0.2-build16)
+
+Use the validated Build 16 artifact for production rollout:
+
+- **Version:** `1.0.2 (16)`
+- **Build ID:** `bca43070-3f1c-47a4-9589-8336fd87853e`
+- **AAB Path:** `/home/ubuntu/locksafe-mobile/build/locksafe-v1.0.2-build16.aab`
+
+#### Google Play Console rollout steps (Build 16)
+1. Open **Play Console → LockSafe app → Production → Create new release**.
+2. Upload `locksafe-v1.0.2-build16.aab`.
+3. Add release notes summary:
+   - Fixed login session persistence ("Remember me" now survives app restarts)
+   - Migrated Android push notifications to native FCM path (OneSignal runtime removed)
+4. Complete policy checks and rollout review prompts.
+5. Start staged rollout (recommended 10% → 25% → 50% → 100%).
+
+#### Mandatory pre-rollout validation
+- [ ] Login once with **Remember me** enabled, close app, reopen app → user remains signed in
+- [ ] Trigger test push from backend or notification admin tool → receives on Build 16 device
+- [ ] Verify no startup crash after sign-in/sign-out cycles
+- [ ] Verify notifications route to correct job screen when opened
+
 ### Review Timeline
 - **Initial review:** 1-3 days
 - **Subsequent updates:** Usually within 24 hours
@@ -536,9 +563,9 @@ After submission:
    - Monitor crash reports
    - Respond to reviews
 
-3. **OneSignal Dashboard:**
-   - Track push notification delivery
-   - Monitor subscription rates
+3. **Push Delivery Monitoring (Native):**
+   - Verify backend native token registration metrics (FCM/APNs)
+   - Track push delivery success/failure rates from your notification backend logs
 
 ### Update Process
 
@@ -566,7 +593,7 @@ If issues occur:
 ### Before First Build
 - [ ] Configure `app.json` with all API keys
 - [ ] Set up Google Maps API keys
-- [ ] Configure OneSignal with APNs/FCM
+- [ ] Configure native push stack (FCM for Android, APNs for iOS)
 - [ ] Add Stripe publishable key
 - [ ] Initialize EAS project
 - [ ] Replace placeholder app icons
@@ -602,9 +629,10 @@ eas build --clear-cache --platform [ios|android]
 ```
 
 **Push notifications not working:**
-1. Verify OneSignal app ID in `app.json`
-2. Check APNs certificate (iOS) / FCM key (Android)
-3. Ensure user granted permission
+1. Verify `google-services.json` is present (Android) or `GOOGLE_SERVICES_JSON` secret is configured for EAS
+2. Confirm physical device testing (push tokens are not generated reliably on simulators/emulators)
+3. Check APNs credentials (iOS) / Firebase Cloud Messaging setup (Android)
+4. Ensure user granted notification permission
 
 **API calls failing:**
 1. Verify `apiUrl` in `app.json`

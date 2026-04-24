@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LockSafe Business Model - Visual Explanation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #1a202c;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+        
+        .flow-section {
+            margin-bottom: 50px;
+        }
+        
+        .flow-title {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+        
+        .flow-step.customer {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .flow-step.platform {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .flow-step.locksmith {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .flow-step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            line-height: 35px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .flow-step-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .flow-step-desc {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+        
+        .arrow {
+            font-size: 40px;
+            color: #cbd5e0;
+            flex-shrink: 0;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .comparison-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .comparison-card h3 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icon {
+            font-size: 24px;
+        }
+        
+        .comparison-list {
+            list-style: none;
+        }
+        
+        .comparison-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .comparison-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+        
+        .comparison-list.cross li:before {
+            content: "✗";
+            color: #f56565;
+        }
+        
+        .highlight-box {
+            background: #fef5e7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        
+        .highlight-box h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .highlight-box p {
+            color: #78350f;
+            line-height: 1.7;
+        }
+        
+        .key-facts {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+        
+        .key-facts h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .fact-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .fact-item h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .fact-item p {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .flow-diagram {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 LockSafe Business Model Explained</h1>
+        <p class="subtitle">Visual guide for App Store Review - No In-App Purchases Required</p>
+        
+        <div class="flow-section">
+            <h2 class="flow-title">Payment & Service Flow</h2>
+            
+            <div class="flow-diagram">
+                <div class="flow-step customer">
+                    <div class="flow-step-number">1</div>
+                    <div class="flow-step-title">Customer</div>
+                    <div class="flow-step-desc">Visits www.locksafe.uk<br>Pays £29-49 assessment fee<br><strong>ON WEB PLATFORM</strong><br>(Not in mobile app)</div>
+                </div>
+                
+                <div class="arrow">→</div>
+                
+                <div class="flow-step platform">
+                    <div class="flow-step-number">2</div>
+                    <div class="flow-step-title">Platform</div>
+                    <div class="flow-step-desc">Receives payment<br>Creates job request<br>Notifies nearby locksmiths<br>(Backend processing)</div>
+                </div>
+                
+                <div class="arrow">→</div>
+                
+                <div class="flow-step locksmith">
+                    <div class="flow-step-number">3</div>
+                    <div class="flow-step-title">Locksmith</div>
+                    <div class="flow-step-desc">Sees job in MOBILE APP<br>Accepts job (free)<br>Performs physical service<br>Gets paid 75-85% via Stripe Connect</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>🎯 Critical Point</h3>
+                <p><strong>The mobile app is Step 3 only.</strong> By the time the locksmith sees the job in the app, the customer has already paid on the web platform. The locksmith uses the app for FREE to view jobs, navigate, and complete services. No money flows through the mobile app at any point.</p>
+            </div>
+        </div>
+        
+        <div class="flow-section">
+            <h2 class="flow-title">What the App DOES vs DOESN'T Do</h2>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h3><span class="icon">✅</span> What It DOES</h3>
+                    <ul class="comparison-list">
+                        <li>Shows available job requests</li>
+                        <li>GPS navigation to customer</li>
+                        <li>Job status updates</li>
+                        <li>Quote builder tool</li>
+                        <li>Photo documentation</li>
+                        <li>Digital signature capture</li>
+                        <li>Earnings history (read-only)</li>
+                        <li>All features FREE for locksmiths</li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-card">
+                    <h3><span class="icon">❌</span> What It DOESN'T Do</h3>
+                    <ul class="comparison-list cross">
+                        <li>Process payments</li>
+                        <li>Sell subscriptions</li>
+                        <li>Unlock paid features</li>
+                        <li>Provide digital content</li>
+                        <li>Use Apple Pay or In-App Purchase</li>
+                        <li>Charge locksmiths for access</li>
+                        <li>Require payment methods</li>
+                        <li>Have premium tiers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flow-section">
+            <h2 class="flow-title">Comparable Approved Apps</h2>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h3><span class="icon">🚗</span> Uber Driver</h3>
+                    <ul class="comparison-list">
+                        <li>Drivers see ride requests</li>
+                        <li>Customers pay in rider app</li>
+                        <li>Driver receives commission</li>
+                        <li>No IAP in driver app</li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-card">
+                    <h3><span class="icon">🍕</span> DoorDash Dasher</h3>
+                    <ul class="comparison-list">
+                        <li>Couriers see delivery orders</li>
+                        <li>Customers pay in customer app</li>
+                        <li>Courier receives commission</li>
+                        <li>No IAP in dasher app</li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-card">
+                    <h3><span class="icon">🔧</span> TaskRabbit Tasker</h3>
+                    <ul class="comparison-list">
+                        <li>Taskers see job requests</li>
+                        <li>Customers pay on platform</li>
+                        <li>Tasker receives commission</li>
+                        <li>No IAP in tasker app</li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-card">
+                    <h3><span class="icon">🔒</span> LockSafe Partner</h3>
+                    <ul class="comparison-list">
+                        <li>Locksmiths see job requests</li>
+                        <li>Customers pay on web platform</li>
+                        <li>Locksmith receives commission</li>
+                        <li>No IAP in locksmith app</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="key-facts">
+            <h3>📋 Key Facts for App Review</h3>
+            
+            <div class="facts-grid">
+                <div class="fact-item">
+                    <h4>App Type</h4>
+                    <p>B2B Service Provider Platform (not consumer app)</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>Users</h4>
+                    <p>Professional locksmiths only (verified businesses)</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>Pricing</h4>
+                    <p>100% FREE for all locksmiths - no charges, subscriptions, or IAP</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>Revenue Model</h4>
+                    <p>Commission on services (15-25%) - exempt under Guideline 3.1.3(d)</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>Customer Payments</h4>
+                    <p>All processed on www.locksafe.uk web platform via Stripe</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>Locksmith Payouts</h4>
+                    <p>Stripe Connect direct to bank account (75-85% of job value)</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>PassKit/Apple Pay</h4>
+                    <p>Included via Stripe SDK but NOT implemented or used</p>
+                </div>
+                
+                <div class="fact-item">
+                    <h4>Guidelines Compliance</h4>
+                    <p>Physical services performed outside app - IAP not required</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="highlight-box" style="margin-top: 40px; background: #dcfce7; border-left-color: #22c55e;">
+            <h3 style="color: #166534;">✅ Why This Is Compliant</h3>
+            <p style="color: #166534;"><strong>App Store Guideline 3.1.3(d):</strong> "Apps may use in-app purchase to sell and deliver physical goods or to purchase goods and services that will be consumed outside of the app."</p>
+            <p style="color: #166534; margin-top: 10px;">LockSafe connects customers with locksmiths for PHYSICAL emergency locksmith services (lockouts, repairs, installations) performed AT THE CUSTOMER'S LOCATION. This is explicitly exempt from the In-App Purchase requirement, just like Uber rides, DoorDash deliveries, and TaskRabbit services.</p>
+        </div>
+    </div>
+</body>
+</html>

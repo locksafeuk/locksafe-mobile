@@ -1,0 +1,158 @@
+APP STORE CONNECT REVIEWER NOTES - BUILD 8
+Version 1.0.2 (Build 8) - uk.locksafe.app
+================================================================================
+
+ISSUE 1: PASSKIT / APPLE PAY FRAMEWORK
+----------------------------------------
+
+PassKit/Apple Pay is NOT actively used in this application.
+
+WHY IT APPEARS:
+• The app includes @stripe/stripe-react-native SDK for backend payment processing
+• The Stripe SDK bundles Apple Pay capabilities by default
+• merchantIdentifier "merchant.uk.locksafe.app" is configured as part of Stripe SDK initialization requirements
+
+WHAT WE ACTUALLY USE:
+• Server-side Stripe payment intents only (created on backend)
+• Traditional card processing, NOT Apple Pay
+• No Apple Pay buttons, payment sheets, or PKPayment APIs implemented anywhere in the app
+
+CODE EVIDENCE:
+• No usage of: initPaymentSheet(), presentApplePay(), confirmApplePayPayment()
+• Payment service only creates backend payment intents via API calls
+• Zero Apple Pay UI components in codebase
+
+RESOLUTION:
+We can remove the merchantIdentifier from config in Build 9 if required, or you may approve with this clarification. The entitlement exists due to SDK dependency, but no Apple Pay functionality is accessible to users.
+
+================================================================================
+
+ISSUE 2: BUSINESS MODEL QUESTIONS
+-----------------------------------
+
+OVERVIEW:
+This is a B2B service provider app for professional locksmiths (similar to Uber Driver, DoorDash Dasher, TaskRabbit Tasker). NOT a consumer app.
+
+DETAILED ANSWERS:
+
+1) WHO ARE THE USERS?
+   • Professional locksmiths (licensed tradespeople)
+   • UK-based locksmith businesses
+   • Verified through backend (license numbers, insurance)
+   • Users do NOT purchase anything within this app
+
+2) WHERE CAN USERS PURCHASE CONTENT/FEATURES?
+   • Users (locksmiths) DO NOT purchase anything
+   • NO in-app purchases, subscriptions, or payments
+   
+   HOW IT WORKS:
+   - Customers visit www.locksafe.uk website
+   - Customers pay assessment fee (£29-49) on WEB PLATFORM via Stripe
+   - Job request appears in locksmith's app (already paid by customer)
+   - Locksmith accepts job, performs physical service
+   - Locksmith receives earnings via Stripe Connect bank transfer
+   
+   PAYMENT FLOW:
+   Customer (Web) → Pays → Job Created → Locksmith (App) sees job → 
+   Performs service → Receives payout to bank account
+   
+   Zero financial transactions occur within this mobile app.
+
+3) WHAT PREVIOUSLY PURCHASED CONTENT CAN USERS ACCESS?
+   • Not applicable - we don't provide "content"
+   • Locksmiths access JOB REQUESTS (service opportunities), not content
+   • They view: job details, customer location, earnings history
+   • This is WORK OPPORTUNITIES, not unlockable content
+   
+   Nothing was "purchased" by locksmith to access jobs. Customers paid for 
+   the SERVICE (locksmith call-out) on web platform.
+
+4) WHAT PAID FEATURES ARE UNLOCKED WITHOUT IN-APP PURCHASE?
+   • NONE - all features are FREE to locksmiths
+   
+   FREE FEATURES (No subscription/payment required):
+   ✓ Job request notifications
+   ✓ Job listings in coverage area
+   ✓ Job acceptance and management
+   ✓ GPS navigation
+   ✓ Quote builder tool
+   ✓ Photo documentation
+   ✓ Digital signature capture
+   ✓ Earnings tracker
+   ✓ Job history
+   
+   NO PAID TIERS:
+   • No Premium vs Basic accounts
+   • No subscription plans
+   • No feature unlocks
+   • No content libraries
+
+REVENUE MODEL (Commission-based Marketplace):
+• Customer pays £40 assessment fee on WEBSITE
+• Locksmith completes job using APP
+• Locksmith receives £34 (85%) via Stripe Connect payout
+• LockSafe retains £6 (15%) commission
+
+Locksmith NEVER pays LockSafe through this app. Commission is deducted 
+from customer payment before transfer. The app is completely free to use.
+
+================================================================================
+
+BUSINESS MODEL SUMMARY:
+-----------------------
+Category: Professional Service Provider Platform
+Comparable: Uber Driver, DoorDash Dasher, TaskRabbit Tasker, Thumbtack Pro
+
+✓ No in-app purchases (Guideline 3.1 - N/A)
+✓ No subscriptions (Guideline 3.1.2 - N/A)
+✓ No paid features/content (Guideline 3.1.3 - N/A)
+✓ Commission-based marketplace (Permitted under 3.1.3(d) - services performed outside app)
+
+All customer payments: Processed on web platform via Stripe
+All locksmith payouts: Stripe Connect direct bank transfers
+Zero financial transactions initiated within mobile app
+
+================================================================================
+
+WHY STRIPE SDK IS INCLUDED:
+• Backend payment intent creation (server-to-server API calls)
+• Payment processing infrastructure (non-Apple Pay)
+• NOT for in-app purchases or subscriptions
+
+CODE EVIDENCE:
+• No StoreKit imports
+• No react-native-iap or IAP libraries
+• No subscription management code
+• No paywall components
+• No "Unlock Premium" features
+• Payment service only creates backend intents via API
+
+================================================================================
+
+COMPARABLE APPROVED APPS:
+Uber Driver - Commission on rides - No IAP
+DoorDash Dasher - Commission on deliveries - No IAP
+TaskRabbit Tasker - Commission on jobs - No IAP
+Thumbtack Pro - Lead fees (web) - No IAP
+
+LockSafe operates identically: Service providers access jobs via app, 
+customers pay on web, provider receives earnings minus platform commission.
+
+================================================================================
+
+TEST CREDENTIALS AVAILABLE:
+We can provide locksmith test account and admin panel access if needed 
+for verification.
+
+================================================================================
+
+REQUEST FOR APPROVAL:
+We believe this detailed clarification demonstrates full compliance with 
+App Store Guidelines. This is a legitimate B2B service provider tool with 
+no in-app purchases, subscriptions, or paid content. We respectfully 
+request approval of Build 8.
+
+If Build 9 is required to remove PassKit entitlement, we can submit 
+within 24 hours.
+
+Contact: locksafeuk26@gmail.com

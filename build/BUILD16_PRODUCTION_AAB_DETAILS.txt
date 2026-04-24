@@ -1,0 +1,15 @@
+LockSafe Android Production Build 16
+===================================
+Build ID: bca43070-3f1c-47a4-9589-8336fd87853e
+Build URL: https://expo.dev/accounts/locksafeuk26/projects/locksafe-mobile/builds/bca43070-3f1c-47a4-9589-8336fd87853e
+Artifact URL: https://expo.dev/artifacts/eas/pi4PJdLtQfYnGNdnPxEdoj.aab
+Saved Artifact Path: /home/ubuntu/locksafe-mobile/build/locksafe-v1.0.2-build16.aab
+File Size: 54,173,561 bytes (51.66 MiB)
+Build Completed (UTC): 2026-04-24 12:02:09 UTC
+Saved File Timestamp (UTC): 2026-04-24 12:03:06 UTC
+Saved File Timestamp (Europe/London): 2026-04-24 13:03:06 BST
+
+Notes:
+- Initial Build ID fac1ff41-a829-4068-9e70-e6153da35ba9 failed in READ_APP_CONFIG due to missing google-services.json in cloud build context.
+- Resolved by creating EAS production file env var GOOGLE_SERVICES_FILE from /home/ubuntu/Uploads/google-services.json.
+- Final build finished successfully and artifact downloaded.
