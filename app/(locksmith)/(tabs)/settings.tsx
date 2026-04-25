@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, Alert, Switch } from 'react-native';
+import { View, Text, Pressable, ScrollView, Alert, Switch, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -78,6 +78,21 @@ export default function LocksmithSettingsScreen() {
 
   const locksmith = user as Locksmith;
   const appVersion = Constants.expoConfig?.version || '1.0.0';
+
+  const openSupportLink = async (url: string, label: string) => {
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (!canOpen) {
+        Alert.alert('Unable to open link', `${label} is currently unavailable.`);
+        return;
+      }
+
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error(`[Settings] Failed to open ${label} link:`, error);
+      Alert.alert('Unable to open link', `Please try again later or visit ${url}`);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert('Log Out', 'Are you sure you want to log out?', [
@@ -194,9 +209,21 @@ export default function LocksmithSettingsScreen() {
           Support
         </Text>
         <View className="bg-white mx-4 rounded-2xl overflow-hidden mb-4">
-          <SettingsItem icon={HelpCircle} label="Help Center" onPress={() => {}} />
-          <SettingsItem icon={FileText} label="Partner Terms" onPress={() => {}} />
-          <SettingsItem icon={Shield} label="Privacy Policy" onPress={() => {}} />
+          <SettingsItem
+            icon={HelpCircle}
+            label="Help Center"
+            onPress={() => void openSupportLink('https://www.locksafe.uk/help', 'Help Center')}
+          />
+          <SettingsItem
+            icon={FileText}
+            label="Partner Terms"
+            onPress={() => void openSupportLink('https://www.locksafe.uk/terms', 'Partner Terms')}
+          />
+          <SettingsItem
+            icon={Shield}
+            label="Privacy Policy"
+            onPress={() => void openSupportLink('https://www.locksafe.uk/privacy', 'Privacy Policy')}
+          />
         </View>
 
         {/* Logout */}

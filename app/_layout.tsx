@@ -2,7 +2,7 @@ import '../global.css';
 import { useEffect, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { InteractionManager } from 'react-native';
+import { InteractionManager, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -105,6 +105,24 @@ export default function RootLayout() {
     };
   }, [user?.id, user?.type]);
 
+  const navigationContent = (
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#f8fafc' },
+          animation: 'slide_from_right',
+          headerLargeTitle: false,
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(locksmith)" options={{ headerShown: false }} />
+      </Stack>
+    </>
+  );
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -113,20 +131,11 @@ export default function RootLayout() {
           merchantIdentifier="merchant.uk.locksafe.app"
         >
           <QueryClientProvider client={queryClient}>
-            <KeyboardProvider>
-              <StatusBar style="dark" />
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: '#f8fafc' },
-                  animation: 'slide_from_right',
-                }}
-              >
-                <Stack.Screen name="index" />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(locksmith)" options={{ headerShown: false }} />
-              </Stack>
-            </KeyboardProvider>
+            {Platform.OS === 'android' ? (
+              <KeyboardProvider>{navigationContent}</KeyboardProvider>
+            ) : (
+              navigationContent
+            )}
           </QueryClientProvider>
         </StripeProvider>
       </SafeAreaProvider>

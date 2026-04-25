@@ -9,6 +9,7 @@ import {
   setAuthToken,
   setStorageItem,
   getStorageItem,
+  deleteStorageItem,
 } from '../services/api';
 import type { Locksmith } from '../types';
 
@@ -16,6 +17,7 @@ import type { Locksmith } from '../types';
 export type UserType = 'locksmith';
 
 const REMEMBER_ME_KEY = 'remember_me';
+const REMEMBERED_EMAIL_KEY = 'remembered_email';
 
 export interface AuthUser {
   id: string;
@@ -94,6 +96,7 @@ interface AuthState {
   updateUser: (updates: Partial<AuthUser>) => void;
   checkSession: () => Promise<boolean>;
   setRememberMe: (rememberMe: boolean) => Promise<void>;
+  getRememberedEmail: () => Promise<string | null>;
 }
 
 export interface LocksmithRegisterData {
@@ -108,7 +111,7 @@ export interface LocksmithRegisterData {
   services?: string[];
 }
 
-function mapAuthUser(user: Partial<AuthUser> | undefined): AuthUser | null {
+function mapAuthUser(user: Partial<AuthUser> | undefined | null): AuthUser | null {
   if (!user) {
     return null;
   }
@@ -140,6 +143,16 @@ async function loadRememberMePreference(): Promise<boolean> {
   const saved = await getStorageItem(REMEMBER_ME_KEY);
   // Default to true for production "stay signed in" behavior
   return saved !== 'false';
+}
+
+async function loadRememberedEmail(): Promise<string | null> {
+  const savedEmail = await getStorageItem(REMEMBERED_EMAIL_KEY);
+  if (!savedEmail) {
+    return null;
+  }
+
+  const normalizedEmail = savedEmail.trim().toLowerCase();
+  return normalizedEmail.length > 0 ? normalizedEmail : null;
 }
 
 type AuthPayload = {
@@ -284,6 +297,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         await setUserData(user);
         await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
+
+        if (rememberMe) {
+          await setStorageItem(REMEMBERED_EMAIL_KEY, email.toLowerCase().trim());
+        } else {
+          await deleteStorageItem(REMEMBERED_EMAIL_KEY);
+        }
 
         set({
           user,
@@ -455,10 +474,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
+
+      // If the user disables remember-me, clear any previously saved credential hints.
+      if (!rememberMe) {
+        await deleteStorageItem(REMEMBERED_EMAIL_KEY);
+      }
     } catch (error) {
       console.error('Failed to persist remember-me preference:', error);
       // Revert to safe default if persistence fails.
       set({ rememberMe: true });
+    }
+  },
+
+  getRememberedEmail: async () => {
+    const rememberMe = get().rememberMe;
+    if (!rememberMe) {
+      return null;
+    }
+
+    try {
+      return await loadRememberedEmail();
+    } catch (error) {
+      console.error('Failed to load remembered email:', error);
+      return null;
     }
   },
 }));
