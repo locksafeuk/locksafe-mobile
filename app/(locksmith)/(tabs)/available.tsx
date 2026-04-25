@@ -1,22 +1,45 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, RefreshControl, Alert } from 'react-native';
+import { View, Text, FlatList, Pressable, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MapPin, Clock, Briefcase, ChevronRight } from 'lucide-react-native';
+import { MapPin, Briefcase, ChevronRight } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/authStore';
 import { useJobStore } from '../../../stores/jobStore';
 import type { Job, Locksmith } from '../../../types';
 
 function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
-  const timeAgo = (date: string) => {
+  const timeAgo = (date: string | undefined) => {
+    if (!date) {
+      return 'Recently';
+    }
+
     const now = new Date();
     const then = new Date(date);
+
+    if (Number.isNaN(then.getTime())) {
+      return 'Recently';
+    }
+
     const diff = Math.floor((now.getTime() - then.getTime()) / 1000 / 60);
 
     if (diff < 1) return 'Just now';
     if (diff < 60) return `${diff}m ago`;
     return `${Math.floor(diff / 60)}h ago`;
   };
+
+  const problemTypeLabel =
+    typeof job.problemType === 'string' && job.problemType.length > 0
+      ? job.problemType.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+      : 'Other';
+
+  const propertyTypeLabel =
+    typeof job.propertyType === 'string' && job.propertyType.length > 0
+      ? job.propertyType.charAt(0).toUpperCase() + job.propertyType.slice(1)
+      : 'Other';
+
+  const hasDistanceMiles = typeof job.distanceMiles === 'number' && Number.isFinite(job.distanceMiles);
+  const assessmentFee = Number(job.assessmentFee);
+  const formattedAssessmentFee = Number.isFinite(assessmentFee) ? assessmentFee.toFixed(2) : '0.00';
 
   return (
     <Pressable
@@ -27,7 +50,7 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
       <View className="flex-row items-center justify-between mb-3">
         <View className="bg-orange-100 px-3 py-1 rounded-full">
           <Text className="text-orange-700 font-medium">
-            {job.problemType.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+            {problemTypeLabel}
           </Text>
         </View>
         <Text className="text-slate-500 text-sm">{timeAgo(job.createdAt)}</Text>
@@ -35,7 +58,7 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
 
       {/* Property Type */}
       <Text className="text-slate-600 text-sm mb-2">
-        {job.propertyType.charAt(0).toUpperCase() + job.propertyType.slice(1)}
+        {propertyTypeLabel}
       </Text>
 
       {/* Location */}
@@ -44,9 +67,9 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
         <Text className="text-slate-700 ml-2 flex-1" numberOfLines={1}>
           {job.postcode}
         </Text>
-        {job.distanceMiles !== undefined && (
+        {hasDistanceMiles && (
           <Text className="text-slate-500 text-sm">
-            {job.distanceMiles.toFixed(1)} mi away
+            {job.distanceMiles!.toFixed(1)} mi away
           </Text>
         )}
       </View>
@@ -65,7 +88,7 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
         <View>
           <Text className="text-slate-500 text-xs">Assessment Fee</Text>
           <Text className="text-2xl font-bold text-green-600">
-            £{job.assessmentFee.toFixed(2)}
+            £{formattedAssessmentFee}
           </Text>
         </View>
         <View className="flex-row items-center">

@@ -6,6 +6,8 @@ export default function LocksmithTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        lazy: true,
+        freezeOnBlur: true,
         tabBarActiveTintColor: '#0f172a',
         tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {

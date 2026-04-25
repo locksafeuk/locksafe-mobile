@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Job, LocksmithApplication } from '../types';
+import type { Job, LocksmithApplication, ProblemType, PropertyType } from '../types';
 import {
   getJob,
   getLocksmithJobs,
@@ -25,6 +25,42 @@ interface JobState {
   clearError: () => void;
 }
 
+const FALLBACK_PROBLEM_TYPE: ProblemType = 'other';
+const FALLBACK_PROPERTY_TYPE: PropertyType = 'other';
+
+function normalizeJob(job: Job): Job {
+  const normalizedAssessmentFee = Number(job.assessmentFee);
+  const normalizedDistanceMiles = Number(job.distanceMiles);
+
+  const safeProblemType =
+    typeof job.problemType === 'string' && job.problemType.trim().length > 0
+      ? (job.problemType as ProblemType)
+      : FALLBACK_PROBLEM_TYPE;
+
+  const safePropertyType =
+    typeof job.propertyType === 'string' && job.propertyType.trim().length > 0
+      ? (job.propertyType as PropertyType)
+      : FALLBACK_PROPERTY_TYPE;
+
+  return {
+    ...job,
+    problemType: safeProblemType,
+    propertyType: safePropertyType,
+    assessmentFee: Number.isFinite(normalizedAssessmentFee) ? normalizedAssessmentFee : 0,
+    distanceMiles: Number.isFinite(normalizedDistanceMiles)
+      ? normalizedDistanceMiles
+      : undefined,
+  };
+}
+
+function normalizeJobs(jobs: Job[] | undefined | null): Job[] {
+  if (!Array.isArray(jobs)) {
+    return [];
+  }
+
+  return jobs.map((job) => normalizeJob(job));
+}
+
 export const useJobStore = create<JobState>((set, get) => ({
   currentJob: null,
   locksmithJobs: [],
@@ -38,7 +74,7 @@ export const useJobStore = create<JobState>((set, get) => ({
     try {
       const response = await getJob(jobId);
       if (response.success) {
-        set({ currentJob: response.job, isLoading: false });
+        set({ currentJob: normalizeJob(response.job), isLoading: false });
       } else {
         set({ error: 'Failed to fetch job', isLoading: false });
       }
@@ -55,7 +91,7 @@ export const useJobStore = create<JobState>((set, get) => ({
     try {
       const response = await getLocksmithJobs(locksmithId);
       if (response.success) {
-        set({ locksmithJobs: response.jobs, isLoading: false });
+        set({ locksmithJobs: normalizeJobs(response.jobs), isLoading: false });
       } else {
         set({ error: 'Failed to fetch jobs', isLoading: false });
       }
@@ -72,7 +108,7 @@ export const useJobStore = create<JobState>((set, get) => ({
     try {
       const response = await getAvailableJobs(locksmithId);
       if (response.success) {
-        set({ availableJobs: response.jobs, isLoading: false });
+        set({ availableJobs: normalizeJobs(response.jobs), isLoading: false });
       } else {
         set({ error: 'Failed to fetch available jobs', isLoading: false });
       }
@@ -102,26 +138,27 @@ export const useJobStore = create<JobState>((set, get) => ({
   },
 
   setCurrentJob: (job) => {
-    set({ currentJob: job });
+    set({ currentJob: job ? normalizeJob(job) : null });
   },
 
   updateJobInList: (updatedJob) => {
+    const normalizedUpdatedJob = normalizeJob(updatedJob);
     const { locksmithJobs, availableJobs, currentJob } = get();
 
     // Update in locksmithJobs
     const updatedLocksmithJobs = locksmithJobs.map((j) =>
-      j.id === updatedJob.id ? updatedJob : j
+      j.id === normalizedUpdatedJob.id ? normalizedUpdatedJob : j
     );
 
     // Remove from availableJobs if no longer pending
     const updatedAvailableJobs =
-      updatedJob.status !== 'PENDING'
-        ? availableJobs.filter((j) => j.id !== updatedJob.id)
-        : availableJobs.map((j) => (j.id === updatedJob.id ? updatedJob : j));
+      normalizedUpdatedJob.status !== 'PENDING'
+        ? availableJobs.filter((j) => j.id !== normalizedUpdatedJob.id)
+        : availableJobs.map((j) => (j.id === normalizedUpdatedJob.id ? normalizedUpdatedJob : j));
 
     // Update currentJob if it matches
     const updatedCurrentJob =
-      currentJob?.id === updatedJob.id ? updatedJob : currentJob;
+      currentJob?.id === normalizedUpdatedJob.id ? normalizedUpdatedJob : currentJob;
 
     set({
       locksmithJobs: updatedLocksmithJobs,

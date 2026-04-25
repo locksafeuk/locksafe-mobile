@@ -31,6 +31,19 @@ import { LocationService } from '../../../../services/location';
 import JobMap from '../../../../components/JobMap';
 import type { JobStatus } from '../../../../types';
 
+const formatProblemType = (value: unknown): string => {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return 'other';
+  }
+  return value.replace(/-/g, ' ');
+};
+
+const parsePositiveNumber = (value: string): number => {
+  const normalized = value.replace(',', '.').trim();
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : NaN;
+};
+
 export default function LocksmithJobDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -58,17 +71,28 @@ export default function LocksmithJobDetailScreen() {
   const isAssigned = currentJob?.locksmithId === locksmith?.id;
 
   const handleApply = async () => {
-    if (!assessmentFee || !eta) {
-      Alert.alert('Missing Information', 'Please enter assessment fee and ETA.');
+    const parsedAssessmentFee = parsePositiveNumber(assessmentFee);
+    const parsedEta = parsePositiveNumber(eta);
+    const trimmedMessage = message.trim();
+
+    if (!Number.isFinite(parsedAssessmentFee) || !Number.isFinite(parsedEta)) {
+      Alert.alert('Missing Information', 'Please enter a valid assessment fee and ETA.');
+      return;
+    }
+
+    if (!locksmith?.id) {
+      Alert.alert('Authentication Error', 'Please sign in again before submitting an application.');
       return;
     }
 
     setIsSubmitting(true);
     try {
       const response = await submitApplication(id!, {
-        assessmentFee: parseFloat(assessmentFee),
-        eta: parseInt(eta, 10),
-        message: message || undefined,
+        locksmithId: locksmith.id,
+        assessmentFee: parsedAssessmentFee,
+        eta: Math.round(parsedEta),
+        // Backend validation currently expects message to be present; send a safe default.
+        message: trimmedMessage.length > 0 ? trimmedMessage : 'Application submitted from LockSafe mobile app.',
       });
 
       if (response.success) {
@@ -166,7 +190,7 @@ export default function LocksmithJobDetailScreen() {
             {currentJob.jobNumber}
           </Text>
           <Text className="text-slate-500 text-sm">
-            {currentJob.problemType.replace(/-/g, ' ')}
+            {formatProblemType(currentJob.problemType)}
           </Text>
         </View>
         {isAssigned && (
@@ -205,7 +229,7 @@ export default function LocksmithJobDetailScreen() {
             <View className="flex-row items-center mb-4">
               <View className="bg-orange-100 px-3 py-1 rounded-full">
                 <Text className="text-orange-700 font-medium">
-                  {currentJob.problemType.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                  {formatProblemType(currentJob.problemType).replace(/\b\w/g, (l) => l.toUpperCase())}
                 </Text>
               </View>
               <Text className="text-slate-500 ml-2">

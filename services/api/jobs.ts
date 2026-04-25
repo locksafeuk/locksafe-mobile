@@ -99,6 +99,7 @@ export async function updateJobStatus(
 export async function submitApplication(
   jobId: string,
   data: {
+    locksmithId: string;
     assessmentFee: number;
     eta: number; // minutes
     message?: string;

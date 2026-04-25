@@ -12,8 +12,20 @@ import {
 } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/authStore';
 import { useJobStore } from '../../../stores/jobStore';
-import { get, post } from '../../../services/api/client';
+import { post } from '../../../services/api/client';
 import type { Locksmith, Job } from '../../../types';
+
+const formatProblemType = (value: unknown): string => {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return 'other';
+  }
+  return value.replace(/-/g, ' ');
+};
+
+const formatCurrency = (value: unknown, decimals = 0): string => {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount.toFixed(decimals) : (0).toFixed(decimals);
+};
 
 function StatCard({
   icon: Icon,
@@ -72,7 +84,7 @@ function ActiveJobCard({ job, onPress }: { job: Job; onPress: () => void }) {
       </View>
       <View className="flex-row items-center justify-between">
         <Text className="text-slate-500 text-sm">
-          {job.problemType.replace(/-/g, ' ')}
+          {formatProblemType(job.problemType)}
         </Text>
         <ChevronRight size={18} color="#94a3b8" />
       </View>
@@ -195,7 +207,7 @@ export default function LocksmithDashboardScreen() {
             <StatCard
               icon={TrendingUp}
               label="Earnings"
-              value={`£${totalEarnings.toFixed(0)}`}
+              value={`£${formatCurrency(totalEarnings, 0)}`}
               color="bg-green-500"
             />
           </View>
@@ -260,14 +272,14 @@ export default function LocksmithDashboardScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="text-slate-900 font-medium">
-                    {job.problemType.replace(/-/g, ' ')}
+                    {formatProblemType(job.problemType)}
                   </Text>
                   <Text className="text-slate-500 text-sm" numberOfLines={1}>
-                    {job.postcode} • {job.distanceMiles?.toFixed(1) || '?'} mi
+                    {job.postcode} • {typeof job.distanceMiles === 'number' && Number.isFinite(job.distanceMiles) ? job.distanceMiles.toFixed(1) : '?'} mi
                   </Text>
                 </View>
                 <Text className="text-green-600 font-semibold">
-                  £{job.assessmentFee.toFixed(0)}
+                  £{formatCurrency(job.assessmentFee, 0)}
                 </Text>
               </Pressable>
             ))}
