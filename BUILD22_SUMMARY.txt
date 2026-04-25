@@ -1,0 +1,27 @@
+LockSafe Mobile - Android Build 22 Summary
+Date (UTC): 2026-04-25
+
+Build Details
+- Build ID: ea61afbe-25f4-41ab-9d0e-c8c7bdec5243
+- Platform: Android (AAB)
+- Profile: production
+- App Version: 1.0.2
+- Version Code: 22
+- Commit: 8f2d9d9a9bd60bb17f8cfe7a781b51b227d9328e
+- Status: FINISHED
+- Build Logs: https://expo.dev/accounts/locksafeuk26/projects/locksafe-mobile/builds/ea61afbe-25f4-41ab-9d0e-c8c7bdec5243
+
+Fixes Included in Build 22
+- iOS crash fix
+- Remember Me updated to securely save both email and password (SecureStore)
+- Settings links added/fixed (Help, Terms, Privacy)
+
+Artifact
+- Downloaded AAB URL: https://expo.dev/artifacts/eas/uWEmUo4q7VBNYXUQYNVnRe.aab
+- Saved file: /home/ubuntu/locksafe-mobile/build/locksafe-v1.0.2-build22.aab
+- Size: 52 MB
+- SHA256: 19b662427aa698b4cb71f804197199bd652594c1639aee187262599b822df27b
+- Integrity check: unzip -t passed (no errors)
+
+Release Readiness
+- Build 22 artifact is ready for XL screen testing.
