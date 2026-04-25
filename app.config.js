@@ -102,6 +102,7 @@ module.exports = () => {
       },
       newArchEnabled: false,
       android: {
+        icon: './assets/icon.png',
         adaptiveIcon: {
           foregroundImage: './assets/android-icon-foreground.png',
           backgroundImage: './assets/android-icon-background.png',
@@ -135,6 +136,7 @@ module.exports = () => {
         'expo-asset',
         'expo-secure-store',
         'expo-dev-client',
+        './plugins/withDisablePlayIntegrityChecks',
         [
           'expo-notifications',
           {
