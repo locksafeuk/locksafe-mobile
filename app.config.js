@@ -83,7 +83,7 @@ module.exports = () => {
       ios: {
         supportsTablet: true,
         bundleIdentifier: getBundleId(),
-        buildNumber: '8',
+        buildNumber: '9',
         infoPlist: {
           NSLocationWhenInUseUsageDescription:
             'LockSafe needs your location to find nearby locksmiths and track job progress.',
@@ -111,7 +111,7 @@ module.exports = () => {
         },
         package: getBundleId(),
         googleServicesFile: hasGoogleServicesFile ? resolvedGoogleServicesFile : undefined,
-        versionCode: 16,
+        versionCode: 17,
         permissions: [
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,14 @@ export default function LocksmithRegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
+
+  useEffect(() => {
+    clearError();
+
+    return () => {
+      clearError();
+    };
+  }, [clearError]);
 
   const handleRegister = async () => {
     if (!name || !email || !phone || !password) {
@@ -257,7 +265,12 @@ export default function LocksmithRegisterScreen() {
             {/* Login Link */}
             <View className="flex-row justify-center mt-6">
               <Text className="text-slate-500">Already a partner? </Text>
-              <Pressable onPress={() => router.push('/(auth)/locksmith-login')}>
+              <Pressable
+                onPress={() => {
+                  clearError();
+                  router.push('/(auth)/locksmith-login');
+                }}
+              >
                 <Text className="text-slate-900 font-semibold">Sign in</Text>
               </Pressable>
             </View>

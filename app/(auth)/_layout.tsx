@@ -11,6 +11,7 @@ export default function AuthLayout() {
     >
       <Stack.Screen name="locksmith-login" />
       <Stack.Screen name="locksmith-register" />
+      <Stack.Screen name="forgot-password" />
     </Stack>
   );
 }

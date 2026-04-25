@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,14 @@ export default function LocksmithLoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    clearError();
+
+    return () => {
+      clearError();
+    };
+  }, [clearError]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -149,7 +157,13 @@ export default function LocksmithLoginScreen() {
             </View>
 
             {/* Forgot Password */}
-            <Pressable className="mb-8">
+            <Pressable
+              className="mb-8"
+              onPress={() => {
+                clearError();
+                router.push('/(auth)/forgot-password');
+              }}
+            >
               <Text className="text-slate-900 text-center font-medium">Forgot password?</Text>
             </Pressable>
 
@@ -171,7 +185,12 @@ export default function LocksmithLoginScreen() {
             {/* Register Link */}
             <View className="flex-row justify-center mt-6">
               <Text className="text-slate-500">New to LockSafe? </Text>
-              <Pressable onPress={() => router.push('/(auth)/locksmith-register')}>
+              <Pressable
+                onPress={() => {
+                  clearError();
+                  router.push('/(auth)/locksmith-register');
+                }}
+              >
                 <Text className="text-slate-900 font-semibold">Join as Partner</Text>
               </Pressable>
             </View>
