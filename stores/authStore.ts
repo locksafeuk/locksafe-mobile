@@ -450,8 +450,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setRememberMe: async (rememberMe: boolean) => {
-    await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
+    // Optimistically update UI state first so login immediately uses the latest toggle choice.
     set({ rememberMe });
+
+    try {
+      await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
+    } catch (error) {
+      console.error('Failed to persist remember-me preference:', error);
+      // Revert to safe default if persistence fails.
+      set({ rememberMe: true });
+    }
   },
 }));
 
