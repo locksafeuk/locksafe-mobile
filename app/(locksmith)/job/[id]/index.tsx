@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,9 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-  findNodeHandle,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -58,19 +58,6 @@ export default function LocksmithJobDetailScreen() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
-  const messageInputRef = useRef<TextInput | null>(null);
-
-  const scrollToInput = (inputRef: { current: TextInput | null }) => {
-    const node = findNodeHandle(inputRef.current);
-    if (!node) {
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      keyboardScrollRef.current?.scrollToFocusedInput(node);
-    });
-  };
 
   useEffect(() => {
     if (id) {
@@ -217,19 +204,17 @@ export default function LocksmithJobDetailScreen() {
         )}
       </View>
 
-      <KeyboardAwareScrollView
-        innerRef={keyboardScrollRef}
-        className="flex-1"
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
-        enableOnAndroid={true}
-        enableAutomaticScroll={true}
-        keyboardOpeningTime={0}
-        extraScrollHeight={20}
-        extraHeight={Platform.OS === 'android' ? 160 : 100}
-        resetScrollToCoords={{ x: 0, y: 0 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 100}
       >
+        <ScrollView
+          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Customer Info */}
         {isAssigned && currentJob.customer && (
           <View className="mx-4 mt-4">
@@ -362,10 +347,8 @@ export default function LocksmithJobDetailScreen() {
                   Message (optional)
                 </Text>
                 <TextInput
-                  ref={messageInputRef}
                   value={message}
                   onChangeText={setMessage}
-                  onFocus={() => scrollToInput(messageInputRef)}
                   multiline
                   numberOfLines={3}
                   textAlignVertical="top"
@@ -470,7 +453,8 @@ export default function LocksmithJobDetailScreen() {
         )}
 
         <View className="h-8" />
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );

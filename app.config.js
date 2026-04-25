@@ -111,7 +111,7 @@ module.exports = () => {
         },
         package: getBundleId(),
         googleServicesFile: hasGoogleServicesFile ? resolvedGoogleServicesFile : undefined,
-        versionCode: 20,
+        versionCode: 21,
         softwareKeyboardLayoutMode: 'resize',
         permissions: [
           'ACCESS_COARSE_LOCATION',

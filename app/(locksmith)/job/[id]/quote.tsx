@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,8 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-  findNodeHandle,
+  KeyboardAvoidingView,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -67,20 +66,6 @@ export default function LocksmithQuoteScreen() {
   const [newPartQty, setNewPartQty] = useState('1');
   const [newPartPrice, setNewPartPrice] = useState('');
 
-  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
-  const defectInputRef = useRef<TextInput | null>(null);
-  const newPartPriceInputRef = useRef<TextInput | null>(null);
-
-  const scrollToInput = (inputRef: { current: TextInput | null }) => {
-    const node = findNodeHandle(inputRef.current);
-    if (!node) {
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      keyboardScrollRef.current?.scrollToFocusedInput(node);
-    });
-  };
 
   useEffect(() => {
     if (id) {
@@ -191,19 +176,17 @@ export default function LocksmithQuoteScreen() {
         </View>
       </View>
 
-      <KeyboardAwareScrollView
-        innerRef={keyboardScrollRef}
-        className="flex-1"
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
-        enableOnAndroid={true}
-        enableAutomaticScroll={true}
-        keyboardOpeningTime={0}
-        extraScrollHeight={20}
-        extraHeight={Platform.OS === 'android' ? 160 : 100}
-        resetScrollToCoords={{ x: 0, y: 0 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 100}
       >
+        <ScrollView
+          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Lock Type */}
         <View className="mx-4 mt-4">
           <Text className="text-sm font-medium text-slate-500 uppercase mb-3">
@@ -271,10 +254,8 @@ export default function LocksmithQuoteScreen() {
           </Text>
           <View className="bg-white rounded-xl border border-slate-200 p-3">
             <TextInput
-              ref={defectInputRef}
               value={defect}
               onChangeText={setDefect}
-              onFocus={() => scrollToInput(defectInputRef)}
               placeholder="Describe what was wrong..."
               multiline
               numberOfLines={4}
@@ -370,10 +351,8 @@ export default function LocksmithQuoteScreen() {
                 placeholderTextColor="#94a3b8"
               />
               <TextInput
-                ref={newPartPriceInputRef}
                 value={newPartPrice}
                 onChangeText={setNewPartPrice}
-                onFocus={() => scrollToInput(newPartPriceInputRef)}
                 placeholder="Price £"
                 keyboardType="numeric"
                 className="flex-1 bg-white rounded-lg px-3 py-2 text-slate-900"
@@ -443,7 +422,8 @@ export default function LocksmithQuoteScreen() {
             )}
           </Pressable>
         </View>
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );

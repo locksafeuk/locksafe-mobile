@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StripeProvider } from '@stripe/stripe-react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Constants from 'expo-constants';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -112,18 +113,20 @@ export default function RootLayout() {
           merchantIdentifier="merchant.uk.locksafe.app"
         >
           <QueryClientProvider client={queryClient}>
-            <StatusBar style="dark" />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: '#f8fafc' },
-                animation: 'slide_from_right',
-              }}
-            >
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(locksmith)" options={{ headerShown: false }} />
-            </Stack>
+            <KeyboardProvider>
+              <StatusBar style="dark" />
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: '#f8fafc' },
+                  animation: 'slide_from_right',
+                }}
+              >
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(locksmith)" options={{ headerShown: false }} />
+              </Stack>
+            </KeyboardProvider>
           </QueryClientProvider>
         </StripeProvider>
       </SafeAreaProvider>

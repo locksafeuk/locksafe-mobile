@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   Platform,
   Alert,
   Switch,
-  findNodeHandle,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, Wrench } from 'lucide-react-native';
@@ -31,19 +31,6 @@ export default function LocksmithLoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
-  const passwordInputRef = useRef<TextInput | null>(null);
-
-  const scrollToInput = (inputRef: { current: TextInput | null }) => {
-    const node = findNodeHandle(inputRef.current);
-    if (!node) {
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      keyboardScrollRef.current?.scrollToFocusedInput(node);
-    });
-  };
 
   useEffect(() => {
     clearError();
@@ -67,19 +54,17 @@ export default function LocksmithLoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <KeyboardAwareScrollView
-        innerRef={keyboardScrollRef}
-        className="flex-1"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        enableOnAndroid={true}
-        enableAutomaticScroll={true}
-        keyboardOpeningTime={0}
-        extraScrollHeight={20}
-        extraHeight={Platform.OS === 'android' ? 140 : 90}
-        resetScrollToCoords={{ x: 0, y: 0 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 100}
       >
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header */}
           <View className="px-4 py-4">
             <Pressable
@@ -138,13 +123,11 @@ export default function LocksmithLoginScreen() {
               <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
                 <Lock size={20} color="#64748b" />
                 <TextInput
-                  ref={passwordInputRef}
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
                     clearError();
                   }}
-                  onFocus={() => scrollToInput(passwordInputRef)}
                   placeholder="Enter password"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
@@ -219,7 +202,8 @@ export default function LocksmithLoginScreen() {
               </Pressable>
             </View>
           </View>
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
