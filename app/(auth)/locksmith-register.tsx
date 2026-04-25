@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Platform,
   Alert,
+  findNodeHandle,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
@@ -27,6 +28,20 @@ export default function LocksmithRegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
+
+  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const confirmPasswordInputRef = useRef<TextInput | null>(null);
+
+  const scrollToInput = (inputRef: { current: TextInput | null }) => {
+    const node = findNodeHandle(inputRef.current);
+    if (!node) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      keyboardScrollRef.current?.scrollToFocusedInput(node);
+    });
+  };
 
   useEffect(() => {
     clearError();
@@ -77,12 +92,17 @@ export default function LocksmithRegisterScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <KeyboardAwareScrollView
+        innerRef={keyboardScrollRef}
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
         keyboardShouldPersistTaps="handled"
-        enableOnAndroid
+        keyboardDismissMode="on-drag"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
         keyboardOpeningTime={0}
-        extraScrollHeight={Platform.OS === 'android' ? 120 : 80}
+        extraScrollHeight={20}
+        extraHeight={Platform.OS === 'android' ? 140 : 90}
+        resetScrollToCoords={{ x: 0, y: 0 }}
       >
           {/* Header */}
           <View className="px-4 py-4">
@@ -230,11 +250,13 @@ export default function LocksmithRegisterScreen() {
               <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
                 <Lock size={20} color="#64748b" />
                 <TextInput
+                  ref={confirmPasswordInputRef}
                   value={confirmPassword}
                   onChangeText={(text) => {
                     setConfirmPassword(text);
                     clearError();
                   }}
+                  onFocus={() => scrollToInput(confirmPasswordInputRef)}
                   placeholder="Confirm password"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"

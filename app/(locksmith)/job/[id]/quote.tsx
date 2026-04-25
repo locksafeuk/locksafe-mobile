@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  findNodeHandle,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -65,6 +66,21 @@ export default function LocksmithQuoteScreen() {
   const [newPartName, setNewPartName] = useState('');
   const [newPartQty, setNewPartQty] = useState('1');
   const [newPartPrice, setNewPartPrice] = useState('');
+
+  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const defectInputRef = useRef<TextInput | null>(null);
+  const newPartPriceInputRef = useRef<TextInput | null>(null);
+
+  const scrollToInput = (inputRef: { current: TextInput | null }) => {
+    const node = findNodeHandle(inputRef.current);
+    if (!node) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      keyboardScrollRef.current?.scrollToFocusedInput(node);
+    });
+  };
 
   useEffect(() => {
     if (id) {
@@ -176,13 +192,17 @@ export default function LocksmithQuoteScreen() {
       </View>
 
       <KeyboardAwareScrollView
+        innerRef={keyboardScrollRef}
         className="flex-1"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
-        enableOnAndroid
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
         keyboardOpeningTime={0}
-        extraScrollHeight={Platform.OS === 'android' ? 140 : 90}
+        extraScrollHeight={20}
+        extraHeight={Platform.OS === 'android' ? 160 : 100}
+        resetScrollToCoords={{ x: 0, y: 0 }}
       >
         {/* Lock Type */}
         <View className="mx-4 mt-4">
@@ -251,11 +271,14 @@ export default function LocksmithQuoteScreen() {
           </Text>
           <View className="bg-white rounded-xl border border-slate-200 p-3">
             <TextInput
+              ref={defectInputRef}
               value={defect}
               onChangeText={setDefect}
+              onFocus={() => scrollToInput(defectInputRef)}
               placeholder="Describe what was wrong..."
               multiline
-              numberOfLines={3}
+              numberOfLines={4}
+              textAlignVertical="top"
               className="text-slate-900"
               placeholderTextColor="#94a3b8"
             />
@@ -347,8 +370,10 @@ export default function LocksmithQuoteScreen() {
                 placeholderTextColor="#94a3b8"
               />
               <TextInput
+                ref={newPartPriceInputRef}
                 value={newPartPrice}
                 onChangeText={setNewPartPrice}
+                onFocus={() => scrollToInput(newPartPriceInputRef)}
                 placeholder="Price £"
                 keyboardType="numeric"
                 className="flex-1 bg-white rounded-lg px-3 py-2 text-slate-900"

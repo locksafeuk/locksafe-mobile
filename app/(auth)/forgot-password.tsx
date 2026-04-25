@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Platform,
   Alert,
+  findNodeHandle,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,6 +24,20 @@ export default function ForgotPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const emailInputRef = useRef<TextInput | null>(null);
+
+  const scrollToInput = (inputRef: { current: TextInput | null }) => {
+    const node = findNodeHandle(inputRef.current);
+    if (!node) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      keyboardScrollRef.current?.scrollToFocusedInput(node);
+    });
+  };
 
   useEffect(() => {
     clearAuthError();
@@ -69,12 +84,17 @@ export default function ForgotPasswordScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <KeyboardAwareScrollView
+        innerRef={keyboardScrollRef}
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
         keyboardShouldPersistTaps="handled"
-        enableOnAndroid
+        keyboardDismissMode="on-drag"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
         keyboardOpeningTime={0}
-        extraScrollHeight={Platform.OS === 'android' ? 120 : 80}
+        extraScrollHeight={20}
+        extraHeight={Platform.OS === 'android' ? 140 : 90}
+        resetScrollToCoords={{ x: 0, y: 0 }}
       >
           <View className="px-4 py-4">
             <Pressable
@@ -118,11 +138,13 @@ export default function ForgotPasswordScreen() {
               <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
                 <Mail size={20} color="#64748b" />
                 <TextInput
+                  ref={emailInputRef}
                   value={email}
                   onChangeText={(text) => {
                     setEmail(text);
                     setError(null);
                   }}
+                  onFocus={() => scrollToInput(emailInputRef)}
                   placeholder="your@email.com"
                   keyboardType="email-address"
                   autoCapitalize="none"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
   Switch,
+  findNodeHandle,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
@@ -29,6 +30,20 @@ export default function LocksmithLoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const passwordInputRef = useRef<TextInput | null>(null);
+
+  const scrollToInput = (inputRef: { current: TextInput | null }) => {
+    const node = findNodeHandle(inputRef.current);
+    if (!node) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      keyboardScrollRef.current?.scrollToFocusedInput(node);
+    });
+  };
 
   useEffect(() => {
     clearError();
@@ -53,12 +68,17 @@ export default function LocksmithLoginScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <KeyboardAwareScrollView
+        innerRef={keyboardScrollRef}
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
         keyboardShouldPersistTaps="handled"
-        enableOnAndroid
+        keyboardDismissMode="on-drag"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
         keyboardOpeningTime={0}
-        extraScrollHeight={Platform.OS === 'android' ? 120 : 80}
+        extraScrollHeight={20}
+        extraHeight={Platform.OS === 'android' ? 140 : 90}
+        resetScrollToCoords={{ x: 0, y: 0 }}
       >
           {/* Header */}
           <View className="px-4 py-4">
@@ -118,11 +138,13 @@ export default function LocksmithLoginScreen() {
               <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
                 <Lock size={20} color="#64748b" />
                 <TextInput
+                  ref={passwordInputRef}
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
                     clearError();
                   }}
+                  onFocus={() => scrollToInput(passwordInputRef)}
                   placeholder="Enter password"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"

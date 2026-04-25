@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   Pressable,
   TextInput,
   Alert,
   ActivityIndicator,
   Platform,
+  findNodeHandle,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -57,6 +57,20 @@ export default function LocksmithJobDetailScreen() {
   const [eta, setEta] = useState('15');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const keyboardScrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const messageInputRef = useRef<TextInput | null>(null);
+
+  const scrollToInput = (inputRef: { current: TextInput | null }) => {
+    const node = findNodeHandle(inputRef.current);
+    if (!node) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      keyboardScrollRef.current?.scrollToFocusedInput(node);
+    });
+  };
 
   useEffect(() => {
     if (id) {
@@ -204,13 +218,17 @@ export default function LocksmithJobDetailScreen() {
       </View>
 
       <KeyboardAwareScrollView
+        innerRef={keyboardScrollRef}
         className="flex-1"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
-        enableOnAndroid
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
         keyboardOpeningTime={0}
-        extraScrollHeight={Platform.OS === 'android' ? 140 : 90}
+        extraScrollHeight={20}
+        extraHeight={Platform.OS === 'android' ? 160 : 100}
+        resetScrollToCoords={{ x: 0, y: 0 }}
       >
         {/* Customer Info */}
         {isAssigned && currentJob.customer && (
@@ -344,10 +362,13 @@ export default function LocksmithJobDetailScreen() {
                   Message (optional)
                 </Text>
                 <TextInput
+                  ref={messageInputRef}
                   value={message}
                   onChangeText={setMessage}
+                  onFocus={() => scrollToInput(messageInputRef)}
                   multiline
-                  numberOfLines={2}
+                  numberOfLines={3}
+                  textAlignVertical="top"
                   className="bg-slate-100 rounded-xl px-4 py-3 text-slate-900"
                   placeholder="Add a note for the customer..."
                 />
