@@ -59,3 +59,38 @@ This build applies Android Build 22 stability and UX fixes to iOS, plus iOS-spec
 - Jobs tab no longer crashes on iOS when tapped.
 - Better keyboard behavior on iOS forms and job flows.
 - Shared Android Build 22 fixes confirmed active on iOS.
+
+
+
+## Build 10 Execution Summary (Completed)
+
+- **Expo account used:** `contact@locksafe.uk` (`locksafeuk26`)
+- **EAS Build ID:** `e529fff5-bc49-40cd-882e-6e8d51b44818`
+- **Platform/Profile:** iOS / `production`
+- **App version / Build number:** `1.0.2` / `10`
+- **Build status:** `FINISHED`
+- **Build artifact URL:** `https://expo.dev/artifacts/eas/uihZFHQXCfxNd7F5U35TaA.ipa`
+
+### IPA Download + Integrity
+- **Saved IPA path:** `/home/ubuntu/locksafe-mobile/build/locksafe-v1.0.2-build10-ios.ipa`
+- **Size:** `31 MB`
+- **Type check:** iOS App Zip archive (`.ipa`) ✅
+- **Archive test (`unzip -t`):** No errors detected ✅
+- **SHA-256:** `72a28c5ca0a82d9b6cf6b856e3e31b4c6a87e6c5a4129692c1ee217e243d9cd1`
+
+### BrowserStack Upload
+- **Upload target:** BrowserStack App Live Dashboard
+- **Dashboard URL:** `https://app-live.browserstack.com/dashboard`
+- **Uploaded artifact visible as:** `locksafe-v1.0.2-build10-ios.ipa` ✅
+
+### Fixes Included in this Build
+- ✅ iOS crash hardening (Jobs/Earnings tabs)
+- ✅ Navigation stabilization (`headerLargeTitle` safety)
+- ✅ Keyboard handling optimized for iOS
+- ✅ Remember Me verified (SecureStore on iOS)
+- ✅ Settings support links verified
+- ✅ Form handling improvements
+- ✅ Version bumped to Build 10
+
+### Ready for Testing
+This build is uploaded and ready for user testing in BrowserStack.
