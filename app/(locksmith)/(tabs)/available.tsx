@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, RefreshControl } from 'react-native';
+import { View, Text, FlatList, Pressable, RefreshControl, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MapPin, Briefcase, ChevronRight } from 'lucide-react-native';
+import { MapPin, Briefcase, ChevronRight, RefreshCw } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/authStore';
 import { useJobStore } from '../../../stores/jobStore';
 import type { Job, Locksmith } from '../../../types';
@@ -105,10 +105,11 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
 export default function LocksmithAvailableJobsScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { availableJobs, fetchAvailableJobs, isLoading } = useJobStore();
+  const { availableJobs, fetchAvailableJobs } = useJobStore();
   const [refreshing, setRefreshing] = useState(false);
 
   const locksmith = user as Locksmith;
+  const isIOS = Platform.OS === 'ios';
 
   useEffect(() => {
     if (locksmith?.id) {
@@ -128,10 +129,23 @@ export default function LocksmithAvailableJobsScreen() {
     <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
       <View className="px-6 pt-6 pb-4 bg-slate-50">
-        <Text className="text-2xl font-bold text-slate-900">Available Jobs</Text>
-        <Text className="text-slate-500 mt-1">
-          {availableJobs.length} job{availableJobs.length !== 1 ? 's' : ''} in your area
-        </Text>
+        <View className="flex-row items-center justify-between">
+          <View>
+            <Text className="text-2xl font-bold text-slate-900">Available Jobs</Text>
+            <Text className="text-slate-500 mt-1">
+              {availableJobs.length} job{availableJobs.length !== 1 ? 's' : ''} in your area
+            </Text>
+          </View>
+          {isIOS && (
+            <Pressable
+              onPress={onRefresh}
+              disabled={refreshing}
+              className="w-10 h-10 rounded-full bg-white border border-slate-200 items-center justify-center"
+            >
+              <RefreshCw size={18} color="#0f172a" />
+            </Pressable>
+          )}
+        </View>
       </View>
 
       <FlatList
@@ -145,11 +159,13 @@ export default function LocksmithAvailableJobsScreen() {
           />
         )}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#0f172a"
-          />
+          isIOS ? undefined : (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#0f172a"
+            />
+          )
         }
         ListEmptyComponent={
           <View className="py-12 items-center">

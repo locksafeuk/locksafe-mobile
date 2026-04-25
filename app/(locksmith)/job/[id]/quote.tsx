@@ -177,9 +177,9 @@ export default function LocksmithQuoteScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 100}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >
         <ScrollView
           className="flex-1"

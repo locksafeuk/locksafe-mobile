@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, Pressable, RefreshControl, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wallet, TrendingUp, ArrowUpRight, Calendar, ExternalLink } from 'lucide-react-native';
+import { Wallet, TrendingUp, ArrowUpRight, Calendar, ExternalLink, RefreshCw } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/authStore';
 import { useJobStore } from '../../../stores/jobStore';
 import type { Locksmith, Job } from '../../../types';
@@ -43,6 +43,7 @@ export default function LocksmithEarningsScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const locksmith = user as Locksmith;
+  const isIOS = Platform.OS === 'ios';
 
   useEffect(() => {
     if (locksmith?.id) {
@@ -84,12 +85,25 @@ export default function LocksmithEarningsScreen() {
       <ScrollView
         className="flex-1"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0f172a" />
+          isIOS ? undefined : (
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0f172a" />
+          )
         }
       >
         {/* Header */}
         <View className="px-6 pt-6 pb-4">
-          <Text className="text-2xl font-bold text-slate-900">Earnings</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-2xl font-bold text-slate-900">Earnings</Text>
+            {isIOS && (
+              <Pressable
+                onPress={onRefresh}
+                disabled={refreshing}
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 items-center justify-center"
+              >
+                <RefreshCw size={18} color="#0f172a" />
+              </Pressable>
+            )}
+          </View>
         </View>
 
         {/* Total Earnings Card */}

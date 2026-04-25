@@ -27,6 +27,7 @@ export default function LocksmithLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: '#f8fafc' },
         animation: 'slide_from_right',
+        headerLargeTitle: false,
       }}
     >
       <Stack.Screen name="(tabs)" />
