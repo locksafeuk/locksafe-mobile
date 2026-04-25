@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import {
   post,
   get as apiGet,
@@ -18,6 +20,7 @@ export type UserType = 'locksmith';
 
 const REMEMBER_ME_KEY = 'remember_me';
 const REMEMBERED_EMAIL_KEY = 'remembered_email';
+const REMEMBERED_PASSWORD_KEY = 'remembered_password';
 
 export interface AuthUser {
   id: string;
@@ -97,6 +100,7 @@ interface AuthState {
   checkSession: () => Promise<boolean>;
   setRememberMe: (rememberMe: boolean) => Promise<void>;
   getRememberedEmail: () => Promise<string | null>;
+  getRememberedCredentials: () => Promise<{ email: string | null; password: string | null }>;
 }
 
 export interface LocksmithRegisterData {
@@ -145,14 +149,49 @@ async function loadRememberMePreference(): Promise<boolean> {
   return saved !== 'false';
 }
 
-async function loadRememberedEmail(): Promise<string | null> {
-  const savedEmail = await getStorageItem(REMEMBERED_EMAIL_KEY);
-  if (!savedEmail) {
-    return null;
+async function setRememberedPassword(password: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    await setStorageItem(REMEMBERED_PASSWORD_KEY, password);
+    return;
   }
 
-  const normalizedEmail = savedEmail.trim().toLowerCase();
-  return normalizedEmail.length > 0 ? normalizedEmail : null;
+  await SecureStore.setItemAsync(REMEMBERED_PASSWORD_KEY, password);
+}
+
+async function getRememberedPassword(): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    return await getStorageItem(REMEMBERED_PASSWORD_KEY);
+  }
+
+  return await SecureStore.getItemAsync(REMEMBERED_PASSWORD_KEY);
+}
+
+async function clearRememberedPassword(): Promise<void> {
+  if (Platform.OS === 'web') {
+    await deleteStorageItem(REMEMBERED_PASSWORD_KEY);
+    return;
+  }
+
+  await SecureStore.deleteItemAsync(REMEMBERED_PASSWORD_KEY);
+}
+
+async function loadRememberedCredentials(): Promise<{ email: string | null; password: string | null }> {
+  const [savedEmail, savedPassword] = await Promise.all([
+    getStorageItem(REMEMBERED_EMAIL_KEY),
+    getRememberedPassword(),
+  ]);
+
+  const normalizedEmail = savedEmail?.trim().toLowerCase() || null;
+
+  return {
+    email: normalizedEmail && normalizedEmail.length > 0 ? normalizedEmail : null,
+    password: savedPassword && savedPassword.length > 0 ? savedPassword : null,
+  };
+}
+
+async function loadRememberedEmail(): Promise<string | null> {
+  const { email } = await loadRememberedCredentials();
+  return email;
 }
 
 type AuthPayload = {
@@ -211,7 +250,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ rememberMe });
 
       if (!rememberMe) {
-        await clearAuthToken();
+        await Promise.all([
+          clearAuthToken(),
+          deleteStorageItem(REMEMBERED_EMAIL_KEY),
+          clearRememberedPassword(),
+        ]);
         set({ user: null, isInitialized: true, isLoading: false });
         return;
       }
@@ -299,9 +342,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         await setStorageItem(REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
 
         if (rememberMe) {
-          await setStorageItem(REMEMBERED_EMAIL_KEY, email.toLowerCase().trim());
+          await Promise.all([
+            setStorageItem(REMEMBERED_EMAIL_KEY, email.toLowerCase().trim()),
+            setRememberedPassword(password),
+          ]);
         } else {
-          await deleteStorageItem(REMEMBERED_EMAIL_KEY);
+          await Promise.all([
+            deleteStorageItem(REMEMBERED_EMAIL_KEY),
+            clearRememberedPassword(),
+          ]);
         }
 
         set({
@@ -477,7 +526,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // If the user disables remember-me, clear any previously saved credential hints.
       if (!rememberMe) {
-        await deleteStorageItem(REMEMBERED_EMAIL_KEY);
+        await Promise.all([
+          deleteStorageItem(REMEMBERED_EMAIL_KEY),
+          clearRememberedPassword(),
+        ]);
       }
     } catch (error) {
       console.error('Failed to persist remember-me preference:', error);
@@ -497,6 +549,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Failed to load remembered email:', error);
       return null;
+    }
+  },
+
+  getRememberedCredentials: async () => {
+    const rememberMe = get().rememberMe;
+    if (!rememberMe) {
+      return { email: null, password: null };
+    }
+
+    try {
+      return await loadRememberedCredentials();
+    } catch (error) {
+      console.error('Failed to load remembered credentials:', error);
+      return { email: null, password: null };
     }
   },
 }));

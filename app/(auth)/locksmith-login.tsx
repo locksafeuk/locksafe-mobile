@@ -25,7 +25,7 @@ export default function LocksmithLoginScreen() {
     clearError,
     rememberMe,
     setRememberMe,
-    getRememberedEmail,
+    getRememberedCredentials,
   } = useAuthStore();
 
   const [email, setEmail] = useState('');
@@ -39,9 +39,18 @@ export default function LocksmithLoginScreen() {
     clearError();
 
     void (async () => {
-      const savedEmail = await getRememberedEmail();
-      if (isMounted && savedEmail) {
+      const { email: savedEmail, password: savedPassword } = await getRememberedCredentials();
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (savedEmail) {
         setEmail(savedEmail);
+      }
+
+      if (savedPassword) {
+        setPassword(savedPassword);
       }
     })();
 
@@ -49,7 +58,7 @@ export default function LocksmithLoginScreen() {
       isMounted = false;
       clearError();
     };
-  }, [clearError, getRememberedEmail]);
+  }, [clearError, getRememberedCredentials]);
 
   const handleLogin = async () => {
     if (!email || !password) {

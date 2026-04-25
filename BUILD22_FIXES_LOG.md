@@ -36,35 +36,41 @@ File: `app/_layout.tsx`
 ## 2) Remember Me fix (credentials persistence behavior)
 
 ### Previous issue
-- “Remember me” maintained session token behavior but did not persist login email for relogin after logout.
+- “Remember me” only prefilled email and did not persist password.
 
 ### Changes made
 
 #### `stores/authStore.ts`
 - Added credential key:
   - `REMEMBERED_EMAIL_KEY = 'remembered_email'`
-- Added remembered email loader helper (`loadRememberedEmail`).
+  - `REMEMBERED_PASSWORD_KEY = 'remembered_password'`
+- Added SecureStore-backed password helpers:
+  - `setRememberedPassword(...)`
+  - `getRememberedPassword(...)`
+  - `clearRememberedPassword(...)`
+- Added combined credential loader:
+  - `loadRememberedCredentials()` to load both email + password
 - On successful `loginLocksmith(...)`:
-  - If `rememberMe = true`, save normalized email to secure storage.
-  - If `rememberMe = false`, clear saved email key.
+  - If `rememberMe = true`, save normalized email and password
+  - If `rememberMe = false`, clear both email and password keys
 - Improved `setRememberMe(...)`:
-  - Persists remember flag.
-  - When toggled OFF, immediately clears saved email key.
+  - Persists remember flag
+  - When toggled OFF, immediately clears both email and password
 - Added action:
-  - `getRememberedEmail(): Promise<string | null>`
+  - `getRememberedCredentials(): Promise<{ email: string | null; password: string | null }>`
 
 #### `app/(auth)/locksmith-login.tsx`
 - On screen mount:
-  - Loads remembered email via store action.
-  - Prefills email field when value exists.
+  - Loads remembered credentials via store action
+  - Prefills **both** email and password fields when values exist
 
 ### New behavior summary
 - Remember Me ON:
-  - Login email is saved and auto-filled next time.
+  - Login email and password are saved and auto-filled next time.
 - Remember Me OFF:
-  - Saved email is removed.
+  - Saved email and password are removed.
 - Logout:
-  - Session/token cleared as before, remembered email preserved only if Remember Me remains ON.
+  - Session/token cleared as before; remembered credentials persist only when Remember Me remains ON.
 
 ---
 
