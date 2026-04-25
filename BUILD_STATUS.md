@@ -32,6 +32,7 @@ This document is intentionally conservative: if something was not fully tested, 
 | 18 | `build-artifacts/locksafe-android-build18.aab` | Artifact exists | ❓ No final validation document found |
 | 19 | `build/locksafe-v1.0.2-build19.aab` + `build/BUILD19_SUMMARY.md` | Claimed touch/keyboard fixed | ❌ Not ready; keyboard scrolling still incomplete |
 | 20 | `build/locksafe-v1.0.2-build20.aab` | Artifact exists | ❓ Untested/undocumented in repo |
+| 22 | `build/locksafe-v1.0.2-build22.aab` + `CURRENT_STATUS_APRIL_26_2026.md` | User-tested stabilization build | ✅ User tested and approved; ready for deployment consideration |
 
 ---
 
@@ -85,7 +86,14 @@ This document is intentionally conservative: if something was not fully tested, 
 
 ---
 
-## 6) Current decision
+## 6) Build 22 (April 26, 2026)
 
-- **Deployment ready:** NO
-- **Correct next step:** fix known blockers + run complete E2E on both platforms before any new readiness claim.
+- **Status:** ✅ User tested and approved
+- **Fixes included:** Remember Me (email + password), Settings links, iOS crash hardening, keyboard improvements
+- **Deployment state:** Ready for deployment consideration (Android)
+
+## 7) Current decision
+
+- **Android deployment ready:** ✅ Build 22 is approved for deployment consideration
+- **iOS deployment ready:** ❌ No (Jobs tab crash + incomplete end-to-end testing)
+- **Correct next step:** Deploy Android Build 22 when release window is confirmed, and continue iOS crash fix + full workflow validation.

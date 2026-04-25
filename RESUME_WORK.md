@@ -1,60 +1,56 @@
 # RESUME_WORK.md
 
-Date paused: 2026-04-25 (Europe/London)  
+Date paused: 2026-04-26 (Europe/London)  
 Project: `/home/ubuntu/locksafe-mobile`
 
 ## Exact current state
 
-### Android Build 19
-- Partial functionality works (login/dashboard/jobs/navigation).
-- Keyboard overlap issue remains in at least one input flow.
-- Not production-ready.
+### Android Build 22 (v1.0.2)
+- ✅ User tested and approved
+- ✅ Working acceptably for current release needs
+- ✅ No major blockers reported right now
+- Ready for Google Play deployment consideration
 
 ### iOS Build 9
-- Auth screens improved and partially tested.
-- Jobs tab crash reported.
-- Full workflow not tested.
-- Not production-ready.
-
-### Trust / process state
-- Prior readiness claims were overstated relative to test coverage.
-- Current docs were updated to reflect only verified status.
+- ⚠️ Still needs work
+- Jobs tab crash reported
+- Full locksmith workflow still not fully validated end-to-end
+- Not ready for deployment
 
 ---
 
-## What must happen next (in order)
+## What was completed in Build 22
 
-1. **Android keyboard bug fix**
-   - Reproduce reliably with explicit steps.
-   - Implement and validate fix.
-
-2. **iOS jobs crash fix**
-   - Reproduce crash path.
-   - Fix crash root cause.
-   - Build and retest jobs flow.
-
-3. **Full E2E validation on both platforms**
-   - Execute complete locksmith workflow checklist.
-   - Record pass/fail evidence.
-
-4. **Only then assess release readiness**
-   - No "ready" claims without complete evidence.
+1. iOS crash hardening around keyboard/navigation provider usage
+2. Remember Me now stores both email and password securely
+3. Settings links fixed (Help Center, Partner Terms, Privacy Policy)
+4. Keyboard scrolling improvements
+5. Form handling improvements
 
 ---
 
-## Suggested immediate action checklist for next session
+## Clear next steps
 
-- [ ] Start from `KNOWN_ISSUES.md`
-- [ ] Reproduce Android keyboard issue and capture exact screen/field path
-- [ ] Reproduce iOS jobs crash with logs
-- [ ] Implement fixes
-- [ ] Build new Android + iOS artifacts
-- [ ] Execute full E2E matrix from `E2E_Test_Report.md` criteria
-- [ ] Update status docs with results
+1. **Android release execution**
+   - Prepare Play Console release using Build 22 AAB
+   - Publish with staged rollout
+
+2. **iOS stabilization**
+   - Reproduce Jobs tab crash with logs
+   - Implement and verify fix
+
+3. **iOS complete workflow validation**
+   - Run full locksmith E2E flow after crash fix
+   - Document pass/fail with evidence
+
+4. **Status refresh after iOS retest**
+   - Update status docs once iOS workflow is fully validated
 
 ---
 
-## No-false-optimism note
+## Quick links
 
-Current builds are **work-in-progress**.  
-They are not blocked forever, but they are not ready now.
+- `CURRENT_STATUS_APRIL_26_2026.md`
+- `BUILD_STATUS.md`
+- `ANDROID_BUILD22_DEPLOYMENT_GUIDE.md`
+- `QUICK_STATUS_BUILD22.txt`
