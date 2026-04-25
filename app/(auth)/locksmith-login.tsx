@@ -5,12 +5,11 @@ import {
   TextInput,
   Pressable,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Alert,
   Switch,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, Wrench } from 'lucide-react-native';
@@ -53,11 +52,14 @@ export default function LocksmithLoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      <KeyboardAwareScrollView
         className="flex-1"
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid
+        keyboardOpeningTime={0}
+        extraScrollHeight={Platform.OS === 'android' ? 120 : 80}
       >
-        <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
           {/* Header */}
           <View className="px-4 py-4">
             <Pressable
@@ -195,8 +197,7 @@ export default function LocksmithLoginScreen() {
               </Pressable>
             </View>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

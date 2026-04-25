@@ -7,9 +7,9 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -161,11 +161,7 @@ export default function LocksmithQuoteScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
-      >
+      <View className="flex-1">
       {/* Header */}
       <View className="flex-row items-center px-4 py-4 bg-white border-b border-slate-200">
         <Pressable onPress={() => router.back()} className="p-2">
@@ -179,11 +175,14 @@ export default function LocksmithQuoteScreen() {
         </View>
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={{ paddingBottom: 12 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+        enableOnAndroid
+        keyboardOpeningTime={0}
+        extraScrollHeight={Platform.OS === 'android' ? 140 : 90}
       >
         {/* Lock Type */}
         <View className="mx-4 mt-4">
@@ -398,30 +397,29 @@ export default function LocksmithQuoteScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
-
-      {/* Submit Button */}
-      <View className="p-4 bg-white border-t border-slate-200">
-        <Pressable
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-          className={`py-4 rounded-xl items-center flex-row justify-center ${
-            isSubmitting ? 'bg-slate-300' : 'bg-slate-900 active:bg-slate-800'
-          }`}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <>
-              <FileText size={20} color="white" />
-              <Text className="text-white font-semibold text-lg ml-2">
-                Send Quote to Customer
-              </Text>
-            </>
-          )}
-        </Pressable>
+        {/* Submit Button */}
+        <View className="p-4 bg-white border-t border-slate-200 mt-4">
+          <Pressable
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+            className={`py-4 rounded-xl items-center flex-row justify-center ${
+              isSubmitting ? 'bg-slate-300' : 'bg-slate-900 active:bg-slate-800'
+            }`}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <>
+                <FileText size={20} color="white" />
+                <Text className="text-white font-semibold text-lg ml-2">
+                  Send Quote to Customer
+                </Text>
+              </>
+            )}
+          </Pressable>
+        </View>
+      </KeyboardAwareScrollView>
       </View>
-      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

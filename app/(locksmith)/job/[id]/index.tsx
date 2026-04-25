@@ -7,9 +7,9 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -182,11 +182,7 @@ export default function LocksmithJobDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
-      >
+      <View className="flex-1">
       {/* Header */}
       <View className="flex-row items-center px-4 py-4 bg-white border-b border-slate-200">
         <Pressable onPress={() => router.back()} className="p-2">
@@ -207,10 +203,14 @@ export default function LocksmithJobDetailScreen() {
         )}
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+        enableOnAndroid
+        keyboardOpeningTime={0}
+        extraScrollHeight={Platform.OS === 'android' ? 140 : 90}
       >
         {/* Customer Info */}
         {isAssigned && currentJob.customer && (
@@ -449,8 +449,8 @@ export default function LocksmithJobDetailScreen() {
         )}
 
         <View className="h-8" />
-      </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+      </View>
     </SafeAreaView>
   );
 }
