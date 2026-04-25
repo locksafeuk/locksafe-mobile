@@ -7,6 +7,8 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -180,6 +182,11 @@ export default function LocksmithJobDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+      >
       {/* Header */}
       <View className="flex-row items-center px-4 py-4 bg-white border-b border-slate-200">
         <Pressable onPress={() => router.back()} className="p-2">
@@ -200,7 +207,11 @@ export default function LocksmithJobDetailScreen() {
         )}
       </View>
 
-      <ScrollView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         {/* Customer Info */}
         {isAssigned && currentJob.customer && (
           <View className="mx-4 mt-4">
@@ -439,6 +450,7 @@ export default function LocksmithJobDetailScreen() {
 
         <View className="h-8" />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

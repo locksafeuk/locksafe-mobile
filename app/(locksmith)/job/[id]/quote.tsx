@@ -7,6 +7,8 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -159,6 +161,11 @@ export default function LocksmithQuoteScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+      >
       {/* Header */}
       <View className="flex-row items-center px-4 py-4 bg-white border-b border-slate-200">
         <Pressable onPress={() => router.back()} className="p-2">
@@ -172,7 +179,12 @@ export default function LocksmithQuoteScreen() {
         </View>
       </View>
 
-      <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
+      <ScrollView
+        className="flex-1"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={{ paddingBottom: 12 }}
+      >
         {/* Lock Type */}
         <View className="mx-4 mt-4">
           <Text className="text-sm font-medium text-slate-500 uppercase mb-3">
@@ -409,6 +421,7 @@ export default function LocksmithQuoteScreen() {
           )}
         </Pressable>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
