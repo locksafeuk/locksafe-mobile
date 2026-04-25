@@ -8,30 +8,32 @@
 
 ---
 
-## 📌 Current Deployment Status (FINAL: 22 Apr 2026)
+## 📌 Current Deployment Status (HONEST: 25 Apr 2026)
 
-### Native Push Migration (Final Outcome)
-- ✅ OneSignal fully removed from runtime, config, and dependencies
-- ✅ Native push stack active on both platforms (`expo-notifications` + `expo-device`)
-- ✅ Backend token contract switched to native device endpoints
+### 🚫 Production Readiness
+- **Android Build 19:** ❌ Not production-ready
+- **iOS Build 9:** ❌ Not production-ready
+- **Overall:** ❌ Do not claim deployment readiness yet
 
-### iOS (App Store Connect)
-- **Current review build:** `1.0.2 (7)`
-- **Push implementation:** Native APNs token registration
-- **Submission status:** **Waiting for Review** (`iOS App 1.0.2 (7)`)
+### What currently works
+- **Android Build 19:** Login, dashboard, jobs tab, navigation, most core locksmith flows
+- **iOS Build 9:** Login + forgot password + auth error handling (auth screens only tested)
 
-### Android (Google Play)
-- **Current review build:** `1.0.2 (15)`
-- **Push implementation:** Native FCM token registration
-- **Submission status:** **In Review**
+### Known blocking issues
+- **Android Build 19:** Keyboard scrolling still incomplete (inputs can be hidden behind keyboard)
+- **iOS Build 9:** Jobs tab crash reported; full workflow untested
 
-### Work Logs / Final Handoff Docs
-- Master log + final update: [`WORK_LOG_2026-04-20.md`](./WORK_LOG_2026-04-20.md)
-- Final status report: [`CURRENT_STATUS_APRIL_20_FINAL.md`](./CURRENT_STATUS_APRIL_20_FINAL.md)
-- Complete session summary: [`SESSION_SUMMARY_2026-04-20.md`](./SESSION_SUMMARY_2026-04-20.md)
-- iOS build history (through Build 7): [`IOS_BUILD_HISTORY.md`](./IOS_BUILD_HISTORY.md)
-- Quick checkpoint: [`QUICK_STATUS.txt`](./QUICK_STATUS.txt)
-- Migration implementation report: [`NATIVE_PUSH_MIGRATION_COMPLETE.md`](./NATIVE_PUSH_MIGRATION_COMPLETE.md)
+### Critical honesty note
+Previous "ready" claims were made before complete end-to-end validation and were inaccurate. This README now reflects the real tested state only.
+
+### Current status documents
+- Comprehensive status: [`CURRENT_STATUS_APRIL_25_2026.md`](./CURRENT_STATUS_APRIL_25_2026.md)
+- Build-by-build reality check: [`BUILD_STATUS.md`](./BUILD_STATUS.md)
+- Resume guide: [`RESUME_WORK.md`](./RESUME_WORK.md)
+- One-page status: [`HONEST_STATUS.txt`](./HONEST_STATUS.txt)
+- Known issues register: [`KNOWN_ISSUES.md`](./KNOWN_ISSUES.md)
+- Build 19 Android test report: [`BUILD19_ANDROID_TEST_REPORT.md`](./BUILD19_ANDROID_TEST_REPORT.md)
+- E2E test coverage status: [`E2E_Test_Report.md`](./E2E_Test_Report.md)
 
 ---
 
