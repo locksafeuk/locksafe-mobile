@@ -216,7 +216,12 @@ export default function LocksmithRegisterScreen() {
                   placeholder="Min. 6 characters"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  className="flex-1 py-4 px-3 text-slate-900 text-base"
+                  className="flex-1 py-4 px-3 text-base"
+                  style={{
+                    color: '#0f172a',
+                    fontSize: 16,
+                  }}
+                  selectionColor="#0f172a"
                   placeholderTextColor="#94a3b8"
                 />
                 <Pressable onPress={() => setShowPassword(!showPassword)}>
@@ -243,7 +248,12 @@ export default function LocksmithRegisterScreen() {
                   placeholder="Confirm password"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  className="flex-1 py-4 px-3 text-slate-900 text-base"
+                  className="flex-1 py-4 px-3 text-base"
+                  style={{
+                    color: '#0f172a',
+                    fontSize: 16,
+                  }}
+                  selectionColor="#0f172a"
                   placeholderTextColor="#94a3b8"
                 />
               </View>
