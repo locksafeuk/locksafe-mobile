@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,15 @@ export default function LocksmithLoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const scrollViewRef = useRef<ScrollView>(null);
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+
+  const scrollFormForKeyboard = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 120);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -77,13 +86,17 @@ export default function LocksmithLoginScreen() {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+        keyboardVerticalOffset={0}
       >
         <ScrollView
+          ref={scrollViewRef}
           className="flex-1"
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
           showsVerticalScrollIndicator={false}
+          scrollEnabled
         >
           {/* Header */}
           <View className="px-4 py-4">
@@ -105,9 +118,7 @@ export default function LocksmithLoginScreen() {
             </View>
 
             <Text className="text-3xl font-bold text-slate-900 mb-2">Welcome back</Text>
-            <Text className="text-slate-500 text-lg mb-8">
-              Sign in to your LockSafe account
-            </Text>
+            <Text className="text-slate-500 text-lg mb-8">Sign in to your LockSafe account</Text>
 
             {/* Error Message */}
             {error && (
@@ -119,10 +130,17 @@ export default function LocksmithLoginScreen() {
             {/* Email Input */}
             <View className="mb-4">
               <Text className="text-slate-700 font-medium mb-2">Email</Text>
-              <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
-                <Mail size={20} color="#64748b" />
+              <Pressable
+                onPress={() => emailInputRef.current?.focus()}
+                className="flex-row items-center bg-slate-100 rounded-xl px-4"
+              >
+                <View pointerEvents="none">
+                  <Mail size={20} color="#64748b" />
+                </View>
                 <TextInput
+                  ref={emailInputRef}
                   value={email}
+                  onFocus={scrollFormForKeyboard}
                   onChangeText={(text) => {
                     setEmail(text);
                     clearError();
@@ -130,20 +148,33 @@ export default function LocksmithLoginScreen() {
                   placeholder="your@email.com"
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  autoCorrect={false}
                   autoComplete="email"
+                  textContentType="username"
+                  returnKeyType="next"
+                  enablesReturnKeyAutomatically
+                  editable={!isLoading}
+                  onSubmitEditing={() => passwordInputRef.current?.focus()}
                   className="flex-1 py-4 px-3 text-slate-900 text-base"
                   placeholderTextColor="#94a3b8"
                 />
-              </View>
+              </Pressable>
             </View>
 
             {/* Password Input */}
             <View className="mb-4">
               <Text className="text-slate-700 font-medium mb-2">Password</Text>
-              <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
-                <Lock size={20} color="#64748b" />
+              <Pressable
+                onPress={() => passwordInputRef.current?.focus()}
+                className="flex-row items-center bg-slate-100 rounded-xl px-4"
+              >
+                <View pointerEvents="none">
+                  <Lock size={20} color="#64748b" />
+                </View>
                 <TextInput
+                  ref={passwordInputRef}
                   value={password}
+                  onFocus={scrollFormForKeyboard}
                   onChangeText={(text) => {
                     setPassword(text);
                     clearError();
@@ -151,17 +182,28 @@ export default function LocksmithLoginScreen() {
                   placeholder="Enter password"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="password"
+                  textContentType="password"
+                  returnKeyType="done"
+                  enablesReturnKeyAutomatically
+                  editable={!isLoading}
+                  onSubmitEditing={handleLogin}
                   className="flex-1 py-4 px-3 text-slate-900 text-base"
                   placeholderTextColor="#94a3b8"
                 />
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Pressable
+                  onPress={() => setShowPassword(!showPassword)}
+                  hitSlop={10}
+                  disabled={isLoading}
+                >
                   {showPassword ? (
                     <EyeOff size={20} color="#64748b" />
                   ) : (
                     <Eye size={20} color="#64748b" />
                   )}
                 </Pressable>
-              </View>
+              </Pressable>
             </View>
 
             {/* Remember Me */}
