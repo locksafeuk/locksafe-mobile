@@ -9,12 +9,39 @@ import {
   Alert,
   KeyboardAvoidingView,
   ScrollView,
+  StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, User, Building, Mail, Phone, Lock, Eye, EyeOff, Wrench } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { LocationService } from '../../services/location';
+
+const styles = StyleSheet.create({
+  passwordFieldContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+  },
+  passwordInput: {
+    flex: 1,
+    minHeight: 50,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    color: '#000000',
+    backgroundColor: '#FFFFFF',
+    opacity: 1,
+  },
+  passwordInputIOS: {
+    color: 'black',
+    backgroundColor: '#FFFFFF',
+  },
+});
 
 export default function LocksmithRegisterScreen() {
   const router = useRouter();
@@ -205,7 +232,7 @@ export default function LocksmithRegisterScreen() {
             {/* Password Input */}
             <View className="mb-4">
               <Text className="text-slate-700 font-medium mb-2">Password *</Text>
-              <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
+              <View style={styles.passwordFieldContainer}>
                 <Lock size={20} color="#64748b" />
                 <TextInput
                   value={password}
@@ -216,13 +243,14 @@ export default function LocksmithRegisterScreen() {
                   placeholder="Min. 6 characters"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  className="flex-1 py-4 px-3 text-base"
-                  style={{
-                    color: '#0f172a',
-                    fontSize: 16,
-                  }}
-                  selectionColor="#0f172a"
-                  placeholderTextColor="#94a3b8"
+                  autoCorrect={false}
+                  spellCheck={false}
+                  style={[
+                    styles.passwordInput,
+                    Platform.OS === 'ios' ? styles.passwordInputIOS : null,
+                  ]}
+                  selectionColor="#000000"
+                  placeholderTextColor="#9CA3AF"
                 />
                 <Pressable onPress={() => setShowPassword(!showPassword)}>
                   {showPassword ? (
@@ -237,7 +265,7 @@ export default function LocksmithRegisterScreen() {
             {/* Confirm Password Input */}
             <View className="mb-8">
               <Text className="text-slate-700 font-medium mb-2">Confirm Password *</Text>
-              <View className="flex-row items-center bg-slate-100 rounded-xl px-4">
+              <View style={styles.passwordFieldContainer}>
                 <Lock size={20} color="#64748b" />
                 <TextInput
                   value={confirmPassword}
@@ -248,13 +276,14 @@ export default function LocksmithRegisterScreen() {
                   placeholder="Confirm password"
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  className="flex-1 py-4 px-3 text-base"
-                  style={{
-                    color: '#0f172a',
-                    fontSize: 16,
-                  }}
-                  selectionColor="#0f172a"
-                  placeholderTextColor="#94a3b8"
+                  autoCorrect={false}
+                  spellCheck={false}
+                  style={[
+                    styles.passwordInput,
+                    Platform.OS === 'ios' ? styles.passwordInputIOS : null,
+                  ]}
+                  selectionColor="#000000"
+                  placeholderTextColor="#9CA3AF"
                 />
               </View>
             </View>
