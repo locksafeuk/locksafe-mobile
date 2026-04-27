@@ -174,32 +174,63 @@ This combination can cause iOS/RN secure-field rendering quirks in some versions
 
 ---
 
-## What needs to be fixed
+## Workaround Implemented (Build 14)
 
-Since no boolean logic bug exists, fix should target iOS secure field behavior:
+### Implemented fix
+Applied **key-based remount workaround** on login password field in:
+- `app/(auth)/locksmith-login.tsx`
 
-1. **Stop pre-filling password text directly into the visible input** (recommended)
-   - Keep remembered email only, or
-   - Store a flag and let OS Keychain autofill instead of app-managed plaintext prefill into field value.
+Implementation details:
+1. Added `secureKey` state:
+   ```ts
+   const [secureKey, setSecureKey] = useState(0);
+   ```
+2. After remembered password prefill (`setPassword(savedPassword)`), schedule remount:
+   ```ts
+   secureReRenderTimeout = setTimeout(() => {
+     if (isMounted) {
+       setSecureKey((prev) => prev + 1);
+     }
+   }, 100);
+   ```
+3. Bound password `TextInput` to remount key:
+   ```tsx
+   <TextInput key={`password-${secureKey}`} secureTextEntry={!showPassword} ... />
+   ```
+4. Added timeout cleanup in `useEffect` return to avoid stale updates.
 
-2. If password prefill must remain, test mitigations:
-   - use `autoComplete="current-password"` for login,
-   - temporarily clear/reapply value after mount,
-   - force remount input when visibility changes,
-   - remove `textContentType` for problematic iOS versions.
+### Why this works
+On iOS, programmatically setting a secure field value before/around initial render can leave masking in a bad visual state. Changing the `key` forces React to fully remount the native `TextInput`, so `secureTextEntry` is re-applied on a fresh instance and the remembered password renders as bullets.
 
-3. Add targeted iOS regression test:
-   - rememberMe ON + relaunch + login screen load + verify bullets rendered before user interaction.
+### Register screen check
+- `app/(auth)/locksmith-register.tsx` does **not** prefill password from Remember Me.
+- No workaround was applied there because the trigger condition (programmatic password prefill) is absent.
+
+---
+
+## Validation / Regression Test Steps
+
+1. Enable **Remember me** on login and sign in successfully.
+2. Kill the app fully (swipe away), then relaunch on iOS.
+3. Open `locksmith-login` screen.
+4. Verify:
+   - Email is prefilled (expected).
+   - Password is prefilled but **masked as bullets** on first render (before any eye-toggle interaction).
+5. Tap eye icon:
+   - Password becomes visible.
+6. Tap eye icon again:
+   - Password returns to masked bullets.
+7. Repeat after another relaunch to confirm consistency.
 
 ---
 
 ## Final Answer to Hypothesis Checks
 - Is `showPassword` starting as true? **No**.
 - Is `secureTextEntry` backwards? **No**.
-- Is Remember Me explicitly showing password? **No direct showPassword state change**, but its prefill flow is the likely trigger.
+- Is Remember Me explicitly showing password? **No direct showPassword state change**, but its prefill flow was the trigger.
 - Is there a state management inversion issue? **No inversion found**.
 
 ---
 
 ## Summary
-There is **no direct logic error** in `showPassword` / `secureTextEntry` implementation. The likely root cause is an **iOS secure text rendering quirk triggered by prefilled remembered password in a controlled `TextInput`**, not a backward boolean condition in the code.
+There was **no boolean logic error** in `showPassword` / `secureTextEntry`. The issue was an iOS secure text rendering quirk with programmatic prefill. Build 14 now uses a **key-based TextInput remount** after remembered password load to restore correct masking on initial render.

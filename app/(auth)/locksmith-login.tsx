@@ -58,6 +58,7 @@ export default function LocksmithLoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [secureKey, setSecureKey] = useState(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const emailInputRef = useRef<TextInput>(null);
@@ -71,6 +72,7 @@ export default function LocksmithLoginScreen() {
 
   useEffect(() => {
     let isMounted = true;
+    let secureReRenderTimeout: ReturnType<typeof setTimeout> | null = null;
 
     clearError();
 
@@ -87,11 +89,22 @@ export default function LocksmithLoginScreen() {
 
       if (savedPassword) {
         setPassword(savedPassword);
+
+        // Workaround for iOS secureTextEntry pre-fill masking bug:
+        // force a remount after programmatic value set so text is masked.
+        secureReRenderTimeout = setTimeout(() => {
+          if (isMounted) {
+            setSecureKey((prev) => prev + 1);
+          }
+        }, 100);
       }
     })();
 
     return () => {
       isMounted = false;
+      if (secureReRenderTimeout) {
+        clearTimeout(secureReRenderTimeout);
+      }
       clearError();
     };
   }, [clearError, getRememberedCredentials]);
@@ -199,6 +212,7 @@ export default function LocksmithLoginScreen() {
                   <Lock size={20} color="#64748b" />
                 </View>
                 <TextInput
+                  key={`password-${secureKey}`}
                   ref={passwordInputRef}
                   value={password}
                   onFocus={scrollFormForKeyboard}
