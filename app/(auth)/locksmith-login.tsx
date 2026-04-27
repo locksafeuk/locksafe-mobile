@@ -46,17 +46,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000000',
     backgroundColor: '#FFFFFF',
+    opacity: 1,
+    tintColor: '#000000',
   },
-  minimalTestInput: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#94A3B8',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#000000',
-    backgroundColor: '#FFFFFF',
-  },
+
 });
 
 export default function LocksmithLoginScreen() {
@@ -74,7 +67,6 @@ export default function LocksmithLoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [minimalPasswordTestValue, setMinimalPasswordTestValue] = useState('');
   const secureTextEntryValue = !showPassword;
 
   const scrollViewRef = useRef<ScrollView>(null);
@@ -222,7 +214,7 @@ export default function LocksmithLoginScreen() {
             </View>
 
             {/* Password Input */}
-            <View className="mb-4">
+            <View className="mb-4" style={{ opacity: 1 }}>
               <Text className="text-slate-700 font-medium mb-2">Password</Text>
 
               {Platform.OS === 'ios' ? (
@@ -253,6 +245,7 @@ export default function LocksmithLoginScreen() {
                   }}
                   placeholder="Enter password"
                   secureTextEntry={secureTextEntryValue}
+                  selectionColor="#000000"
                   editable={!isLoading}
                   onSubmitEditing={handleLogin}
                   style={styles.iosMinimalPasswordInput}
@@ -327,23 +320,6 @@ export default function LocksmithLoginScreen() {
               </Pressable>
             </View>
 
-            {Platform.OS === 'ios' && (
-              <View className="mb-6 bg-slate-50 rounded-xl p-3">
-                <Text className="text-slate-700 text-xs font-semibold mb-2">
-                  Temporary diagnostic: isolated secure TextInput test
-                </Text>
-                <TextInput
-                  secureTextEntry
-                  value={minimalPasswordTestValue}
-                  onChangeText={setMinimalPasswordTestValue}
-                  style={styles.minimalTestInput}
-                />
-                <Text className="text-slate-500 text-xs mt-2">
-                  If this isolated field shows dots, issue is likely with wrapper/traits. If not, issue is likely
-                  native iOS input session behavior.
-                </Text>
-              </View>
-            )}
 
             {/* Remember Me */}
             <View className="flex-row items-center justify-between bg-slate-50 rounded-xl px-4 py-3 mb-6">

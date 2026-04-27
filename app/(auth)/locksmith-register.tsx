@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
     borderRadius: 12,
     paddingHorizontal: 16,
+    opacity: 1,
   },
   passwordInput: {
     flex: 1,
@@ -40,6 +41,8 @@ const styles = StyleSheet.create({
   passwordInputIOS: {
     color: 'black',
     backgroundColor: '#FFFFFF',
+    opacity: 1,
+    tintColor: '#000000',
   },
 });
 
@@ -242,6 +245,7 @@ export default function LocksmithRegisterScreen() {
                   }}
                   placeholder="Min. 6 characters"
                   secureTextEntry={!showPassword}
+                  selectionColor="#000000"
                   autoCapitalize="none"
                   autoCorrect={false}
                   spellCheck={false}
@@ -249,7 +253,6 @@ export default function LocksmithRegisterScreen() {
                     styles.passwordInput,
                     Platform.OS === 'ios' ? styles.passwordInputIOS : null,
                   ]}
-                  selectionColor="#000000"
                   placeholderTextColor="#9CA3AF"
                 />
                 <Pressable onPress={() => setShowPassword(!showPassword)}>
@@ -275,6 +278,7 @@ export default function LocksmithRegisterScreen() {
                   }}
                   placeholder="Confirm password"
                   secureTextEntry={!showPassword}
+                  selectionColor="#000000"
                   autoCapitalize="none"
                   autoCorrect={false}
                   spellCheck={false}
@@ -282,7 +286,6 @@ export default function LocksmithRegisterScreen() {
                     styles.passwordInput,
                     Platform.OS === 'ios' ? styles.passwordInputIOS : null,
                   ]}
-                  selectionColor="#000000"
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
