@@ -14,7 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Mail, Wrench } from 'lucide-react-native';
-import { SecurePasswordInput } from '../../components/SecurePasswordInput';
+import { CustomPasswordInput } from '../../components/CustomPasswordInput';
 import { useAuthStore } from '../../stores/authStore';
 
 export default function LocksmithLoginScreen() {
@@ -72,15 +72,6 @@ export default function LocksmithLoginScreen() {
       clearError();
     };
   }, [clearError, getRememberedCredentials]);
-
-  useEffect(() => {
-    console.info('[PasswordDebug] Password field render state', {
-      secureTextEntryValue: true,
-      passwordLength: password.length,
-      rememberMe,
-      platform: Platform.OS,
-    });
-  }, [password.length, rememberMe]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -178,12 +169,15 @@ export default function LocksmithLoginScreen() {
             <View className="mb-4" style={{ opacity: 1 }}>
               <Text className="text-slate-700 font-medium mb-2">Password</Text>
 
-              <SecurePasswordInput
+              <CustomPasswordInput
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
                   clearError();
                 }}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                testID="password-input"
               />
             </View>
 

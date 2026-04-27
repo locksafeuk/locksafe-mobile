@@ -9,44 +9,13 @@ import {
   Alert,
   KeyboardAvoidingView,
   ScrollView,
-  StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, User, Building, Mail, Phone, Lock, Eye, EyeOff, Wrench } from 'lucide-react-native';
+import { ArrowLeft, User, Building, Mail, Phone, Wrench } from 'lucide-react-native';
+import { CustomPasswordInput } from '../../components/CustomPasswordInput';
 import { useAuthStore } from '../../stores/authStore';
 import { LocationService } from '../../services/location';
-
-const styles = StyleSheet.create({
-  passwordFieldContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    opacity: 1,
-  },
-  passwordInput: {
-    flex: 1,
-    minHeight: 50,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#000000',
-    backgroundColor: '#FFFFFF',
-    opacity: 1,
-  },
-  passwordInputIOS: {
-    color: 'black',
-    backgroundColor: '#FFFFFF',
-    opacity: 1,
-    tintColor: '#000000',
-    // iOS secure text fields should use system font so bullet dots render correctly.
-    fontFamily: 'System',
-  },
-});
 
 export default function LocksmithRegisterScreen() {
   const router = useRouter();
@@ -58,7 +27,6 @@ export default function LocksmithRegisterScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
 
 
@@ -237,60 +205,29 @@ export default function LocksmithRegisterScreen() {
             {/* Password Input */}
             <View className="mb-4">
               <Text className="text-slate-700 font-medium mb-2">Password *</Text>
-              <View style={styles.passwordFieldContainer}>
-                <Lock size={20} color="#64748b" />
-                <TextInput
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    clearError();
-                  }}
-                  placeholder="Min. 6 characters"
-                  secureTextEntry={!showPassword}
-                  selectionColor="#000000"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  spellCheck={false}
-                  style={[
-                    styles.passwordInput,
-                    Platform.OS === 'ios' ? styles.passwordInputIOS : null,
-                  ]}
-                  placeholderTextColor="#9CA3AF"
-                />
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
-                  {showPassword ? (
-                    <EyeOff size={20} color="#64748b" />
-                  ) : (
-                    <Eye size={20} color="#64748b" />
-                  )}
-                </Pressable>
-              </View>
+              <CustomPasswordInput
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  clearError();
+                }}
+                placeholder="Create password"
+                autoComplete="new-password"
+              />
             </View>
 
             {/* Confirm Password Input */}
             <View className="mb-8">
               <Text className="text-slate-700 font-medium mb-2">Confirm Password *</Text>
-              <View style={styles.passwordFieldContainer}>
-                <Lock size={20} color="#64748b" />
-                <TextInput
-                  value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    clearError();
-                  }}
-                  placeholder="Confirm password"
-                  secureTextEntry={!showPassword}
-                  selectionColor="#000000"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  spellCheck={false}
-                  style={[
-                    styles.passwordInput,
-                    Platform.OS === 'ios' ? styles.passwordInputIOS : null,
-                  ]}
-                  placeholderTextColor="#9CA3AF"
-                />
-              </View>
+              <CustomPasswordInput
+                value={confirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  clearError();
+                }}
+                placeholder="Confirm password"
+                autoComplete="new-password"
+              />
             </View>
 
             {/* Register Button */}
