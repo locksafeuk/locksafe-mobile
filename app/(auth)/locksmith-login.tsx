@@ -10,49 +10,12 @@ import {
   Switch,
   KeyboardAvoidingView,
   ScrollView,
-  StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, Wrench } from 'lucide-react-native';
+import { ArrowLeft, Mail, Wrench } from 'lucide-react-native';
+import { SecurePasswordInput } from '../../components/SecurePasswordInput';
 import { useAuthStore } from '../../stores/authStore';
-
-const styles = StyleSheet.create({
-  passwordFieldContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-  },
-  passwordInput: {
-    flex: 1,
-    minHeight: 50,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#000000',
-    backgroundColor: '#FFFFFF',
-    opacity: 1,
-  },
-  iosMinimalPasswordInput: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#000000',
-    backgroundColor: '#FFFFFF',
-    opacity: 1,
-    tintColor: '#000000',
-    // iOS secure text fields should use system font so bullet dots render correctly.
-    fontFamily: 'System',
-  },
-
-});
 
 export default function LocksmithLoginScreen() {
   const router = useRouter();
@@ -68,12 +31,9 @@ export default function LocksmithLoginScreen() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const secureTextEntryValue = !showPassword;
 
   const scrollViewRef = useRef<ScrollView>(null);
   const emailInputRef = useRef<TextInput>(null);
-  const passwordInputRef = useRef<TextInput>(null);
 
   const scrollFormForKeyboard = () => {
     setTimeout(() => {
@@ -115,13 +75,12 @@ export default function LocksmithLoginScreen() {
 
   useEffect(() => {
     console.info('[PasswordDebug] Password field render state', {
-      showPassword,
-      secureTextEntryValue,
+      secureTextEntryValue: true,
       passwordLength: password.length,
       rememberMe,
       platform: Platform.OS,
     });
-  }, [password.length, rememberMe, secureTextEntryValue, showPassword]);
+  }, [password.length, rememberMe]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -208,7 +167,7 @@ export default function LocksmithLoginScreen() {
                   returnKeyType="next"
                   enablesReturnKeyAutomatically
                   editable={!isLoading}
-                  onSubmitEditing={() => passwordInputRef.current?.focus()}
+                  onSubmitEditing={scrollFormForKeyboard}
                   className="flex-1 py-4 px-3 text-slate-900 text-base"
                   placeholderTextColor="#94a3b8"
                 />
@@ -219,107 +178,13 @@ export default function LocksmithLoginScreen() {
             <View className="mb-4" style={{ opacity: 1 }}>
               <Text className="text-slate-700 font-medium mb-2">Password</Text>
 
-              {Platform.OS === 'ios' ? (
-                <TextInput
-                  ref={passwordInputRef}
-                  value={password}
-                  onFocus={() => {
-                    console.info('[PasswordDebug] Password input focused (iOS minimal)', {
-                      showPassword,
-                      secureTextEntryValue,
-                      passwordLength: password.length,
-                    });
-                    scrollFormForKeyboard();
-                  }}
-                  onBlur={() => {
-                    console.info('[PasswordDebug] Password input blurred (iOS minimal)', {
-                      passwordLength: password.length,
-                    });
-                  }}
-                  onChangeText={(text) => {
-                    console.info('[PasswordDebug] Password changed (iOS minimal)', {
-                      nextPasswordLength: text.length,
-                      showPassword,
-                      secureTextEntryValue,
-                    });
-                    setPassword(text);
-                    clearError();
-                  }}
-                  placeholder="Enter password"
-                  secureTextEntry={secureTextEntryValue}
-                  selectionColor="#000000"
-                  editable={!isLoading}
-                  onSubmitEditing={handleLogin}
-                  style={styles.iosMinimalPasswordInput}
-                />
-              ) : (
-                <Pressable
-                  onPress={() => passwordInputRef.current?.focus()}
-                  style={styles.passwordFieldContainer}
-                >
-                  <View pointerEvents="none">
-                    <Lock size={20} color="#64748b" />
-                  </View>
-                  <TextInput
-                    ref={passwordInputRef}
-                    value={password}
-                    onFocus={() => {
-                      console.info('[PasswordDebug] Password input focused', {
-                        showPassword,
-                        secureTextEntryValue,
-                        passwordLength: password.length,
-                      });
-                      scrollFormForKeyboard();
-                    }}
-                    onChangeText={(text) => {
-                      console.info('[PasswordDebug] Password changed', {
-                        nextPasswordLength: text.length,
-                        showPassword,
-                        secureTextEntryValue,
-                      });
-                      setPassword(text);
-                      clearError();
-                    }}
-                    placeholder="Enter password"
-                    secureTextEntry={secureTextEntryValue}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    autoComplete="password"
-                    textContentType="password"
-                    returnKeyType="done"
-                    enablesReturnKeyAutomatically
-                    editable={!isLoading}
-                    onSubmitEditing={handleLogin}
-                    style={styles.passwordInput}
-                    selectionColor="#000000"
-                    placeholderTextColor="#9CA3AF"
-                    spellCheck={false}
-                  />
-                </Pressable>
-              )}
-
-              <Pressable
-                onPress={() => {
-                  setShowPassword((prev) => {
-                    const next = !prev;
-                    console.info('[PasswordDebug] Eye toggle pressed', {
-                      previousShowPassword: prev,
-                      nextShowPassword: next,
-                      nextSecureTextEntryValue: !next,
-                    });
-                    return next;
-                  });
+              <SecurePasswordInput
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  clearError();
                 }}
-                hitSlop={10}
-                disabled={isLoading}
-                className="self-end mt-2"
-              >
-                {showPassword ? (
-                  <EyeOff size={20} color="#64748b" />
-                ) : (
-                  <Eye size={20} color="#64748b" />
-                )}
-              </Pressable>
+              />
             </View>
 
 
