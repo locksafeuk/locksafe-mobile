@@ -1,9 +1,12 @@
 # LockSafe Mobile App — Testing Guide
 
-> **Last updated:** 8 April 2026  
-> **App version:** 1.0.0  
+> **Last updated:** 27 April 2026  
+> **App version:** 1.0.2 (Build 17)  
 > **Expo SDK:** 52  
-> **Backend API:** https://locksafe.uk
+> **Backend API:** https://www.locksafe.uk  
+> **Build 17 EAS ID:** `c9e472dd-ce72-4a62-9e5c-49eb3fc0fefa`  
+> **Build 17 IPA (EAS):** https://expo.dev/artifacts/eas/qVYiSarPNDAXg8g5PTfkoj.ipa  
+> **Build 17 IPA (local VM):** `/home/ubuntu/locksafe-mobile/build/locksafe-v1.0.2-build17-ios.ipa`
 
 ---
 
@@ -20,6 +23,74 @@ This app uses **native modules** that are not included in the standard Expo Go a
 | `expo-camera` | Job photo documentation |
 
 **You must create a custom build** (development or preview) to test the app on a physical device or emulator.
+
+---
+
+## Build 17 — Comprehensive iOS Testing Plan (Priority)
+
+### Scope for this build
+Build 17 specifically targets iOS stability and password entry reliability. Test this build as a **release candidate** with focus on:
+
+- Secure password dots rendering and login reliability
+- Keyboard behavior across auth and job forms
+- iOS navigation stability (no `SIGABRT` regressions)
+- Refresh interactions on iOS tabs (using header refresh buttons)
+- Native module reliability (maps, camera, location, Stripe, notifications)
+
+### Build metadata
+- **Build Number:** 17
+- **Version:** 1.0.2
+- **EAS Build ID:** `c9e472dd-ce72-4a62-9e5c-49eb3fc0fefa`
+- **Status:** Finished
+- **Started:** 27 Apr 2026, 09:32 UTC
+- **Finished:** 27 Apr 2026, 09:39 UTC
+- **IPA URL:** https://expo.dev/artifacts/eas/qVYiSarPNDAXg8g5PTfkoj.ipa
+- **Local IPA copy:** `/home/ubuntu/locksafe-mobile/build/locksafe-v1.0.2-build17-ios.ipa`
+
+### Pre-test setup checklist
+- Install Build 17 on at least 2 iOS devices (recommended: one small-screen + one large-screen iPhone)
+- Test on iOS 17+ and (if available) iOS 18+
+- Use both good network (Wi-Fi) and constrained network (4G/poor signal)
+- Prepare test locksmith credentials and one invalid credential set
+- Enable screen recording during all critical tests (login, quote, photos, status updates)
+
+### Critical test cases (must pass)
+1. **Login password masking:** password field shows secure dots while typing.
+2. **Login success path:** valid credentials login and route to locksmith tabs.
+3. **Login failure path:** invalid credentials show error without UI freeze/crash.
+4. **Remember me persistence:** restart app and verify remembered credentials behavior.
+5. **Forgot password navigation:** route opens correctly from login.
+6. **Dashboard stability:** toggle availability repeatedly (10x) without crash.
+7. **Available Jobs refresh on iOS:** header refresh button works repeatedly (10x).
+8. **Earnings refresh on iOS:** header refresh button works repeatedly (10x).
+9. **Job details form + keyboard:** message input and scrolling remain stable.
+10. **Quote form + keyboard:** all numeric/text fields editable, no clipped inputs.
+11. **Job photos:** camera + gallery pick + upload + delete all succeed.
+12. **Map rendering:** job map loads with correct marker and no blank tiles.
+13. **Location permissions:** permission flow is handled gracefully.
+14. **Push registration:** notification token registration path completes.
+15. **Cold start + warm start loops:** 20 open/close cycles without crash.
+
+### Extended regression matrix
+- Authentication: login/logout/session restore
+- Jobs: fetch available jobs, apply, update status transitions
+- Quote: create quote with parts/labor values and submission validation
+- Payments: ensure payment intent flows still initialize
+- Notifications: fetch notifications list and mark-as-read flow
+- Support links: Help Center / Terms / Privacy links open correctly
+
+### Evidence to collect for sign-off
+- Screen recording for all 15 critical tests
+- Crash-free confirmation from device logs / Xcode organizer / TestFlight diagnostics
+- API error screenshots (if any) including timestamp and endpoint
+- Final tester checklist with Pass/Fail and reproduction steps for failures
+
+### Exit criteria for release
+- 100% pass on critical test cases
+- No P0/P1 crashes
+- No keyboard regression on iOS auth/job/quote forms
+- No secure password rendering regressions
+- No blocker in job flow (apply → quote → photo → status updates)
 
 ---
 
@@ -185,8 +256,8 @@ After installing the preview build, verify the following:
 - [ ] Job list loads correctly
 - [ ] Notifications load
 
-The app connects to: **https://locksafe.uk**  
-Backend health check: `curl https://locksafe.uk/api/health`
+The app connects to: **https://www.locksafe.uk**  
+Backend health check: `curl https://www.locksafe.uk/api/health`
 
 ### ✅ Google Maps
 - [ ] Maps render on job detail screens
@@ -221,25 +292,24 @@ Backend health check: `curl https://locksafe.uk/api/health`
 
 ## 9. Testing Flows
 
-### Customer Flow
-1. **Register** as a new customer
-2. **Request a locksmith** — select problem type, property type, enter location
-3. **View job details** — check map, status, and locksmith applications
-4. **Accept a locksmith** — pay assessment fee
-5. **Track locksmith** — real-time map tracking
-6. **Review quote** — accept or decline the work quote
-7. **Sign & complete** — digital signature on job completion
-8. **Rate the locksmith**
+### Locksmith Core Flow (Build 17)
+1. **Sign in** as locksmith (validate secure password dots + remember-me behavior)
+2. **Open dashboard** and toggle availability repeatedly
+3. **Browse available jobs** and use iOS header refresh button
+4. **Open a job detail** and test keyboard/input stability in all editable fields
+5. **Apply for a job** (assessment fee + ETA + optional message)
+6. **Capture photos** via camera and gallery, then delete one uploaded photo
+7. **Create and submit quote** (labor + parts + VAT calculations)
+8. **Update job statuses** through workflow transitions
+9. **Check earnings tab** and trigger header refresh on iOS
+10. **Open settings links** (Help Center / Terms / Privacy)
 
-### Locksmith Flow
-1. **Register** as a locksmith (or use test credentials)
-2. **View dashboard** — toggle availability, see stats
-3. **Browse available jobs** — see nearby requests
-4. **Apply for a job** — set assessment fee and ETA
-5. **Navigate to job** — update status through the workflow
-6. **Take photos** — before, during, after documentation
-7. **Submit quote** — parts, labour, VAT calculation
-8. **Complete job** — await customer signature
+### Stability & Recovery Flow
+1. Kill and relaunch app 20 times (cold/warm cycles)
+2. Switch between Wi-Fi and mobile data during session
+3. Trigger API failure scenario (invalid token / expired session)
+4. Confirm app recovers gracefully (no crash loops, clear messaging)
+5. Confirm session restore and re-login behavior remain stable
 
 ---
 
@@ -249,7 +319,7 @@ All API keys are configured in both `.env` and `eas.json`:
 
 | Service | Status | Key Prefix |
 |---|---|---|
-| Backend API | ✅ Connected | `https://locksafe.uk` |
+| Backend API | ✅ Connected | `https://www.locksafe.uk` |
 | Stripe | ✅ Live key configured | `pk_live_51T5TBs...` |
 | OneSignal | ✅ Configured | `os_v2_app_zum5e4c...` |
 | Google Maps | ✅ Configured | `AIzaSyBm5KY...` |
@@ -258,7 +328,7 @@ All API keys are configured in both `.env` and `eas.json`:
 
 ```bash
 # Check backend health
-curl -s https://locksafe.uk/api/health | python3 -m json.tool
+curl -s https://www.locksafe.uk/api/health | python3 -m json.tool
 
 # Expected response:
 # {
@@ -349,5 +419,5 @@ eas whoami
 eas build:list
 
 # Check backend health
-curl https://locksafe.uk/api/health
+curl https://www.locksafe.uk/api/health
 ```
