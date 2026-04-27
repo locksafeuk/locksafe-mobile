@@ -43,6 +43,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     opacity: 1,
     tintColor: '#000000',
+    // iOS secure text fields should use system font so bullet dots render correctly.
+    fontFamily: 'System',
   },
 });
 
