@@ -59,6 +59,7 @@ export default function LocksmithLoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [secureKey, setSecureKey] = useState(0);
+  const secureTextEntryValue = !showPassword;
 
   const scrollViewRef = useRef<ScrollView>(null);
   const emailInputRef = useRef<TextInput>(null);
@@ -82,6 +83,11 @@ export default function LocksmithLoginScreen() {
       if (!isMounted) {
         return;
       }
+
+      console.info('[PasswordDebug] Remembered credentials loaded', {
+        hasSavedEmail: Boolean(savedEmail),
+        savedPasswordLength: savedPassword?.length ?? 0,
+      });
 
       if (savedEmail) {
         setEmail(savedEmail);
@@ -108,6 +114,17 @@ export default function LocksmithLoginScreen() {
       clearError();
     };
   }, [clearError, getRememberedCredentials]);
+
+  useEffect(() => {
+    console.info('[PasswordDebug] Password field render state', {
+      showPassword,
+      secureTextEntryValue,
+      secureKey,
+      passwordLength: password.length,
+      rememberMe,
+      platform: Platform.OS,
+    });
+  }, [password.length, rememberMe, secureKey, secureTextEntryValue, showPassword]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -215,13 +232,25 @@ export default function LocksmithLoginScreen() {
                   key={`password-${secureKey}`}
                   ref={passwordInputRef}
                   value={password}
-                  onFocus={scrollFormForKeyboard}
+                  onFocus={() => {
+                    console.info('[PasswordDebug] Password input focused', {
+                      showPassword,
+                      secureTextEntryValue,
+                      passwordLength: password.length,
+                    });
+                    scrollFormForKeyboard();
+                  }}
                   onChangeText={(text) => {
+                    console.info('[PasswordDebug] Password changed', {
+                      nextPasswordLength: text.length,
+                      showPassword,
+                      secureTextEntryValue,
+                    });
                     setPassword(text);
                     clearError();
                   }}
                   placeholder="Enter password"
-                  secureTextEntry={!showPassword}
+                  secureTextEntry={secureTextEntryValue}
                   autoCapitalize="none"
                   autoCorrect={false}
                   autoComplete="password"
@@ -239,7 +268,17 @@ export default function LocksmithLoginScreen() {
                   spellCheck={false}
                 />
                 <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
+                  onPress={() => {
+                    setShowPassword((prev) => {
+                      const next = !prev;
+                      console.info('[PasswordDebug] Eye toggle pressed', {
+                        previousShowPassword: prev,
+                        nextShowPassword: next,
+                        nextSecureTextEntryValue: !next,
+                      });
+                      return next;
+                    });
+                  }}
                   hitSlop={10}
                   disabled={isLoading}
                 >
