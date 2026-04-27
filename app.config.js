@@ -83,7 +83,7 @@ module.exports = () => {
       ios: {
         supportsTablet: true,
         bundleIdentifier: getBundleId(),
-        buildNumber: '18',
+        buildNumber: '19',
         infoPlist: {
           NSLocationWhenInUseUsageDescription:
             'LockSafe needs your location to find nearby locksmiths and track job progress.',
