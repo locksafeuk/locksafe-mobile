@@ -1,4 +1,4 @@
-import { post, get } from './client';
+import { post, get, del } from './client';
 import type { Locksmith, ApiResponse } from '../../types';
 
 // ==========================================
@@ -51,6 +51,12 @@ export interface ResetPasswordResponse {
   error?: string;
 }
 
+export interface DeleteAccountResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
 // ==========================================
 // Auth API Functions
 // ==========================================
@@ -98,6 +104,26 @@ export async function registerLocksmith(data: {
  */
 export async function logout(): Promise<{ success: boolean }> {
   return post<{ success: boolean }>('/api/auth/logout', {});
+}
+
+/**
+ * Delete locksmith account and associated data.
+ *
+ * Primary endpoint is /api/locksmith/account.
+ * Fallback endpoint /api/user/delete is attempted only if primary is unavailable (404/405).
+ */
+export async function deleteLocksmithAccount(): Promise<DeleteAccountResponse> {
+  try {
+    return await del<DeleteAccountResponse>('/api/locksmith/account');
+  } catch (error: any) {
+    const status = error?.response?.status;
+
+    if (status === 404 || status === 405) {
+      return await del<DeleteAccountResponse>('/api/user/delete');
+    }
+
+    throw error;
+  }
 }
 
 /**

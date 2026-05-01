@@ -1,4 +1,16 @@
-import { View, Text, Pressable, ScrollView, Alert, Switch, Linking } from 'react-native';
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  Alert,
+  Switch,
+  Linking,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,9 +28,13 @@ import {
   LogOut,
   ChevronRight,
   Star,
+  TriangleAlert,
 } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/authStore';
+import { deleteLocksmithAccount } from '../../../services/api/auth';
 import type { Locksmith } from '../../../types';
+
+const DELETE_CONFIRMATION_TEXT = 'DELETE';
 
 function SettingsItem({
   icon: Icon,
@@ -79,6 +95,10 @@ export default function LocksmithSettingsScreen() {
   const locksmith = user as Locksmith;
   const appVersion = Constants.expoConfig?.version || '1.0.0';
 
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [deleteConfirmationInput, setDeleteConfirmationInput] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
   const openSupportLink = async (url: string, label: string) => {
     try {
       const canOpen = await Linking.canOpenURL(url);
@@ -107,6 +127,79 @@ export default function LocksmithSettingsScreen() {
       },
     ]);
   };
+
+  const deleteAccountRequest = async () => {
+    await deleteLocksmithAccount();
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account?',
+      'This action cannot be undone. All your data will be permanently deleted.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Continue',
+          style: 'destructive',
+          onPress: () => {
+            setDeleteConfirmationInput('');
+            setIsDeleteModalVisible(true);
+          },
+        },
+      ]
+    );
+  };
+
+  const closeDeleteModal = () => {
+    if (isDeletingAccount) {
+      return;
+    }
+
+    setDeleteConfirmationInput('');
+    setIsDeleteModalVisible(false);
+  };
+
+  const confirmDeleteAccount = async () => {
+    const normalizedInput = deleteConfirmationInput.trim().toUpperCase();
+    if (normalizedInput !== DELETE_CONFIRMATION_TEXT) {
+      Alert.alert('Confirmation Required', "Please type 'DELETE' to confirm account deletion.");
+      return;
+    }
+
+    if (isDeletingAccount) {
+      return;
+    }
+
+    setIsDeletingAccount(true);
+
+    try {
+      await deleteAccountRequest();
+      setDeleteConfirmationInput('');
+      setIsDeleteModalVisible(false);
+
+      await logout();
+
+      Alert.alert('Account Deleted', 'Your account has been permanently deleted.', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(auth)/locksmith-login'),
+        },
+      ]);
+    } catch (error: any) {
+      console.error('[Settings] Account deletion failed:', error);
+
+      const apiError = error?.response?.data?.error || error?.response?.data?.message;
+      Alert.alert(
+        'Error',
+        apiError || 'Failed to delete account. Please try again or contact support.'
+      );
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
+  const isDeleteInputValid =
+    deleteConfirmationInput.trim().toUpperCase() === DELETE_CONFIRMATION_TEXT;
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -226,15 +319,87 @@ export default function LocksmithSettingsScreen() {
           />
         </View>
 
+        {/* Danger Zone */}
+        <Text className="px-6 py-2 text-sm font-medium text-red-500 uppercase">Danger Zone</Text>
+        <View className="bg-white mx-4 rounded-2xl overflow-hidden mb-4 border border-red-200">
+          <View className="px-4 py-4 border-b border-red-100 flex-row items-center">
+            <TriangleAlert size={18} color="#ef4444" />
+            <Text className="text-red-600 font-semibold ml-2">Delete Account</Text>
+          </View>
+          <View className="px-4 py-4">
+            <Text className="text-slate-600 text-sm mb-4">
+              This will permanently delete your account and all associated data.
+            </Text>
+            <Pressable
+              onPress={handleDeleteAccount}
+              className="bg-red-600 rounded-xl py-3 items-center active:bg-red-700"
+            >
+              <Text className="text-white font-semibold">Delete Account</Text>
+            </Pressable>
+          </View>
+        </View>
+
         {/* Logout */}
         <View className="bg-white mx-4 rounded-2xl overflow-hidden mb-8">
           <SettingsItem icon={LogOut} label="Log Out" onPress={handleLogout} danger />
         </View>
 
-        <Text className="text-center text-slate-400 text-sm mb-8">
-          LockSafe Partner v{appVersion}
-        </Text>
+        <Text className="text-center text-slate-400 text-sm mb-8">LockSafe Partner v{appVersion}</Text>
       </ScrollView>
+
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeDeleteModal}
+      >
+        <View className="flex-1 bg-black/50 justify-center px-6">
+          <View className="bg-white rounded-2xl p-5">
+            <Text className="text-xl font-bold text-slate-900 mb-2">Are you absolutely sure?</Text>
+            <Text className="text-slate-600 mb-4">
+              Type 'DELETE' to confirm account deletion.
+            </Text>
+
+            <TextInput
+              value={deleteConfirmationInput}
+              onChangeText={setDeleteConfirmationInput}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              editable={!isDeletingAccount}
+              placeholder="Type DELETE"
+              placeholderTextColor="#94a3b8"
+              className="border border-slate-300 rounded-xl px-4 py-3 text-slate-900"
+            />
+
+            <View className="flex-row justify-end mt-5">
+              <Pressable
+                onPress={closeDeleteModal}
+                disabled={isDeletingAccount}
+                className="px-4 py-2 mr-2"
+              >
+                <Text className="text-slate-600 font-medium">Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => void confirmDeleteAccount()}
+                disabled={!isDeleteInputValid || isDeletingAccount}
+                className={`px-4 py-2 rounded-lg flex-row items-center ${
+                  !isDeleteInputValid || isDeletingAccount ? 'bg-red-300' : 'bg-red-600'
+                }`}
+              >
+                {isDeletingAccount ? (
+                  <>
+                    <ActivityIndicator size="small" color="#ffffff" />
+                    <Text className="text-white font-semibold ml-2">Deleting...</Text>
+                  </>
+                ) : (
+                  <Text className="text-white font-semibold">Delete Account</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
