@@ -8,36 +8,39 @@
 
 ---
 
-## 📌 Current Deployment Status (Updated: 26 Apr 2026)
+## 📌 Current Deployment Status (Updated: 29 Apr 2026)
 
 ### ✅ Current Build Readiness
-- **Android Build 22 (v1.0.2):** ✅ Working, user tested and approved
-- **iOS Build 9:** ⚠️ Needs work (Jobs tab crash + workflow not fully validated)
+- **iOS Build 20 (v1.0.2):** 🟡 Submitted to Apple, waiting for review
+- **Android Build 12 (v1.0.2):** 🟡 Closed alpha active, 8/12 testers onboarded
+
+### Latest iOS Build Information
+- **Version / Build:** 1.0.2 (Build 20)
+- **Bundle ID:** `uk.locksafe.app`
+- **Status:** Waiting for Apple Review
+- **Submitted:** April 29, 2026 at 4:18 PM
+- **Key release change:** Account deletion flow added to meet Guideline 5.1.1(v)
 
 ### Latest Android Build Information
-- **Version / Build:** 1.0.2 (Build 22)
-- **Build ID:** `ea61afbe-25f4-41ab-9d0e-c8c7bdec5243`
-- **Artifact:** `build/locksafe-v1.0.2-build22.aab`
-- **Current assessment:** Ready for deployment consideration to Google Play
+- **Version / Build:** 1.0.2 (versionCode 12)
+- **Package:** `uk.locksafe.app`
+- **Track:** Closed Alpha Testing
+- **Current tester count:** 8 of 12 required
+- **Next action:** Add 4 more testers and request production access
 
-### What Build 22 includes
-- Remember Me stores **email + password** securely
-- Settings links fixed (Help Center, Partner Terms, Privacy Policy)
-- iOS crash hardening fix around keyboard/navigation provider usage
-- Keyboard scrolling and form handling improvements
-
-### Testing summary
-- User tested on device
-- Working acceptably for current Android release needs
-- No critical Android blockers reported for Build 22
+### What Build 20 includes (iOS)
+- Settings → **Delete Account** (danger zone)
+- Two-step irreversible confirmation flow
+- Typed keyword validation (`DELETE`) before final action
+- Backend deletion API integration with fallback endpoint support
+- Forced logout + redirect after successful account deletion
 
 ### Current status documents
-- Comprehensive status: [`CURRENT_STATUS_APRIL_26_2026.md`](./CURRENT_STATUS_APRIL_26_2026.md)
-- Build-by-build status: [`BUILD_STATUS.md`](./BUILD_STATUS.md)
-- Resume guide: [`RESUME_WORK.md`](./RESUME_WORK.md)
-- Android deployment guide: [`ANDROID_BUILD22_DEPLOYMENT_GUIDE.md`](./ANDROID_BUILD22_DEPLOYMENT_GUIDE.md)
-- One-page quick status: [`QUICK_STATUS_BUILD22.txt`](./QUICK_STATUS_BUILD22.txt)
-- Known issues register: [`KNOWN_ISSUES.md`](./KNOWN_ISSUES.md)
+- Comprehensive memory: [`COMPLETE_PROJECT_MEMORY_APRIL_29_2026.md`](./COMPLETE_PROJECT_MEMORY_APRIL_29_2026.md)
+- One-page quick status: [`CURRENT_STATUS_QUICK.txt`](./CURRENT_STATUS_QUICK.txt)
+- Build 20 verification: [`BUILD20_VERIFICATION.md`](./BUILD20_VERIFICATION.md)
+- App Store submission complete: [`BUILD20_APPSTORE_SUBMISSION_COMPLETE.md`](./BUILD20_APPSTORE_SUBMISSION_COMPLETE.md)
+- Build 20 submission report: [`BUILD20_SUBMISSION_REPORT.md`](./BUILD20_SUBMISSION_REPORT.md)
 
 ---
 
