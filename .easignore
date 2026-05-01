@@ -1,0 +1,16 @@
+# Exclude local artifacts and reports from EAS build upload
+
+# Build output artifacts
+build/
+*.ipa
+*.aab
+
+# Generated reports/docs not required for app binary
+*.pdf
+*.docx
+
+# Local logs
+*.log
+
+# Tooling/system artifacts
+.DS_Store

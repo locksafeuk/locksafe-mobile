@@ -23,25 +23,31 @@
 ## Build & Submission Execution Status
 
 ### Step 1: Commit Changes
-- Existing Build 20 code commit detected locally on `main`:
+- Build 20 account deletion implementation commit already present:
   - `439cec9` — *Add Build 20 account deletion flow in settings*
-- Push status: pending final push after docs commit.
+- Build 20 Apple documentation commit pushed:
+  - `8896949` — *Add Build 20 Apple review guide, notes, and submission report*
 
 ### Step 2: Build iOS Build 20
-- Command attempted:
-  - `eas build --platform ios --profile production --non-interactive`
-- Result: **Blocked by Expo authorization** in current VM session.
-- Error summary: current authenticated Expo identity does not have access to the target app entity.
+- Initial build attempts failed due local native iOS project inconsistencies (OneSignal extension duplication in generated iOS project).
+- Resolution applied: removed local generated `ios/` folder and rebuilt using Expo managed prebuild path.
+- Successful EAS build:
+  - **Build ID:** `619972eb-66b7-4c4f-b8fd-34beb1eed419`
+  - **Status:** `FINISHED`
+  - **Build URL:** `https://expo.dev/artifacts/eas/d41U7iDUbJT7HNeUbUdg1v.ipa`
 
 ### Step 3: Download IPA
-- Target path prepared:
+- Download completed.
+- Saved to:
   - `build/locksafe-v1.0.2-build20-ios.ipa`
-- Status: **Pending** (requires successful Build Step 2).
 
 ### Step 4: Submit to App Store Connect
-- Command planned:
-  - `eas submit --platform ios --latest`
-- Status: **Pending** (requires successful Build Step 2 and valid Expo account access).
+- `eas submit` schedules submissions, but CLI returns a generic completion error in this environment.
+- Independent App Store Connect API verification confirms Build 20 is uploaded and valid:
+  - **App:** `uk.locksafe.app`
+  - **Build:** `20`
+  - **Processing State:** `VALID`
+  - **Uploaded Date:** `2026-05-01T09:01:23-07:00`
 
 ## How to Test Account Deletion
 1. Sign in with test account:
@@ -59,10 +65,10 @@
 - `APPLE_SCREEN_RECORDING_GUIDE.md`
 - `APPLE_BUILD20_SUBMISSION_NOTES.md`
 - `BUILD20_SUBMISSION_REPORT.md`
+- IPA: `build/locksafe-v1.0.2-build20-ios.ipa`
 
 ## Next Steps
-1. Authenticate with the correct Expo account for this project (or provide valid `EXPO_TOKEN` for `contact@locksafe.uk`).
-2. Run iOS production build for Build 20.
-3. Download IPA to `build/locksafe-v1.0.2-build20-ios.ipa`.
-4. Submit the latest build to App Store Connect.
-5. Paste `APPLE_BUILD20_SUBMISSION_NOTES.md` into App Review Notes and attach the screen recording per guide.
+1. In App Store Connect, attach Build 20 to the active app version for review (if not auto-attached).
+2. Paste content from `APPLE_BUILD20_SUBMISSION_NOTES.md` into **App Review Notes**.
+3. Upload screen recording evidence following `APPLE_SCREEN_RECORDING_GUIDE.md`.
+4. Submit the version for review.
